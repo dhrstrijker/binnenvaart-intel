@@ -4,10 +4,11 @@ import React, { useEffect, useState } from "react";
 import { getSupabase, Vessel, PriceHistory } from "@/lib/supabase";
 import NavLink from "@/components/NavLink";
 import MarketOverview from "@/components/analytics/MarketOverview";
-import PriceDistribution from "@/components/analytics/PriceDistribution";
-import TypeBreakdown from "@/components/analytics/TypeBreakdown";
+import SupplyByType from "@/components/analytics/TypeBreakdown";
+import TimeOnMarket from "@/components/analytics/PriceDistribution";
 import PriceTrends from "@/components/analytics/PriceTrends";
-import SourceComparison from "@/components/analytics/SourceComparison";
+import PricePerMeter from "@/components/analytics/SourceComparison";
+import MarketFlow from "@/components/analytics/MarketFlow";
 
 export default function AnalyticsPage() {
   const [vessels, setVessels] = useState<Vessel[]>([]);
@@ -96,7 +97,7 @@ export default function AnalyticsPage() {
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-slate-900">Marktanalyse</h2>
           <p className="text-sm text-slate-500">
-            Overzicht van de Nederlandse binnenvaart schepenmarkt
+            Marktinzichten voor scheepseigenaren en kopers
           </p>
         </div>
 
@@ -134,20 +135,23 @@ export default function AnalyticsPage() {
         {/* Analytics content */}
         {!loading && !error && (
           <div className="space-y-6">
-            {/* Market Overview cards */}
+            {/* KPI overview cards */}
             <MarketOverview vessels={vessels} />
 
-            {/* Two-column grid for charts */}
+            {/* Supply by type + Time on market */}
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              <PriceDistribution vessels={vessels} />
-              <TypeBreakdown vessels={vessels} />
+              <SupplyByType vessels={vessels} />
+              <TimeOnMarket vessels={vessels} />
             </div>
 
-            {/* Full-width price trends */}
-            <PriceTrends priceHistory={priceHistory} />
+            {/* Price trends by type (full-width) */}
+            <PriceTrends priceHistory={priceHistory} vessels={vessels} />
 
-            {/* Source comparison */}
-            <SourceComparison vessels={vessels} />
+            {/* Price per meter + Market flow */}
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <PricePerMeter vessels={vessels} />
+              <MarketFlow vessels={vessels} />
+            </div>
           </div>
         )}
       </div>

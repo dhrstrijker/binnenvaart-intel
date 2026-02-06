@@ -1,9 +1,8 @@
 "use client";
 
 import { Vessel } from "@/lib/supabase";
-import { sourceLabel as sharedSourceLabel, sourceColor } from "@/lib/sources";
 
-interface SourceComparisonProps {
+interface PricePerMeterProps {
   vessels: Vessel[];
 }
 
@@ -16,180 +15,124 @@ function formatEur(value: number): string {
   }).format(value);
 }
 
-function sourceLabel(source: string): string {
-  return sharedSourceLabel(source);
+function median(values: number[]): number {
+  if (values.length === 0) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0
+    ? (sorted[mid - 1] + sorted[mid]) / 2
+    : sorted[mid];
 }
 
-interface SourceStats {
-  source: string;
-  label: string;
-  count: number;
-  withPrice: number;
-  avgPrice: number;
-  minPrice: number;
-  maxPrice: number;
-  avgLength: number;
-  avgWidth: number;
-  avgAge: number;
-}
+const BAR_COLORS = [
+  "fill-blue-500",
+  "fill-sky-500",
+  "fill-teal-500",
+  "fill-emerald-500",
+  "fill-amber-500",
+  "fill-orange-500",
+  "fill-rose-500",
+  "fill-purple-500",
+];
 
-function computeStats(vessels: Vessel[], source: string): SourceStats {
-  const sv = vessels.filter((v) => v.source === source);
-  const withPrice = sv.filter((v) => v.price !== null && v.price > 0);
-  const prices = withPrice.map((v) => v.price!);
-  const withLength = sv.filter((v) => v.length_m !== null && v.length_m > 0);
-  const withWidth = sv.filter((v) => v.width_m !== null && v.width_m > 0);
-  const currentYear = new Date().getFullYear();
-  const withYear = sv.filter((v) => v.build_year !== null && v.build_year > 0);
+export default function PricePerMeter({ vessels }: PricePerMeterProps) {
+  // Group by type, compute median price per meter
+  const typeGroups = new Map<string, number[]>();
+  for (const v of vessels) {
+    if (!v.price || v.price <= 0 || !v.length_m || v.length_m <= 0) continue;
+    const t = v.type || "Onbekend";
+    const ppm = v.price / v.length_m;
+    const arr = typeGroups.get(t) ?? [];
+    arr.push(ppm);
+    typeGroups.set(t, arr);
+  }
 
-  return {
-    source,
-    label: sourceLabel(source),
-    count: sv.length,
-    withPrice: withPrice.length,
-    avgPrice:
-      prices.length > 0
-        ? prices.reduce((s, p) => s + p, 0) / prices.length
-        : 0,
-    minPrice: prices.length > 0 ? Math.min(...prices) : 0,
-    maxPrice: prices.length > 0 ? Math.max(...prices) : 0,
-    avgLength:
-      withLength.length > 0
-        ? withLength.reduce((s, v) => s + v.length_m!, 0) / withLength.length
-        : 0,
-    avgWidth:
-      withWidth.length > 0
-        ? withWidth.reduce((s, v) => s + v.width_m!, 0) / withWidth.length
-        : 0,
-    avgAge:
-      withYear.length > 0
-        ? withYear.reduce((s, v) => s + (currentYear - v.build_year!), 0) /
-          withYear.length
-        : 0,
-  };
-}
+  const typeStats = Array.from(typeGroups.entries())
+    .map(([type, vals]) => ({
+      type,
+      medianPpm: Math.round(median(vals)),
+      minPpm: Math.round(Math.min(...vals)),
+      maxPpm: Math.round(Math.max(...vals)),
+      count: vals.length,
+    }))
+    .filter((s) => s.count >= 2)
+    .sort((a, b) => b.medianPpm - a.medianPpm);
 
-export default function SourceComparison({ vessels }: SourceComparisonProps) {
-  const sources = Array.from(new Set(vessels.map((v) => v.source))).sort();
-  const stats = sources.map((s) => computeStats(vessels, s));
+  if (typeStats.length === 0) {
+    return (
+      <div className="rounded-xl bg-white p-5 shadow-md ring-1 ring-gray-100">
+        <h2 className="mb-1 text-lg font-bold text-slate-900">Prijs per meter</h2>
+        <p className="text-sm text-slate-400">Onvoldoende gegevens</p>
+      </div>
+    );
+  }
 
-  const colors = ["border-sky-400 bg-sky-50", "border-amber-400 bg-amber-50", "border-emerald-400 bg-emerald-50", "border-violet-400 bg-violet-50"];
-  const headerColors = ["bg-sky-100 text-sky-800", "bg-amber-100 text-amber-800", "bg-emerald-100 text-emerald-800", "bg-violet-100 text-violet-800"];
+  const maxPpm = Math.max(...typeStats.map((s) => s.medianPpm), 1);
 
-  const rows: { label: string; getValue: (s: SourceStats) => string }[] = [
-    { label: "Aantal schepen", getValue: (s) => String(s.count) },
-    {
-      label: "Met prijsinfo",
-      getValue: (s) => `${s.withPrice} (${s.count > 0 ? Math.round((s.withPrice / s.count) * 100) : 0}%)`,
-    },
-    {
-      label: "Gem. prijs",
-      getValue: (s) => (s.avgPrice > 0 ? formatEur(s.avgPrice) : "-"),
-    },
-    {
-      label: "Laagste prijs",
-      getValue: (s) => (s.minPrice > 0 ? formatEur(s.minPrice) : "-"),
-    },
-    {
-      label: "Hoogste prijs",
-      getValue: (s) => (s.maxPrice > 0 ? formatEur(s.maxPrice) : "-"),
-    },
-    {
-      label: "Gem. lengte",
-      getValue: (s) =>
-        s.avgLength > 0 ? `${s.avgLength.toFixed(1)} m` : "-",
-    },
-    {
-      label: "Gem. breedte",
-      getValue: (s) =>
-        s.avgWidth > 0 ? `${s.avgWidth.toFixed(1)} m` : "-",
-    },
-    {
-      label: "Gem. leeftijd",
-      getValue: (s) =>
-        s.avgAge > 0 ? `${Math.round(s.avgAge)} jaar` : "-",
-    },
-  ];
+  const barHeight = 28;
+  const gap = 6;
+  const labelWidth = 140;
+  const chartWidth = 400;
+  const svgHeight = typeStats.length * (barHeight + gap) - gap;
 
   return (
     <div className="rounded-xl bg-white p-5 shadow-md ring-1 ring-gray-100">
-      <h2 className="mb-4 text-lg font-bold text-slate-900">
-        Vergelijking per makelaar
-      </h2>
-      {stats.length === 0 ? (
-        <p className="text-sm text-slate-400">Geen gegevens beschikbaar</p>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr>
-                <th className="pb-3 pr-4 text-left text-xs font-medium uppercase tracking-wide text-slate-400">
-                  &nbsp;
-                </th>
-                {stats.map((s, i) => (
-                  <th key={s.source} className="pb-3 text-center">
-                    <span
-                      className={`inline-block rounded-md px-3 py-1 text-xs font-semibold ${headerColors[i % headerColors.length]}`}
-                    >
-                      {s.label}
-                    </span>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row, ri) => (
-                <tr
-                  key={row.label}
-                  className={ri % 2 === 0 ? "bg-slate-50" : ""}
-                >
-                  <td className="whitespace-nowrap py-2.5 pr-4 text-xs font-medium text-slate-600">
-                    {row.label}
-                  </td>
-                  {stats.map((s, i) => (
-                    <td
-                      key={s.source}
-                      className={`py-2.5 text-center text-sm font-semibold text-slate-800`}
-                    >
-                      {row.getValue(s)}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <h2 className="mb-1 text-lg font-bold text-slate-900">Prijs per meter</h2>
+      <p className="mb-4 text-xs text-slate-400">
+        Mediaan vraagprijs per meter lengte per scheepstype
+      </p>
+      <svg
+        viewBox={`0 0 ${labelWidth + chartWidth + 120} ${svgHeight}`}
+        className="w-full"
+        role="img"
+        aria-label="Prijs per meter per scheepstype"
+      >
+        {typeStats.map((s, i) => {
+          const y = i * (barHeight + gap);
+          const barW = (s.medianPpm / maxPpm) * chartWidth;
+          const color = BAR_COLORS[i % BAR_COLORS.length];
 
-          {/* Visual bar comparison for vessel count */}
-          <div className="mt-5 space-y-2">
-            <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-              Verdeling aantal schepen
-            </p>
-            {stats.map((s, i) => {
-              const maxCount = Math.max(...stats.map((st) => st.count), 1);
-              const pct = (s.count / maxCount) * 100;
-              const barColors = ["bg-sky-400", "bg-amber-400", "bg-emerald-400", "bg-violet-400"];
-              const barColor = barColors[i % barColors.length];
-              return (
-                <div key={s.source} className="flex items-center gap-3">
-                  <span className="w-32 shrink-0 text-xs font-medium text-slate-600">
-                    {s.label}
-                  </span>
-                  <div className="flex-1 rounded-full bg-slate-100 h-5">
-                    <div
-                      className={`h-5 rounded-full ${barColor} flex items-center justify-end pr-2 transition-all`}
-                      style={{ width: `${Math.max(pct, 5)}%` }}
-                    >
-                      <span className="text-[10px] font-bold text-white">
-                        {s.count}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
+          return (
+            <g key={s.type}>
+              <text
+                x={labelWidth - 8}
+                y={y + barHeight / 2}
+                textAnchor="end"
+                dominantBaseline="central"
+                className="fill-slate-600 text-[12px] font-medium"
+              >
+                {s.type}
+              </text>
+              <rect
+                x={labelWidth}
+                y={y}
+                width={chartWidth}
+                height={barHeight}
+                rx={5}
+                className="fill-slate-100"
+              />
+              {barW > 0 && (
+                <rect
+                  x={labelWidth}
+                  y={y}
+                  width={Math.max(barW, 4)}
+                  height={barHeight}
+                  rx={5}
+                  className={color}
+                />
+              )}
+              <text
+                x={labelWidth + Math.max(barW, 4) + 8}
+                y={y + barHeight / 2}
+                dominantBaseline="central"
+                className="fill-slate-700 text-[12px] font-bold"
+              >
+                {formatEur(s.medianPpm)}/m
+              </text>
+            </g>
+          );
+        })}
+      </svg>
     </div>
   );
 }
