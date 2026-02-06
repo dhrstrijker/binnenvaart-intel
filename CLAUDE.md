@@ -16,14 +16,14 @@
 
 ### How it works
 
-- **Scraper (local only)**: Python scripts that hit two broker sources, parse vessel data, and upsert into Supabase. Runs manually via `python main.py` from `scraper/`. It does NOT run on Vercel or any server - you run it on your Mac whenever you want fresh data.
+- **Scraper**: Python scripts that hit four broker sources, parse vessel data, and upsert into Supabase. Runs automatically via GitHub Actions (twice daily at 08:00 and 20:00 CET) or manually via `python main.py` from `scraper/`.
 - **Supabase (cloud DB)**: PostgreSQL database with RLS (Row Level Security). The publishable key allows anonymous reads (frontend). The secret key allows full writes (scraper). Data persists between scraper runs.
 - **Frontend (Vercel)**: Next.js app that reads directly from Supabase using the publishable key. No backend/API routes needed. Auto-deploys when you push to `main` on GitHub.
 
 ### Data flow
 
-1. You run `cd scraper && source venv/bin/activate && python main.py`
-2. Scraper fetches ~82 vessels from RensenDriessen (API) and Galle (HTML)
+1. GitHub Actions runs `python main.py` twice daily (or you run it manually)
+2. Scraper fetches ~375 vessels from 4 broker sources
 3. Scraper upserts into Supabase `vessels` table, tracks price changes in `price_history`
 4. If changes detected and Resend API key is set, sends email summary to subscribers
 5. Frontend on Vercel reads from Supabase on page load (client-side fetch)
@@ -32,10 +32,10 @@
 
 | Component | Runs on | Triggered by |
 |-----------|---------|--------------|
-| Scraper | Your Mac | Manual: `python main.py` |
+| Scraper | GitHub Actions | Cron (08:00/20:00 CET) or manual dispatch |
 | Supabase DB | Supabase cloud | Always available |
 | Frontend | Vercel | Auto-deploy on git push |
-| Email notifications | Your Mac (via scraper) | Runs after scraper detects changes |
+| Email notifications | GitHub Actions (via scraper) | Runs after scraper detects changes |
 
 ## Project Structure
 
@@ -44,11 +44,14 @@ binnenvaart-intel/
 ├── scraper/                    # Python 3.13 (use venv)
 │   ├── venv/                   # Virtual environment (not in git)
 │   ├── .env                    # SUPABASE_URL, SUPABASE_KEY (secret), RESEND_API_KEY
-│   ├── main.py                 # Entry point - runs both scrapers + notifications
+│   ├── main.py                 # Entry point - runs all 4 scrapers + notifications
 │   ├── db.py                   # Supabase client, upsert logic, change tracking
-│   ├── scrape_rensendriessen.py # REST API scraper (POST, 7 pages, ~57 vessels)
-│   ├── scrape_galle.py         # HTML scraper (BeautifulSoup, ~25 vessels)
+│   ├── scrape_rensendriessen.py # REST API scraper (POST, ~58 vessels)
+│   ├── scrape_galle.py         # HTML scraper (~25 vessels)
+│   ├── scrape_pcshipbrokers.py # HTML+JSON scraper (~152 vessels)
+│   ├── scrape_gtsschepen.py    # Paginated HTML scraper (~140 vessels)
 │   ├── notifications.py       # Resend email notifications
+│   ├── tests/                  # pytest unit tests (75 tests)
 │   └── requirements.txt
 ├── frontend/                   # Next.js 16 + Tailwind v4 + TypeScript
 │   ├── .env.local              # NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -78,7 +81,7 @@ binnenvaart-intel/
 
 Three tables in Supabase (project: `alafvkqfqlrznoqmabpf`):
 
-- **vessels**: id (UUID), name, type, length_m, width_m, tonnage, build_year, price, url, image_url, source, source_id, scraped_at, first_seen_at, updated_at. UNIQUE(source, source_id).
+- **vessels**: id (UUID), name, type, length_m, width_m, tonnage, build_year, price, url, image_url, source, source_id, raw_details (JSONB), image_urls (JSONB), scraped_at, first_seen_at, updated_at. UNIQUE(source, source_id).
 - **price_history**: id (UUID), vessel_id (FK), price, recorded_at. Tracks every price change.
 - **notification_subscribers**: id (UUID), email (UNIQUE), created_at, active. Public signup via frontend.
 
@@ -86,8 +89,10 @@ All tables have RLS enabled. Anonymous read access on all. Anonymous insert on n
 
 ## Data Sources
 
-- **RensenDriessen**: POST `https://api.rensendriessen.com/api/public/ships/brokers/list/filter/` with `{"page": N}`, pages 1-7, ~57 vessels. Clean JSON response.
+- **RensenDriessen**: POST `https://api.rensendriessen.com/api/public/ships/brokers/list/filter/` with `{"page": N}`, ~58 vessels. Clean JSON API with ~319 fields per vessel.
 - **Galle**: GET `https://gallemakelaars.nl/scheepsaanbod`, single HTML page, ~25 vessels. Parsed with BeautifulSoup.
+- **PC Shipbrokers**: GET `https://pcshipbrokers.com/scheepsaanbod`, single page with `compareShipData` JSON embedded in `<script>` tag + HTML cards. ~152 vessels. Detail pages fetched per vessel.
+- **GTS Schepen**: GET `https://www.gtsschepen.nl/schepen/`, paginated HTML (~11 pages), ~140 vessels. Card-based layout with `.grid-item` elements. Detail pages fetched per vessel.
 
 ## Column Naming Convention
 
@@ -136,10 +141,9 @@ NEXT_PUBLIC_SUPABASE_URL=https://alafvkqfqlrznoqmabpf.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_...  # Publishable key (read-only)
 ```
 
-## Future Considerations
+## CI/CD
 
-The scraper currently runs manually. To automate it, options include:
-- **Cron job** on your Mac (launchd or crontab)
-- **GitHub Actions** scheduled workflow (free, runs in CI)
-- **Supabase Edge Function** with pg_cron (runs in cloud, would need rewrite to TypeScript/Deno)
-- **Railway/Render** background worker (small always-on server)
+- **GitHub Actions CI** (`.github/workflows/ci.yml`): Runs pytest + `npm run build` on push/PR to main
+- **Automated scraper** (`.github/workflows/scrape.yml`): Runs `python main.py` at 08:00 and 20:00 CET via cron, also supports manual dispatch
+- **Claude Code pre-commit hook** (`.claude/hooks/test-before-commit.sh`): Runs tests before every git commit, blocks commit on failure
+- **75 pytest tests** covering all 4 scraper parsing functions (no network calls)
