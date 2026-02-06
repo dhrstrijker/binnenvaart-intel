@@ -13,6 +13,26 @@ _url = os.environ["SUPABASE_URL"]
 _key = os.environ["SUPABASE_KEY"]
 supabase = create_client(_url, _key)
 
+# Canonical type mapping: raw variations → single canonical name.
+# Keys are lowercase for case-insensitive matching.
+TYPE_MAP: dict[str, str] = {
+    "tanker": "Tankschip",
+    "motortankschip": "Tankschip",
+    "sleepboot": "Duw/Sleepboot",
+    "duwboot": "Duw/Sleepboot",
+}
+
+
+def normalize_type(raw_type: str | None) -> str | None:
+    """Normalize a vessel type to its canonical name.
+
+    Returns the canonical type if a mapping exists, otherwise
+    returns the original value unchanged.  Returns None for None input.
+    """
+    if raw_type is None:
+        return None
+    return TYPE_MAP.get(raw_type.strip().lower(), raw_type)
+
 # Module-level list that collects all changes for notification emails.
 # Reset via clear_changes() before a scrape run; read via get_changes() after.
 _changes: list[dict] = []
@@ -37,6 +57,10 @@ def upsert_vessel(vessel: dict) -> str:
     source = vessel["source"]
     source_id = vessel["source_id"]
     now = datetime.now(timezone.utc).isoformat()
+
+    # Normalize type before any DB operations
+    if "type" in vessel:
+        vessel["type"] = normalize_type(vessel["type"])
 
     try:
         existing = (
