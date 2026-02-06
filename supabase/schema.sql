@@ -1,0 +1,40 @@
+-- Binnenvaart Intel - Supabase Schema
+-- Tracks inland shipping vessels listed by Dutch brokers
+
+-- Main vessels table (all prices in EUR, no currency field needed)
+CREATE TABLE vessels (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  type TEXT,
+  length_m NUMERIC,
+  width_m NUMERIC,
+  tonnage NUMERIC,
+  build_year INTEGER,
+  price NUMERIC,
+  url TEXT,
+  image_url TEXT,
+  source TEXT NOT NULL,
+  source_id TEXT,
+  scraped_at TIMESTAMPTZ DEFAULT NOW(),
+  first_seen_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(source, source_id)
+);
+
+-- Price history table for tracking changes over time
+CREATE TABLE price_history (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  vessel_id UUID REFERENCES vessels(id) ON DELETE CASCADE,
+  price NUMERIC NOT NULL,
+  recorded_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_price_history_vessel ON price_history(vessel_id);
+CREATE INDEX idx_price_history_recorded ON price_history(recorded_at);
+
+-- RLS: allow anonymous read access to both tables
+ALTER TABLE vessels ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow anonymous read access" ON vessels FOR SELECT USING (true);
+
+ALTER TABLE price_history ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow anonymous read access" ON price_history FOR SELECT USING (true);
