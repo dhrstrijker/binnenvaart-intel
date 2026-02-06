@@ -101,16 +101,17 @@ export default function VesselCard({ vessel, priceHistory = [], onOpenDetail }: 
           )}
         </div>
 
-        {/* Source badge(s) */}
-        <div className="absolute top-2.5 right-2.5 flex gap-1.5">
-          <span
-            className={`rounded-md px-2 py-0.5 text-xs font-semibold shadow-sm ${sourceColor(vessel.source)}`}
-          >
-            {sourceLabel(vessel.source)}
-          </span>
-          {vessel.linked_sources && vessel.linked_sources.length >= 2 && (
+        {/* Source badge */}
+        <div className="absolute top-2.5 right-2.5">
+          {vessel.linked_sources && vessel.linked_sources.length >= 2 ? (
             <span className="rounded-md bg-indigo-100 px-2 py-0.5 text-xs font-semibold text-indigo-800 shadow-sm">
               {vessel.linked_sources.length} bronnen
+            </span>
+          ) : (
+            <span
+              className={`rounded-md px-2 py-0.5 text-xs font-semibold shadow-sm ${sourceColor(vessel.source)}`}
+            >
+              {sourceLabel(vessel.source)}
             </span>
           )}
         </div>
