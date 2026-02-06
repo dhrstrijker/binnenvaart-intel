@@ -4,6 +4,7 @@ import scrape_rensendriessen
 import scrape_galle
 import scrape_pcshipbrokers
 import scrape_gtsschepen
+import scrape_gsk
 from db import clear_changes, get_changes, run_dedup
 from notifications import send_summary_email
 
@@ -19,6 +20,7 @@ SCRAPERS = [
     ("Galle", scrape_galle),
     ("PC Shipbrokers", scrape_pcshipbrokers),
     ("GTS Schepen", scrape_gtsschepen),
+    ("GSK Brokers", scrape_gsk),
 ]
 
 

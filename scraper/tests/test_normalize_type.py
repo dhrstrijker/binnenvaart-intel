@@ -83,5 +83,8 @@ class TestNormalizeType:
         assert "duwboot" in lower_keys
 
     def test_all_map_values_are_known_canonical_types(self):
-        expected = {"Tankschip", "Duw/Sleepboot"}
+        expected = {
+            "Tankschip", "Duw/Sleepboot", "Duwbak", "Koppelverband",
+            "Beunschip", "Jacht", "Woonschip", "Passagiersschip", "Nieuwbouw",
+        }
         assert set(TYPE_MAP.values()) == expected

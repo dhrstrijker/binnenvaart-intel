@@ -20,6 +20,13 @@ TYPE_MAP: dict[str, str] = {
     "motortankschip": "Tankschip",
     "sleepboot": "Duw/Sleepboot",
     "duwboot": "Duw/Sleepboot",
+    "duwbak": "Duwbak",
+    "koppelverband": "Koppelverband",
+    "beunschip": "Beunschip",
+    "jacht": "Jacht",
+    "woonschip": "Woonschip",
+    "passagiersschip": "Passagiersschip",
+    "nieuwbouw": "Nieuwbouw",
 }
 
 

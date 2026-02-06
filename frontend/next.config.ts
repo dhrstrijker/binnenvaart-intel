@@ -38,6 +38,11 @@ const nextConfig: NextConfig = {
         hostname: "www.gtsschepen.nl",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "gskbrokers.imgix.net",
+        pathname: "/**",
+      },
     ],
   },
 };
