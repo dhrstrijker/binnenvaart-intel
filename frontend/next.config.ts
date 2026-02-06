@@ -28,6 +28,16 @@ const nextConfig: NextConfig = {
         hostname: "www.gallemakelaars.nl",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "cdn.pcshipbrokers.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "www.gtsschepen.nl",
+        pathname: "/**",
+      },
     ],
   },
 };

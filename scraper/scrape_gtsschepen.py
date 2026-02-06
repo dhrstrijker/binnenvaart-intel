@@ -158,7 +158,7 @@ def parse_card(card) -> dict | None:
         style = img_div.get("style", "")
         match = re.search(r"background-image:\s*url\(['\"]?(.+?)['\"]?\)", style)
         if match:
-            image_url = match.group(1)
+            image_url = match.group(1).strip()
 
     return {
         "source": "gtsschepen",

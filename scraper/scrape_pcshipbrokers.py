@@ -158,7 +158,7 @@ def _parse_listing(html: str) -> list[dict]:
             "tonnage": parse_tonnage(data.get("tonnage", "")),
             "price": parse_price(price_text),
             "url": f"https://pcshipbrokers.com/ships/{slug}",
-            "image_url": data.get("image"),
+            "image_url": (data.get("image") or "").replace("\\/", "/").strip() or None,
         })
 
     return vessels

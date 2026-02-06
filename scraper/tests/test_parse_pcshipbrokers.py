@@ -113,6 +113,54 @@ class TestParseListing:
         vessels = _parse_listing(html)
         assert len(vessels) == 0
 
+    def test_image_url_unescaped(self):
+        html = r"""
+        <html><body>
+        <script>
+        compareShipData = {"img-ship": {"slug": "img-ship", "name": "Image Ship", "year": "", "afmetingen": "", "tonnage": "", "price": "€ 100.000,-", "image": "https:\/\/cdn.pcshipbrokers.com\/media\/12345\/photo.jpg"}};
+        </script>
+        </body></html>
+        """
+        vessels = _parse_listing(html)
+        assert len(vessels) == 1
+        assert vessels[0]["image_url"] == "https://cdn.pcshipbrokers.com/media/12345/photo.jpg"
+
+    def test_image_url_already_clean(self):
+        html = """
+        <html><body>
+        <script>
+        compareShipData = {"clean-ship": {"slug": "clean-ship", "name": "Clean Ship", "year": "", "afmetingen": "", "tonnage": "", "price": "€ 100.000,-", "image": "https://cdn.pcshipbrokers.com/media/12345/photo.jpg"}};
+        </script>
+        </body></html>
+        """
+        vessels = _parse_listing(html)
+        assert len(vessels) == 1
+        assert vessels[0]["image_url"] == "https://cdn.pcshipbrokers.com/media/12345/photo.jpg"
+
+    def test_image_url_none_when_empty(self):
+        html = """
+        <html><body>
+        <script>
+        compareShipData = {"no-img": {"slug": "no-img", "name": "No Image", "year": "", "afmetingen": "", "tonnage": "", "price": "€ 100.000,-", "image": ""}};
+        </script>
+        </body></html>
+        """
+        vessels = _parse_listing(html)
+        assert len(vessels) == 1
+        assert vessels[0]["image_url"] is None
+
+    def test_image_url_none_when_missing(self):
+        html = """
+        <html><body>
+        <script>
+        compareShipData = {"missing-img": {"slug": "missing-img", "name": "Missing Image", "year": "", "afmetingen": "", "tonnage": "", "price": "€ 100.000,-"}};
+        </script>
+        </body></html>
+        """
+        vessels = _parse_listing(html)
+        assert len(vessels) == 1
+        assert vessels[0]["image_url"] is None
+
     def test_empty_compare_data(self):
         html = "<html><body><p>No data</p></body></html>"
         vessels = _parse_listing(html)

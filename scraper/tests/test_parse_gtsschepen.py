@@ -132,3 +132,9 @@ class TestParseCard:
         card = BeautifulSoup(html, "html.parser").select_one(".grid-item")
         result = parse_card(card)
         assert result["image_url"] == "https://www.gtsschepen.nl/wp-content/uploads/2026/01/ship.jpg"
+
+    def test_image_url_strips_whitespace(self):
+        html = self._make_card_html(image_url="https://www.gtsschepen.nl/wp-content/uploads/2026/01/ship.jpg   ")
+        card = BeautifulSoup(html, "html.parser").select_one(".grid-item")
+        result = parse_card(card)
+        assert result["image_url"] == "https://www.gtsschepen.nl/wp-content/uploads/2026/01/ship.jpg"
