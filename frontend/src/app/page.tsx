@@ -1,4 +1,6 @@
 import Dashboard from "@/components/Dashboard";
+import NotificationSignup from "@/components/NotificationSignup";
+import NavLink from "@/components/NavLink";
 
 export default function Home() {
   return (
@@ -33,19 +35,30 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Status indicator */}
-          <div className="hidden items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 sm:flex">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-            </span>
-            <span className="text-xs font-medium text-blue-100">Live</span>
+          {/* Navigation + Status */}
+          <div className="flex items-center gap-4">
+            <nav className="flex items-center gap-2">
+              <NavLink href="/">Dashboard</NavLink>
+              <NavLink href="/analytics">Analyse</NavLink>
+            </nav>
+            <div className="hidden items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 sm:flex">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+              </span>
+              <span className="text-xs font-medium text-blue-100">Live</span>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Content */}
       <Dashboard />
+
+      {/* Notification signup */}
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+        <NotificationSignup />
+      </div>
 
       {/* Footer */}
       <footer className="border-t border-slate-200 bg-white py-6">

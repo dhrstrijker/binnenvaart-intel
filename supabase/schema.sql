@@ -38,3 +38,15 @@ CREATE POLICY "Allow anonymous read access" ON vessels FOR SELECT USING (true);
 
 ALTER TABLE price_history ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow anonymous read access" ON price_history FOR SELECT USING (true);
+
+-- Notification subscribers for email alerts
+CREATE TABLE notification_subscribers (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  email TEXT NOT NULL UNIQUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  active BOOLEAN DEFAULT TRUE
+);
+
+ALTER TABLE notification_subscribers ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow anonymous read access" ON notification_subscribers FOR SELECT USING (true);
+CREATE POLICY "Allow anonymous insert" ON notification_subscribers FOR INSERT WITH CHECK (true);

@@ -2,7 +2,8 @@
 
 import React from "react";
 import Image from "next/image";
-import { Vessel } from "@/lib/supabase";
+import { Vessel, PriceHistory } from "@/lib/supabase";
+import { MiniSparkline } from "./PriceHistoryChart";
 
 function formatPrice(price: number | null): string {
   if (price === null) return "Prijs op aanvraag";
@@ -34,19 +35,41 @@ function sourceColor(source: string): string {
   return "bg-gray-100 text-gray-800";
 }
 
-interface VesselCardProps {
-  vessel: Vessel;
+type PriceTrend = "down" | "up" | "unchanged" | null;
+
+function getPriceTrend(history: PriceHistory[]): PriceTrend {
+  if (history.length < 2) return null;
+  const first = history[0].price;
+  const last = history[history.length - 1].price;
+  if (last < first) return "down";
+  if (last > first) return "up";
+  return "unchanged";
 }
 
-export default function VesselCard({ vessel }: VesselCardProps) {
+interface VesselCardProps {
+  vessel: Vessel;
+  priceHistory?: PriceHistory[];
+  onOpenDetail?: (vessel: Vessel) => void;
+}
+
+export default function VesselCard({ vessel, priceHistory = [], onOpenDetail }: VesselCardProps) {
   const [imgError, setImgError] = React.useState(false);
+  const trend = getPriceTrend(priceHistory);
+
+  function handleClick(e: React.MouseEvent) {
+    if (onOpenDetail) {
+      e.preventDefault();
+      onOpenDetail(vessel);
+    }
+  }
 
   return (
     <a
       href={vessel.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="group block overflow-hidden rounded-xl bg-white shadow-md ring-1 ring-gray-100 transition-all duration-200 hover:shadow-xl hover:ring-blue-200 hover:-translate-y-0.5"
+      onClick={handleClick}
+      className="group block overflow-hidden rounded-xl bg-white shadow-md ring-1 ring-gray-100 transition-all duration-200 hover:shadow-xl hover:ring-blue-200 hover:-translate-y-0.5 cursor-pointer"
     >
       {/* Image */}
       <div className="relative aspect-[16/10] w-full bg-slate-100 overflow-hidden">
@@ -135,13 +158,37 @@ export default function VesselCard({ vessel }: VesselCardProps) {
           )}
         </div>
 
-        {/* Price */}
+        {/* Price + trend indicator */}
         <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
-          <span className="text-xl font-extrabold text-slate-900">
-            {formatPrice(vessel.price)}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xl font-extrabold text-slate-900">
+              {formatPrice(vessel.price)}
+            </span>
+            {trend === "down" && (
+              <span className="flex items-center gap-0.5 text-xs font-semibold text-emerald-600" title="Prijs gedaald">
+                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                </svg>
+              </span>
+            )}
+            {trend === "up" && (
+              <span className="flex items-center gap-0.5 text-xs font-semibold text-red-500" title="Prijs gestegen">
+                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                </svg>
+              </span>
+            )}
+            {trend === "unchanged" && (
+              <span className="flex items-center text-xs font-semibold text-slate-400" title="Prijs ongewijzigd">
+                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
+                </svg>
+              </span>
+            )}
+            <MiniSparkline history={priceHistory} />
+          </div>
           <span className="flex items-center gap-1 text-xs font-medium text-blue-600 opacity-0 transition-opacity group-hover:opacity-100">
-            Bekijk
+            Details
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>

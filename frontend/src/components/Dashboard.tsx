@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
-import { getSupabase, Vessel } from "@/lib/supabase";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
+import { getSupabase, Vessel, PriceHistory } from "@/lib/supabase";
 import VesselCard from "./VesselCard";
+import VesselDetail from "./VesselDetail";
 import Filters, { FilterState } from "./Filters";
 
 const INITIAL_FILTERS: FilterState = {
@@ -28,24 +29,54 @@ function formatAvgPrice(vessels: Vessel[]): string {
 
 export default function Dashboard() {
   const [vessels, setVessels] = useState<Vessel[]>([]);
+  const [priceHistoryMap, setPriceHistoryMap] = useState<Record<string, PriceHistory[]>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterState>(INITIAL_FILTERS);
+  const [selectedVessel, setSelectedVessel] = useState<Vessel | null>(null);
+
+  const handleOpenDetail = useCallback((vessel: Vessel) => {
+    setSelectedVessel(vessel);
+  }, []);
+
+  const handleCloseDetail = useCallback(() => {
+    setSelectedVessel(null);
+  }, []);
 
   useEffect(() => {
-    async function fetchVessels() {
+    async function fetchData() {
       setLoading(true);
       try {
         const supabase = getSupabase();
-        const { data, error: err } = await supabase
-          .from("vessels")
-          .select("*")
-          .order("scraped_at", { ascending: false });
 
-        if (err) {
-          setError(err.message);
+        // Fetch vessels and price history in parallel
+        const [vesselsRes, historyRes] = await Promise.all([
+          supabase
+            .from("vessels")
+            .select("*")
+            .order("scraped_at", { ascending: false }),
+          supabase
+            .from("price_history")
+            .select("*")
+            .order("recorded_at", { ascending: true }),
+        ]);
+
+        if (vesselsRes.error) {
+          setError(vesselsRes.error.message);
         } else {
-          setVessels(data ?? []);
+          setVessels(vesselsRes.data ?? []);
+        }
+
+        // Group price history by vessel_id
+        if (!historyRes.error && historyRes.data) {
+          const grouped: Record<string, PriceHistory[]> = {};
+          for (const entry of historyRes.data) {
+            if (!grouped[entry.vessel_id]) {
+              grouped[entry.vessel_id] = [];
+            }
+            grouped[entry.vessel_id].push(entry);
+          }
+          setPriceHistoryMap(grouped);
         }
       } catch (e) {
         setError(
@@ -55,7 +86,7 @@ export default function Dashboard() {
       setLoading(false);
     }
 
-    fetchVessels();
+    fetchData();
   }, []);
 
   const availableTypes = useMemo(() => {
@@ -229,9 +260,23 @@ export default function Dashboard() {
       {!loading && filtered.length > 0 && (
         <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
           {filtered.map((vessel) => (
-            <VesselCard key={vessel.id} vessel={vessel} />
+            <VesselCard
+              key={vessel.id}
+              vessel={vessel}
+              priceHistory={priceHistoryMap[vessel.id] ?? []}
+              onOpenDetail={handleOpenDetail}
+            />
           ))}
         </div>
+      )}
+
+      {/* Vessel detail modal */}
+      {selectedVessel && (
+        <VesselDetail
+          vessel={selectedVessel}
+          history={priceHistoryMap[selectedVessel.id] ?? []}
+          onClose={handleCloseDetail}
+        />
       )}
     </div>
   );
