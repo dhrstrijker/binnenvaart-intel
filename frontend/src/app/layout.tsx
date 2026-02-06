@@ -1,21 +1,16 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Binnenvaart Intel - Scheepvaart Marktplaats Monitor",
+  title: "Navisio - Scheepsmarkt Intelligence",
   description:
-    "Monitor binnenvaartschepen te koop bij Rensen & Driessen en Galle Makelaars. Vergelijk prijzen, specificaties en trends.",
+    "Monitor binnenvaartschepen te koop bij 5 makelaars. Vergelijk prijzen, specificaties en markttrends.",
 };
 
 export default function RootLayout({
@@ -25,9 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="nl">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${inter.variable} font-sans antialiased`}>
         {children}
       </body>
     </html>

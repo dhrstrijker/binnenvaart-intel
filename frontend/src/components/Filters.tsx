@@ -50,7 +50,7 @@ export default function Filters({
           placeholder="Zoek op naam..."
           value={filters.search}
           onChange={(e) => update({ search: e.target.value })}
-          className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm text-slate-800 placeholder-slate-400 outline-none transition-colors focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
+          className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm text-slate-800 placeholder-slate-400 outline-none transition-colors focus:border-cyan-400 focus:bg-white focus:ring-2 focus:ring-cyan-100"
         />
       </div>
 
@@ -60,7 +60,7 @@ export default function Filters({
         <select
           value={filters.type}
           onChange={(e) => update({ type: e.target.value })}
-          className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 outline-none transition-colors focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+          className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 outline-none transition-colors focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
         >
           <option value="">Alle types</option>
           {availableTypes.map((t) => (
@@ -74,7 +74,7 @@ export default function Filters({
         <select
           value={filters.source}
           onChange={(e) => update({ source: e.target.value })}
-          className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 outline-none transition-colors focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+          className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 outline-none transition-colors focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
         >
           <option value="">Alle bronnen</option>
           <option value="rensendriessen">Rensen & Driessen</option>
@@ -90,7 +90,7 @@ export default function Filters({
           placeholder="Min prijs"
           value={filters.minPrice}
           onChange={(e) => update({ minPrice: e.target.value })}
-          className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 placeholder-slate-400 outline-none transition-colors focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+          className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 placeholder-slate-400 outline-none transition-colors focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
         />
 
         {/* Max price */}
@@ -99,14 +99,14 @@ export default function Filters({
           placeholder="Max prijs"
           value={filters.maxPrice}
           onChange={(e) => update({ maxPrice: e.target.value })}
-          className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 placeholder-slate-400 outline-none transition-colors focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+          className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 placeholder-slate-400 outline-none transition-colors focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
         />
 
         {/* Sort */}
         <select
           value={filters.sort}
           onChange={(e) => update({ sort: e.target.value })}
-          className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 outline-none transition-colors focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+          className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 outline-none transition-colors focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
         >
           <option value="newest">Nieuwste eerst</option>
           <option value="price_asc">Prijs (laag - hoog)</option>

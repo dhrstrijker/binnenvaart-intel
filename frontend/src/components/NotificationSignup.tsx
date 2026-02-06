@@ -40,10 +40,10 @@ export default function NotificationSignup() {
   }
 
   return (
-    <div className="rounded-xl bg-[#1e3a5f] p-6 text-center shadow-lg">
+    <div className="rounded-xl bg-slate-950 p-6 text-center shadow-lg">
       <div className="mx-auto max-w-md">
         <svg
-          className="mx-auto h-8 w-8 text-blue-300"
+          className="mx-auto h-8 w-8 text-cyan-300"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -58,7 +58,7 @@ export default function NotificationSignup() {
         <h3 className="mt-3 text-lg font-semibold text-white">
           E-mailnotificaties
         </h3>
-        <p className="mt-1 text-sm text-blue-200">
+        <p className="mt-1 text-sm text-cyan-200">
           Ontvang een melding bij nieuwe schepen en prijswijzigingen.
         </p>
 
@@ -77,12 +77,12 @@ export default function NotificationSignup() {
                 setEmail(e.target.value);
                 if (status === "error") setStatus("idle");
               }}
-              className="min-w-0 flex-1 rounded-lg border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white placeholder-blue-300/60 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
+              className="min-w-0 flex-1 rounded-lg border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white placeholder-cyan-300/60 outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400"
             />
             <button
               type="submit"
               disabled={status === "loading"}
-              className="rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-[#1e3a5f] transition hover:bg-blue-50 disabled:opacity-50"
+              className="rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-50 disabled:opacity-50"
             >
               {status === "loading" ? "..." : "Aanmelden"}
             </button>

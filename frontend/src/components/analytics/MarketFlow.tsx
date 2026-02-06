@@ -104,7 +104,7 @@ export default function CompetitivePosition({ vessels }: CompetitivePositionProp
               <tr key={s.type} className="border-b border-slate-100 last:border-0">
                 <td className="py-2 pr-3 font-medium text-slate-800">{s.type}</td>
                 <td className="py-2 pr-3">
-                  <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700 ring-1 ring-blue-200">
+                  <span className="inline-flex items-center rounded-full bg-cyan-50 px-2 py-0.5 text-xs font-semibold text-cyan-700 ring-1 ring-cyan-200">
                     {s.count}
                   </span>
                 </td>

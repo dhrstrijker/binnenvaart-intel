@@ -215,7 +215,7 @@ export default function VesselDetail({ vessel, history, onClose }: VesselDetailP
                             href={ls.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-xs font-semibold text-blue-600 hover:text-blue-800"
+                            className="text-xs font-semibold text-cyan-600 hover:text-cyan-800"
                           >
                             Bekijken &rarr;
                           </a>
@@ -237,7 +237,7 @@ export default function VesselDetail({ vessel, history, onClose }: VesselDetailP
                   href={ls.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-[#1e3a5f] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#16304f]"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-slate-900"
                 >
                   Bekijk op {sourceLabel(ls.source)}
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -250,7 +250,7 @@ export default function VesselDetail({ vessel, history, onClose }: VesselDetailP
                 href={vessel.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-lg bg-[#1e3a5f] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#16304f]"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-slate-900"
               >
                 Bekijk op {sourceLabel(vessel.source)}
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

@@ -18,7 +18,7 @@ function formatEur(value: number): string {
 }
 
 const LINE_COLORS = [
-  { stroke: "stroke-blue-500", fill: "fill-blue-500", dot: "bg-blue-500" },
+  { stroke: "stroke-cyan-500", fill: "fill-cyan-500", dot: "bg-cyan-500" },
   { stroke: "stroke-emerald-500", fill: "fill-emerald-500", dot: "bg-emerald-500" },
   { stroke: "stroke-amber-500", fill: "fill-amber-500", dot: "bg-amber-500" },
   { stroke: "stroke-rose-500", fill: "fill-rose-500", dot: "bg-rose-500" },

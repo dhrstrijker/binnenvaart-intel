@@ -106,7 +106,7 @@ export default function MarketOverview({ vessels }: MarketOverviewProps) {
             className="rounded-xl bg-white p-4 shadow-md ring-1 ring-gray-100"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-cyan-50 text-cyan-600">
                 {stat.icon}
               </div>
               <div className="min-w-0">

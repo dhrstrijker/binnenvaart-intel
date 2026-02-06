@@ -56,7 +56,7 @@ export default function VesselCard({ vessel, priceHistory = [], onOpenDetail }: 
       target="_blank"
       rel="noopener noreferrer"
       onClick={handleClick}
-      className="group block overflow-hidden rounded-xl bg-white shadow-md ring-1 ring-gray-100 transition-all duration-200 hover:shadow-xl hover:ring-blue-200 hover:-translate-y-0.5 cursor-pointer"
+      className="group block overflow-hidden rounded-xl bg-white shadow-md ring-1 ring-gray-100 transition-all duration-200 hover:shadow-xl hover:ring-cyan-200 hover:-translate-y-0.5 cursor-pointer"
     >
       {/* Image */}
       <div className="relative aspect-[16/10] w-full bg-slate-100 overflow-hidden">
@@ -119,7 +119,7 @@ export default function VesselCard({ vessel, priceHistory = [], onOpenDetail }: 
 
       {/* Content */}
       <div className="p-4">
-        <h3 className="truncate text-lg font-bold text-slate-900 group-hover:text-blue-700 transition-colors">
+        <h3 className="truncate text-lg font-bold text-slate-900 group-hover:text-cyan-700 transition-colors">
           {vessel.name}
         </h3>
 
@@ -180,7 +180,7 @@ export default function VesselCard({ vessel, priceHistory = [], onOpenDetail }: 
             )}
             <MiniSparkline history={priceHistory} />
           </div>
-          <span className="flex items-center gap-1 text-xs font-medium text-blue-600 opacity-0 transition-opacity group-hover:opacity-100">
+          <span className="flex items-center gap-1 text-xs font-medium text-cyan-600 opacity-0 transition-opacity group-hover:opacity-100">
             Details
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />

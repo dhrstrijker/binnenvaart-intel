@@ -231,7 +231,7 @@ export default function Dashboard() {
       {/* Loading state */}
       {loading && (
         <div className="mt-12 flex flex-col items-center justify-center gap-3 py-16">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-blue-600" />
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-cyan-500" />
           <p className="text-sm text-slate-500">Schepen laden...</p>
         </div>
       )}
@@ -317,7 +317,7 @@ function StatCard({
   return (
     <div className="rounded-xl bg-white p-4 shadow-md ring-1 ring-gray-100">
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-50 text-cyan-600">
           {icon}
         </div>
         <div>

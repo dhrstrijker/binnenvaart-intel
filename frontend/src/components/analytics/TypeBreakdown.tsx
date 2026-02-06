@@ -7,7 +7,7 @@ interface SupplyByTypeProps {
 }
 
 const TYPE_COLORS = [
-  "#3b82f6", // blue-500
+  "#06B6D4", // cyan-500
   "#0ea5e9", // sky-500
   "#14b8a6", // teal-500
   "#10b981", // emerald-500
