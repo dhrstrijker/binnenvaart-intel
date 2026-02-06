@@ -4,7 +4,7 @@ import scrape_rensendriessen
 import scrape_galle
 import scrape_pcshipbrokers
 import scrape_gtsschepen
-from db import clear_changes, get_changes
+from db import clear_changes, get_changes, run_dedup
 from notifications import send_summary_email
 
 logging.basicConfig(
@@ -47,6 +47,16 @@ def main():
 
     total = sum(s["total"] for s in all_stats)
     logger.info("Done. %d vessels processed.", total)
+
+    # Run deduplication across sources
+    try:
+        dedup_result = run_dedup()
+        logger.info(
+            "Dedup: %d clusters, %d duplicates linked",
+            dedup_result["clusters"], dedup_result["linked"],
+        )
+    except Exception:
+        logger.exception("Deduplication failed")
 
     combined_stats = {
         "total": total,

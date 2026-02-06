@@ -53,7 +53,7 @@ export default function Dashboard() {
         const [vesselsRes, historyRes] = await Promise.all([
           supabase
             .from("vessels")
-            .select("id, name, type, length_m, width_m, tonnage, build_year, price, url, image_url, source, source_id, scraped_at, first_seen_at, updated_at")
+            .select("id, name, type, length_m, width_m, tonnage, build_year, price, url, image_url, source, source_id, scraped_at, first_seen_at, updated_at, canonical_vessel_id, linked_sources")
             .order("scraped_at", { ascending: false }),
           supabase
             .from("price_history")
@@ -64,7 +64,9 @@ export default function Dashboard() {
         if (vesselsRes.error) {
           setError(vesselsRes.error.message);
         } else {
-          setVessels(vesselsRes.data ?? []);
+          // Only show canonical/unique vessels (filter out duplicates)
+          const all = vesselsRes.data ?? [];
+          setVessels(all.filter((v) => v.canonical_vessel_id === null || v.canonical_vessel_id === undefined));
         }
 
         // Group price history by vessel_id
@@ -107,7 +109,10 @@ export default function Dashboard() {
     }
 
     if (filters.source) {
-      result = result.filter((v) => v.source === filters.source);
+      result = result.filter((v) =>
+        v.source === filters.source ||
+        (v.linked_sources?.some((ls) => ls.source === filters.source) ?? false)
+      );
     }
 
     if (filters.minPrice) {
@@ -274,7 +279,25 @@ export default function Dashboard() {
       {selectedVessel && (
         <VesselDetail
           vessel={selectedVessel}
-          history={priceHistoryMap[selectedVessel.id] ?? []}
+          history={(() => {
+            // Collect price history from all linked sources
+            const ids = [selectedVessel.id];
+            if (selectedVessel.linked_sources) {
+              for (const ls of selectedVessel.linked_sources) {
+                if (ls.vessel_id !== selectedVessel.id) {
+                  ids.push(ls.vessel_id);
+                }
+              }
+            }
+            const combined: PriceHistory[] = [];
+            for (const vid of ids) {
+              const entries = priceHistoryMap[vid];
+              if (entries) combined.push(...entries);
+            }
+            return combined.sort((a, b) =>
+              new Date(a.recorded_at).getTime() - new Date(b.recorded_at).getTime()
+            );
+          })()}
           onClose={handleCloseDetail}
         />
       )}

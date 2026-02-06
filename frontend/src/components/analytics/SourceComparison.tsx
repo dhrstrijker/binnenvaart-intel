@@ -1,6 +1,7 @@
 "use client";
 
 import { Vessel } from "@/lib/supabase";
+import { sourceLabel as sharedSourceLabel, sourceColor } from "@/lib/sources";
 
 interface SourceComparisonProps {
   vessels: Vessel[];
@@ -16,11 +17,7 @@ function formatEur(value: number): string {
 }
 
 function sourceLabel(source: string): string {
-  const labels: Record<string, string> = {
-    rensendriessen: "Rensen & Driessen",
-    galle: "Galle Makelaars",
-  };
-  return labels[source] ?? source;
+  return sharedSourceLabel(source);
 }
 
 interface SourceStats {
@@ -76,8 +73,8 @@ export default function SourceComparison({ vessels }: SourceComparisonProps) {
   const sources = Array.from(new Set(vessels.map((v) => v.source))).sort();
   const stats = sources.map((s) => computeStats(vessels, s));
 
-  const colors = ["border-sky-400 bg-sky-50", "border-amber-400 bg-amber-50"];
-  const headerColors = ["bg-sky-100 text-sky-800", "bg-amber-100 text-amber-800"];
+  const colors = ["border-sky-400 bg-sky-50", "border-amber-400 bg-amber-50", "border-emerald-400 bg-emerald-50", "border-violet-400 bg-violet-50"];
+  const headerColors = ["bg-sky-100 text-sky-800", "bg-amber-100 text-amber-800", "bg-emerald-100 text-emerald-800", "bg-violet-100 text-violet-800"];
 
   const rows: { label: string; getValue: (s: SourceStats) => string }[] = [
     { label: "Aantal schepen", getValue: (s) => String(s.count) },
@@ -170,7 +167,8 @@ export default function SourceComparison({ vessels }: SourceComparisonProps) {
             {stats.map((s, i) => {
               const maxCount = Math.max(...stats.map((st) => st.count), 1);
               const pct = (s.count / maxCount) * 100;
-              const barColor = i === 0 ? "bg-sky-400" : "bg-amber-400";
+              const barColors = ["bg-sky-400", "bg-amber-400", "bg-emerald-400", "bg-violet-400"];
+              const barColor = barColors[i % barColors.length];
               return (
                 <div key={s.source} className="flex items-center gap-3">
                   <span className="w-32 shrink-0 text-xs font-medium text-slate-600">

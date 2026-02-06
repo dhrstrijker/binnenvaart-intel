@@ -112,3 +112,138 @@ def upsert_vessel(vessel: dict) -> str:
     except Exception:
         logger.exception("Failed to upsert vessel %s/%s", source, source_id)
         return "error"
+
+
+def run_dedup() -> dict:
+    """Find duplicate vessels across sources and link them.
+
+    Matching rule: LOWER(TRIM(name)) + length_m within 2m + width_m within 1m.
+    Returns summary dict with counts.
+    """
+    logger.info("Running deduplication...")
+
+    # 1. Fetch all vessels
+    resp = supabase.table("vessels").select(
+        "id, name, source, length_m, width_m, price, raw_details, first_seen_at, url"
+    ).execute()
+    vessels = resp.data or []
+    logger.info("Fetched %d vessels for dedup", len(vessels))
+
+    # 2. Reset all dedup columns (clean slate each run)
+    supabase.table("vessels").update(
+        {"canonical_vessel_id": None, "linked_sources": None}
+    ).neq("id", "00000000-0000-0000-0000-000000000000").execute()
+
+    # 3. Group by normalised name
+    groups: dict[str, list[dict]] = {}
+    for v in vessels:
+        key = (v.get("name") or "").strip().lower()
+        if key:
+            groups.setdefault(key, []).append(v)
+
+    linked_count = 0
+    cluster_count = 0
+
+    for name_key, group in groups.items():
+        if len(group) < 2:
+            continue
+
+        # 4. Build clusters where dimensions match
+        clusters = _build_clusters(group)
+
+        for cluster in clusters:
+            if len(cluster) < 2:
+                continue
+
+            cluster_count += 1
+
+            # 5. Pick canonical vessel
+            canonical = _pick_canonical(cluster)
+
+            # 6. Set canonical_vessel_id on non-canonical vessels
+            non_canonical_ids = [v["id"] for v in cluster if v["id"] != canonical["id"]]
+            for vid in non_canonical_ids:
+                supabase.table("vessels").update(
+                    {"canonical_vessel_id": canonical["id"]}
+                ).eq("id", vid).execute()
+                linked_count += 1
+
+            # 7. Build and set linked_sources on canonical
+            linked = [_source_entry(canonical)]
+            for v in cluster:
+                if v["id"] != canonical["id"]:
+                    linked.append(_source_entry(v))
+
+            supabase.table("vessels").update(
+                {"linked_sources": linked}
+            ).eq("id", canonical["id"]).execute()
+
+    logger.info(
+        "Dedup complete: %d clusters, %d vessels linked as duplicates",
+        cluster_count, linked_count,
+    )
+    return {"clusters": cluster_count, "linked": linked_count}
+
+
+def _dims_match(a: dict, b: dict) -> bool:
+    """Check if two vessels have matching dimensions within tolerance."""
+    a_len = a.get("length_m")
+    a_wid = a.get("width_m")
+    b_len = b.get("length_m")
+    b_wid = b.get("width_m")
+
+    # Both must have non-NULL dimensions
+    if a_len is None or a_wid is None or b_len is None or b_wid is None:
+        return False
+
+    return abs(float(a_len) - float(b_len)) <= 2 and abs(float(a_wid) - float(b_wid)) <= 1
+
+
+def _build_clusters(group: list[dict]) -> list[list[dict]]:
+    """Build clusters of vessels that match on dimensions using union-find."""
+    n = len(group)
+    parent = list(range(n))
+
+    def find(x: int) -> int:
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+
+    def union(x: int, y: int) -> None:
+        rx, ry = find(x), find(y)
+        if rx != ry:
+            parent[rx] = ry
+
+    for i in range(n):
+        for j in range(i + 1, n):
+            if _dims_match(group[i], group[j]):
+                union(i, j)
+
+    clusters_map: dict[int, list[dict]] = {}
+    for i in range(n):
+        root = find(i)
+        clusters_map.setdefault(root, []).append(group[i])
+
+    return list(clusters_map.values())
+
+
+def _pick_canonical(cluster: list[dict]) -> dict:
+    """Pick the canonical vessel: prefer has-price > has-raw_details > earliest first_seen_at."""
+    def sort_key(v: dict):
+        has_price = 0 if v.get("price") is not None else 1
+        has_details = 0 if v.get("raw_details") is not None else 1
+        first_seen = v.get("first_seen_at") or "9999"
+        return (has_price, has_details, first_seen)
+
+    return min(cluster, key=sort_key)
+
+
+def _source_entry(v: dict) -> dict:
+    """Build a linked_sources entry for a vessel."""
+    return {
+        "source": v["source"],
+        "price": v.get("price"),
+        "url": v.get("url") or "",
+        "vessel_id": v["id"],
+    }

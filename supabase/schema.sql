@@ -17,6 +17,8 @@ CREATE TABLE vessels (
   source_id TEXT,
   raw_details JSONB DEFAULT NULL,
   image_urls JSONB DEFAULT NULL,
+  canonical_vessel_id UUID REFERENCES vessels(id) ON DELETE SET NULL,
+  linked_sources JSONB DEFAULT NULL,
   scraped_at TIMESTAMPTZ DEFAULT NOW(),
   first_seen_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
@@ -40,6 +42,7 @@ CREATE INDEX idx_vessels_type ON vessels(type);
 CREATE INDEX idx_vessels_price ON vessels(price);
 CREATE INDEX idx_vessels_build_year ON vessels(build_year);
 CREATE INDEX idx_vessels_raw_details ON vessels USING gin (raw_details);
+CREATE INDEX idx_vessels_canonical ON vessels(canonical_vessel_id);
 
 -- RLS: allow anonymous read access to both tables
 ALTER TABLE vessels ENABLE ROW LEVEL SECURITY;

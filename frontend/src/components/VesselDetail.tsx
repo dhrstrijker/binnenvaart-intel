@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import Image from "next/image";
 import { Vessel, PriceHistory } from "@/lib/supabase";
+import { sourceLabel } from "@/lib/sources";
 import PriceHistoryChart from "./PriceHistoryChart";
 
 interface VesselDetailProps {
@@ -27,14 +28,6 @@ function formatDate(iso: string): string {
     month: "long",
     year: "numeric",
   });
-}
-
-function sourceLabel(source: string): string {
-  const labels: Record<string, string> = {
-    rensendriessen: "Rensen & Driessen",
-    galle: "Galle Makelaars",
-  };
-  return labels[source] ?? source;
 }
 
 export default function VesselDetail({ vessel, history, onClose }: VesselDetailProps) {
@@ -195,19 +188,76 @@ export default function VesselDetail({ vessel, history, onClose }: VesselDetailP
             </div>
           )}
 
+          {/* Cross-source comparison */}
+          {vessel.linked_sources && vessel.linked_sources.length >= 2 && (
+            <div className="mt-5">
+              <h3 className="text-sm font-semibold text-slate-700">Bronvergelijking</h3>
+              <div className="mt-2 overflow-hidden rounded-lg border border-slate-100">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-100 bg-slate-50 text-left text-xs text-slate-500">
+                      <th className="px-3 py-2 font-medium">Bron</th>
+                      <th className="px-3 py-2 font-medium text-right">Prijs</th>
+                      <th className="px-3 py-2 font-medium text-right">Link</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {vessel.linked_sources.map((ls) => (
+                      <tr key={ls.vessel_id} className="border-b border-slate-50 last:border-b-0">
+                        <td className="px-3 py-2 text-slate-700 font-medium">
+                          {sourceLabel(ls.source)}
+                        </td>
+                        <td className="px-3 py-2 text-right font-semibold text-slate-900">
+                          {formatPrice(ls.price)}
+                        </td>
+                        <td className="px-3 py-2 text-right">
+                          <a
+                            href={ls.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs font-semibold text-blue-600 hover:text-blue-800"
+                          >
+                            Bekijken &rarr;
+                          </a>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
           {/* Link to original listing */}
-          <div className="mt-5">
-            <a
-              href={vessel.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-[#1e3a5f] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#16304f]"
-            >
-              Bekijk op {sourceLabel(vessel.source)}
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </a>
+          <div className="mt-5 flex flex-wrap gap-2">
+            {vessel.linked_sources && vessel.linked_sources.length >= 2 ? (
+              vessel.linked_sources.map((ls) => (
+                <a
+                  key={ls.vessel_id}
+                  href={ls.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-[#1e3a5f] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#16304f]"
+                >
+                  Bekijk op {sourceLabel(ls.source)}
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </a>
+              ))
+            ) : (
+              <a
+                href={vessel.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-[#1e3a5f] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#16304f]"
+              >
+                Bekijk op {sourceLabel(vessel.source)}
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </a>
+            )}
           </div>
         </div>
       </div>

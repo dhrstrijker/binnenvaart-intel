@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { Vessel, PriceHistory } from "@/lib/supabase";
+import { sourceLabel, sourceColor } from "@/lib/sources";
 import { MiniSparkline } from "./PriceHistoryChart";
 
 function formatPrice(price: number | null): string {
@@ -19,20 +20,6 @@ function isNew(firstSeenAt: string): boolean {
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
   return new Date(firstSeenAt) > sevenDaysAgo;
-}
-
-function sourceLabel(source: string): string {
-  const labels: Record<string, string> = {
-    rensendriessen: "Rensen & Driessen",
-    galle: "Galle Makelaars",
-  };
-  return labels[source] ?? source;
-}
-
-function sourceColor(source: string): string {
-  if (source === "rensendriessen") return "bg-sky-100 text-sky-800";
-  if (source === "galle") return "bg-amber-100 text-amber-800";
-  return "bg-gray-100 text-gray-800";
 }
 
 type PriceTrend = "down" | "up" | "unchanged" | null;
@@ -114,13 +101,18 @@ export default function VesselCard({ vessel, priceHistory = [], onOpenDetail }: 
           )}
         </div>
 
-        {/* Source badge */}
-        <div className="absolute top-2.5 right-2.5">
+        {/* Source badge(s) */}
+        <div className="absolute top-2.5 right-2.5 flex gap-1.5">
           <span
             className={`rounded-md px-2 py-0.5 text-xs font-semibold shadow-sm ${sourceColor(vessel.source)}`}
           >
             {sourceLabel(vessel.source)}
           </span>
+          {vessel.linked_sources && vessel.linked_sources.length >= 2 && (
+            <span className="rounded-md bg-indigo-100 px-2 py-0.5 text-xs font-semibold text-indigo-800 shadow-sm">
+              {vessel.linked_sources.length} bronnen
+            </span>
+          )}
         </div>
       </div>
 

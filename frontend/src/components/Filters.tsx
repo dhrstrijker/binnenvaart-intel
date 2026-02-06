@@ -79,6 +79,8 @@ export default function Filters({
           <option value="">Alle bronnen</option>
           <option value="rensendriessen">Rensen & Driessen</option>
           <option value="galle">Galle Makelaars</option>
+          <option value="pcshipbrokers">PC Shipbrokers</option>
+          <option value="gtsschepen">GTS Schepen</option>
         </select>
 
         {/* Min price */}

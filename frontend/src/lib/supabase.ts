@@ -35,6 +35,8 @@ export interface Vessel {
   updated_at: string;
   raw_details?: Record<string, unknown> | null;
   image_urls?: Array<{ original?: string; thumbnail?: string; sorting_no?: number } | string> | null;
+  canonical_vessel_id?: string | null;
+  linked_sources?: Array<{ source: string; price: number | null; url: string; vessel_id: string }> | null;
 }
 
 export interface PriceHistory {
