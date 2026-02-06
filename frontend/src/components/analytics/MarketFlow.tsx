@@ -2,149 +2,129 @@
 
 import { Vessel } from "@/lib/supabase";
 
-interface MarketFlowProps {
+interface CompetitivePositionProps {
   vessels: Vessel[];
 }
 
-export default function MarketFlow({ vessels }: MarketFlowProps) {
-  // Group vessels by first_seen_at month
-  const monthly = new Map<string, number>();
-  for (const v of vessels) {
-    const d = new Date(v.first_seen_at);
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-    monthly.set(key, (monthly.get(key) ?? 0) + 1);
+function formatEur(value: number): string {
+  return new Intl.NumberFormat("nl-NL", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function median(values: number[]): number {
+  if (values.length === 0) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0
+    ? (sorted[mid - 1] + sorted[mid]) / 2
+    : sorted[mid];
+}
+
+function rangeStr(min: number | null, max: number | null, suffix = ""): string {
+  if (min == null && max == null) return "-";
+  if (min == null) return `${max}${suffix}`;
+  if (max == null) return `${min}${suffix}`;
+  if (min === max) return `${min}${suffix}`;
+  return `${min}-${max}${suffix}`;
+}
+
+export default function CompetitivePosition({ vessels }: CompetitivePositionProps) {
+  // 1. Filter: vessels with price > 0 and type defined
+  const valid = vessels.filter((v) => v.price && v.price > 0 && v.type);
+
+  // 2. Group by type
+  const typeGroups = new Map<
+    string,
+    { prices: number[]; lengths: number[]; buildYears: number[] }
+  >();
+  for (const v of valid) {
+    const t = v.type!;
+    if (!typeGroups.has(t)) {
+      typeGroups.set(t, { prices: [], lengths: [], buildYears: [] });
+    }
+    const g = typeGroups.get(t)!;
+    g.prices.push(v.price!);
+    if (v.length_m != null) g.lengths.push(v.length_m);
+    if (v.build_year != null) g.buildYears.push(v.build_year);
   }
 
-  const monthNames = [
-    "jan", "feb", "mrt", "apr", "mei", "jun",
-    "jul", "aug", "sep", "okt", "nov", "dec",
-  ];
+  // 3. Only types with 3+ vessels, compute stats
+  const segments = Array.from(typeGroups.entries())
+    .filter(([, g]) => g.prices.length >= 3)
+    .map(([type, g]) => ({
+      type,
+      count: g.prices.length,
+      lengthMin: g.lengths.length > 0 ? Math.round(Math.min(...g.lengths)) : null,
+      lengthMax: g.lengths.length > 0 ? Math.round(Math.max(...g.lengths)) : null,
+      yearMin: g.buildYears.length > 0 ? Math.min(...g.buildYears) : null,
+      yearMax: g.buildYears.length > 0 ? Math.max(...g.buildYears) : null,
+      medianPrice: Math.round(median(g.prices)),
+      priceMin: Math.round(Math.min(...g.prices)),
+      priceMax: Math.round(Math.max(...g.prices)),
+    }))
+    .sort((a, b) => b.count - a.count);
 
-  const dataPoints = Array.from(monthly.entries())
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([key, count]) => {
-      const [year, month] = key.split("-");
-      return {
-        key,
-        label: `${monthNames[parseInt(month) - 1]} '${year.slice(2)}`,
-        count,
-      };
-    });
-
-  if (dataPoints.length === 0) {
+  // Empty state
+  if (segments.length === 0) {
     return (
       <div className="rounded-xl bg-white p-5 shadow-md ring-1 ring-gray-100">
-        <h2 className="mb-1 text-lg font-bold text-slate-900">Nieuwe aanbiedingen</h2>
-        <p className="text-sm text-slate-400">Geen gegevens beschikbaar</p>
+        <h2 className="mb-1 text-lg font-bold text-slate-900">Concurrentiepositie</h2>
+        <p className="text-sm text-slate-400">
+          Onvoldoende gegevens voor concurrentiepositie-overzicht.
+        </p>
       </div>
     );
   }
 
-  const maxCount = Math.max(...dataPoints.map((d) => d.count), 1);
-
-  // Vertical bar chart
-  const padding = { top: 20, right: 10, bottom: 50, left: 40 };
-  const chartWidth = 500;
-  const chartHeight = 220;
-  const innerWidth = chartWidth - padding.left - padding.right;
-  const innerHeight = chartHeight - padding.top - padding.bottom;
-
-  const barGap = 4;
-  const barWidth = Math.max(
-    8,
-    (innerWidth - barGap * (dataPoints.length - 1)) / dataPoints.length
-  );
-  const totalBarWidth = barWidth * dataPoints.length + barGap * (dataPoints.length - 1);
-  const xOffset = padding.left + (innerWidth - totalBarWidth) / 2;
-
-  // Y-axis ticks
-  const yTicks = 4;
-  const yTickValues = Array.from({ length: yTicks }, (_, i) =>
-    Math.round((maxCount * i) / (yTicks - 1))
-  );
-
   return (
     <div className="rounded-xl bg-white p-5 shadow-md ring-1 ring-gray-100">
-      <h2 className="mb-1 text-lg font-bold text-slate-900">Nieuwe aanbiedingen</h2>
+      <h2 className="mb-1 text-lg font-bold text-slate-900">Concurrentiepositie</h2>
       <p className="mb-4 text-xs text-slate-400">
-        Aantal nieuwe listings per maand (stijgend = groeiend aanbod)
+        Marktsegmenten per scheepstype &mdash; vind uw concurrentie
       </p>
-      <svg
-        viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-        className="w-full"
-        role="img"
-        aria-label="Nieuwe aanbiedingen per maand"
-      >
-        {/* Y-axis grid lines */}
-        {yTickValues.map((val) => {
-          const y = padding.top + (1 - val / maxCount) * innerHeight;
-          return (
-            <g key={val}>
-              <line
-                x1={padding.left}
-                y1={y}
-                x2={padding.left + innerWidth}
-                y2={y}
-                className="stroke-slate-200"
-                strokeWidth={1}
-                strokeDasharray="4 4"
-              />
-              <text
-                x={padding.left - 6}
-                y={y}
-                textAnchor="end"
-                dominantBaseline="central"
-                className="fill-slate-500 text-[10px]"
-              >
-                {val}
-              </text>
-            </g>
-          );
-        })}
 
-        {/* Bars */}
-        {dataPoints.map((d, i) => {
-          const x = xOffset + i * (barWidth + barGap);
-          const barH = (d.count / maxCount) * innerHeight;
-          const y = padding.top + innerHeight - barH;
-
-          return (
-            <g key={d.key}>
-              <rect
-                x={x}
-                y={y}
-                width={barWidth}
-                height={barH}
-                rx={3}
-                className="fill-blue-500"
-              />
-              {/* Count label above bar */}
-              <text
-                x={x + barWidth / 2}
-                y={y - 6}
-                textAnchor="middle"
-                className="fill-slate-600 text-[9px] font-medium"
-              >
-                {d.count}
-              </text>
-              {/* Month label */}
-              <text
-                x={x + barWidth / 2}
-                y={padding.top + innerHeight + 16}
-                textAnchor="middle"
-                className="fill-slate-500 text-[9px]"
-                transform={
-                  dataPoints.length > 6
-                    ? `rotate(-45, ${x + barWidth / 2}, ${padding.top + innerHeight + 16})`
-                    : undefined
-                }
-              >
-                {d.label}
-              </text>
-            </g>
-          );
-        })}
-      </svg>
+      <div className="overflow-x-auto -mx-5 px-5">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-slate-200 text-left text-xs font-medium text-slate-500">
+              <th className="pb-2 pr-3">Type</th>
+              <th className="pb-2 pr-3">Aantal</th>
+              <th className="pb-2 pr-3">Lengte</th>
+              <th className="pb-2 pr-3">Bouwjaar</th>
+              <th className="pb-2 pr-3 text-right">Mediaan prijs</th>
+              <th className="pb-2 text-right">Prijsbereik</th>
+            </tr>
+          </thead>
+          <tbody>
+            {segments.map((s) => (
+              <tr key={s.type} className="border-b border-slate-100 last:border-0">
+                <td className="py-2 pr-3 font-medium text-slate-800">{s.type}</td>
+                <td className="py-2 pr-3">
+                  <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700 ring-1 ring-blue-200">
+                    {s.count}
+                  </span>
+                </td>
+                <td className="py-2 pr-3 text-slate-600">
+                  {rangeStr(s.lengthMin, s.lengthMax, "m")}
+                </td>
+                <td className="py-2 pr-3 text-slate-600">
+                  {rangeStr(s.yearMin, s.yearMax)}
+                </td>
+                <td className="py-2 pr-3 text-right font-semibold text-slate-800">
+                  {formatEur(s.medianPrice)}
+                </td>
+                <td className="py-2 text-right text-slate-600">
+                  {formatEur(s.priceMin)} - {formatEur(s.priceMax)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

@@ -7,8 +7,8 @@ import MarketOverview from "@/components/analytics/MarketOverview";
 import SupplyByType from "@/components/analytics/TypeBreakdown";
 import TimeOnMarket from "@/components/analytics/PriceDistribution";
 import PriceTrends from "@/components/analytics/PriceTrends";
-import PricePerMeter from "@/components/analytics/SourceComparison";
-import MarketFlow from "@/components/analytics/MarketFlow";
+import PricePressure from "@/components/analytics/SourceComparison";
+import CompetitivePosition from "@/components/analytics/MarketFlow";
 
 export default function AnalyticsPage() {
   const [vessels, setVessels] = useState<Vessel[]>([]);
@@ -147,10 +147,10 @@ export default function AnalyticsPage() {
             {/* Price trends by type (full-width) */}
             <PriceTrends priceHistory={priceHistory} vessels={vessels} />
 
-            {/* Price per meter + Market flow */}
+            {/* Price pressure + Competitive position */}
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              <PricePerMeter vessels={vessels} />
-              <MarketFlow vessels={vessels} />
+              <PricePressure vessels={vessels} priceHistory={priceHistory} />
+              <CompetitivePosition vessels={vessels} />
             </div>
           </div>
         )}
