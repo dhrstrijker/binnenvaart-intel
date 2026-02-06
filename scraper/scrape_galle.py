@@ -1,5 +1,4 @@
 import re
-from typing import Optional
 
 import requests
 from bs4 import BeautifulSoup
@@ -36,7 +35,7 @@ def parse_dimensions(specs_text: str):
         return None, None
 
 
-def extract_image_url(card) -> Optional[str]:
+def extract_image_url(card) -> str | None:
     """Extract background-image URL from the image div."""
     img_div = card.select_one(".cat-product-small-image .img")
     if not img_div:
