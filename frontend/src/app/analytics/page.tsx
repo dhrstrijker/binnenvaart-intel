@@ -160,7 +160,7 @@ export default function AnalyticsPage() {
       <footer className="border-t border-slate-200 bg-white py-6">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <p className="text-center text-xs text-slate-400">
-            Binnenvaart Intel &mdash; Gegevens van 4 makelaars
+            Binnenvaart Intel &mdash; Gegevens van 5 makelaars
           </p>
         </div>
       </footer>

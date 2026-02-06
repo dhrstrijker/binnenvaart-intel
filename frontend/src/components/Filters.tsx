@@ -81,6 +81,7 @@ export default function Filters({
           <option value="galle">Galle Makelaars</option>
           <option value="pcshipbrokers">PC Shipbrokers</option>
           <option value="gtsschepen">GTS Schepen</option>
+          <option value="gsk">GSK Brokers</option>
         </select>
 
         {/* Min price */}
