@@ -43,6 +43,10 @@ def main():
             name, stats["total"], stats["inserted"], stats["price_changed"],
             stats["unchanged"], stats.get("error", 0),
         )
+        if stats["total"] == 0:
+            logger.warning(
+                "⚠ %s returned 0 vessels — site structure may have changed!", name,
+            )
         all_stats.append(stats)
 
     total = sum(s["total"] for s in all_stats)
