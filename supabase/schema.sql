@@ -15,6 +15,8 @@ CREATE TABLE vessels (
   image_url TEXT,
   source TEXT NOT NULL,
   source_id TEXT,
+  raw_details JSONB DEFAULT NULL,
+  image_urls JSONB DEFAULT NULL,
   scraped_at TIMESTAMPTZ DEFAULT NOW(),
   first_seen_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
@@ -31,6 +33,13 @@ CREATE TABLE price_history (
 
 CREATE INDEX idx_price_history_vessel ON price_history(vessel_id);
 CREATE INDEX idx_price_history_recorded ON price_history(recorded_at);
+
+-- Indices for frontend filter columns
+CREATE INDEX idx_vessels_source ON vessels(source);
+CREATE INDEX idx_vessels_type ON vessels(type);
+CREATE INDEX idx_vessels_price ON vessels(price);
+CREATE INDEX idx_vessels_build_year ON vessels(build_year);
+CREATE INDEX idx_vessels_raw_details ON vessels USING gin (raw_details);
 
 -- RLS: allow anonymous read access to both tables
 ALTER TABLE vessels ENABLE ROW LEVEL SECURITY;

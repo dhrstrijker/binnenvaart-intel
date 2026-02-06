@@ -21,7 +21,7 @@ export default function AnalyticsPage() {
       try {
         const supabase = getSupabase();
         const [vesselsRes, priceRes] = await Promise.all([
-          supabase.from("vessels").select("*"),
+          supabase.from("vessels").select("id, name, type, length_m, width_m, tonnage, build_year, price, url, image_url, source, source_id, scraped_at, first_seen_at, updated_at"),
           supabase
             .from("price_history")
             .select("*")

@@ -53,7 +53,7 @@ export default function Dashboard() {
         const [vesselsRes, historyRes] = await Promise.all([
           supabase
             .from("vessels")
-            .select("*")
+            .select("id, name, type, length_m, width_m, tonnage, build_year, price, url, image_url, source, source_id, scraped_at, first_seen_at, updated_at")
             .order("scraped_at", { ascending: false }),
           supabase
             .from("price_history")

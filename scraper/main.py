@@ -1,29 +1,54 @@
+import logging
+
 import scrape_rensendriessen
 import scrape_galle
 from db import clear_changes, get_changes
 from notifications import send_summary_email
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    datefmt="%H:%M:%S",
+)
+logger = logging.getLogger(__name__)
+
+
+def _empty_stats():
+    return {"total": 0, "inserted": 0, "price_changed": 0, "unchanged": 0, "error": 0}
+
 
 def main():
-    print("Starting scrape...")
+    logger.info("Starting scrape...")
     clear_changes()
 
-    print("\n--- RensenDriessen ---")
-    rd_stats = scrape_rensendriessen.scrape()
-    print(f"  Total: {rd_stats['total']}")
-    print(f"  Inserted: {rd_stats['inserted']}")
-    print(f"  Price changed: {rd_stats['price_changed']}")
-    print(f"  Unchanged: {rd_stats['unchanged']}")
+    # --- RensenDriessen ---
+    try:
+        rd_stats = scrape_rensendriessen.scrape()
+    except Exception:
+        logger.exception("RensenDriessen scraper failed")
+        rd_stats = _empty_stats()
 
-    print("\n--- Galle ---")
-    galle_stats = scrape_galle.scrape()
-    print(f"  Total: {galle_stats['total']}")
-    print(f"  Inserted: {galle_stats['inserted']}")
-    print(f"  Price changed: {galle_stats['price_changed']}")
-    print(f"  Unchanged: {galle_stats['unchanged']}")
+    logger.info(
+        "RensenDriessen — total: %d, inserted: %d, price_changed: %d, unchanged: %d, errors: %d",
+        rd_stats["total"], rd_stats["inserted"], rd_stats["price_changed"],
+        rd_stats["unchanged"], rd_stats.get("error", 0),
+    )
+
+    # --- Galle ---
+    try:
+        galle_stats = scrape_galle.scrape()
+    except Exception:
+        logger.exception("Galle scraper failed")
+        galle_stats = _empty_stats()
+
+    logger.info(
+        "Galle — total: %d, inserted: %d, price_changed: %d, unchanged: %d, errors: %d",
+        galle_stats["total"], galle_stats["inserted"], galle_stats["price_changed"],
+        galle_stats["unchanged"], galle_stats.get("error", 0),
+    )
 
     total = rd_stats["total"] + galle_stats["total"]
-    print(f"\nDone. {total} vessels processed.")
+    logger.info("Done. %d vessels processed.", total)
 
     # Send notification email with all detected changes
     combined_stats = {
@@ -33,8 +58,7 @@ def main():
         "unchanged": rd_stats["unchanged"] + galle_stats["unchanged"],
     }
     changes = get_changes()
-    print(f"\n--- Notifications ---")
-    print(f"  Changes detected: {len(changes)}")
+    logger.info("Changes detected: %d", len(changes))
     send_summary_email(combined_stats, changes)
 
 

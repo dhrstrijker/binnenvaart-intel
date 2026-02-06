@@ -4,6 +4,7 @@ Sends alerts to subscribers when the scraper detects vessel changes
 (new listings, price changes). Called from main.py after scraping.
 """
 
+import logging
 import os
 from datetime import datetime, timezone
 
@@ -13,6 +14,8 @@ from dotenv import load_dotenv
 from db import supabase
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 resend.api_key = os.environ.get("RESEND_API_KEY", "")
 
@@ -154,16 +157,16 @@ def send_summary_email(stats: dict, changes: list[dict]) -> None:
         changes: List of change dicts with keys: kind, vessel, and optionally old_price/new_price.
     """
     if not changes:
-        print("Notifications: geen wijzigingen, geen e-mail verstuurd.")
+        logger.info("Geen wijzigingen, geen e-mail verstuurd.")
         return
 
     if not resend.api_key:
-        print("Notifications: RESEND_API_KEY niet ingesteld, overgeslagen.")
+        logger.warning("RESEND_API_KEY niet ingesteld, overgeslagen.")
         return
 
     subscribers = _get_active_subscribers()
     if not subscribers:
-        print("Notifications: geen actieve abonnees gevonden.")
+        logger.info("Geen actieve abonnees gevonden.")
         return
 
     count = len(changes)
@@ -180,6 +183,6 @@ def send_summary_email(stats: dict, changes: list[dict]) -> None:
                     "html": html,
                 }
             )
-            print(f"Notifications: e-mail verstuurd naar {email}")
-        except Exception as e:
-            print(f"Notifications: fout bij verzenden naar {email}: {e}")
+            logger.info("E-mail verstuurd naar %s", email)
+        except Exception:
+            logger.exception("Fout bij verzenden naar %s", email)

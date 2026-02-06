@@ -1,11 +1,30 @@
+import logging
 import re
+import time
 
 import requests
 
 from db import upsert_vessel
 
+logger = logging.getLogger(__name__)
+
 API_URL = "https://api.rensendriessen.com/api/public/ships/brokers/list/filter/"
-TOTAL_PAGES = 7
+MAX_PAGES = 50
+
+
+def _fetch_with_retry(method, url, retries=3, **kwargs):
+    """Fetch a URL with exponential-backoff retries on network errors."""
+    for attempt in range(1, retries + 1):
+        try:
+            resp = method(url, timeout=30, **kwargs)
+            resp.raise_for_status()
+            return resp
+        except requests.RequestException as e:
+            if attempt == retries:
+                raise
+            wait = 2 ** (attempt - 1)
+            logger.warning("Attempt %d failed: %s. Retrying in %ds...", attempt, e, wait)
+            time.sleep(wait)
 
 
 def parse_dimension(value):
@@ -37,6 +56,24 @@ def parse_vessel(ship: dict) -> dict:
     images = ship.get("images") or []
     image_url = images[0].get("original") if images else None
 
+    # Store all image URLs with metadata
+    image_urls = [
+        {
+            "original": img.get("original"),
+            "thumbnail": img.get("thumbnail"),
+            "sorting_no": img.get("sorting_no"),
+        }
+        for img in images
+        if img.get("original")
+    ]
+
+    # Store full API response as raw_details, excluding images (stored separately)
+    # and bin_* fields (all empty/unused)
+    raw_details = {
+        k: v for k, v in ship.items()
+        if k != "images" and not k.startswith("bin_")
+    }
+
     return {
         "source": "rensendriessen",
         "source_id": str(ship_id),
@@ -48,19 +85,26 @@ def parse_vessel(ship: dict) -> dict:
         "price": price,
         "url": f"https://rensendriessen.com/aanbod/{ship_id}",
         "image_url": image_url,
+        "raw_details": raw_details,
+        "image_urls": image_urls or None,
     }
 
 
 def scrape() -> dict:
     """Scrape all pages and upsert vessels. Returns a summary dict."""
-    stats = {"inserted": 0, "price_changed": 0, "unchanged": 0, "total": 0}
+    stats = {"inserted": 0, "price_changed": 0, "unchanged": 0, "error": 0, "total": 0}
 
-    for page in range(1, TOTAL_PAGES + 1):
-        resp = requests.post(API_URL, json={"page": page}, timeout=30)
-        resp.raise_for_status()
+    page = 1
+    while page <= MAX_PAGES:
+        logger.info("Fetching page %d...", page)
+        resp = _fetch_with_retry(requests.post, API_URL, json={"page": page})
         data = resp.json()
 
         ships = data if isinstance(data, list) else data.get("results", data.get("data", []))
+
+        if not ships:
+            logger.info("Page %d returned 0 results, stopping.", page)
+            break
 
         for ship in ships:
             vessel = parse_vessel(ship)
@@ -68,9 +112,17 @@ def scrape() -> dict:
             stats[result] += 1
             stats["total"] += 1
 
+        page += 1
+
+    logger.info("Scraped %d pages, %d vessels total.", page - 1, stats["total"])
     return stats
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+        datefmt="%H:%M:%S",
+    )
     summary = scrape()
-    print(f"RensenDriessen: {summary}")
+    logger.info("RensenDriessen: %s", summary)
