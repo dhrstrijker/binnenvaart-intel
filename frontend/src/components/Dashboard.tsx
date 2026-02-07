@@ -15,6 +15,12 @@ const INITIAL_FILTERS: FilterState = {
   source: "",
   minPrice: "",
   maxPrice: "",
+  minLength: "",
+  maxLength: "",
+  minTonnage: "",
+  maxTonnage: "",
+  minBuildYear: "",
+  maxBuildYear: "",
   sort: "newest",
   showRemoved: false,
 };
@@ -133,6 +139,36 @@ export default function Dashboard() {
       result = result.filter((v) => v.price !== null && v.price <= max);
     }
 
+    if (filters.minLength) {
+      const min = Number(filters.minLength);
+      result = result.filter((v) => v.length_m !== null && v.length_m >= min);
+    }
+
+    if (filters.maxLength) {
+      const max = Number(filters.maxLength);
+      result = result.filter((v) => v.length_m !== null && v.length_m <= max);
+    }
+
+    if (filters.minTonnage) {
+      const min = Number(filters.minTonnage);
+      result = result.filter((v) => v.tonnage !== null && v.tonnage >= min);
+    }
+
+    if (filters.maxTonnage) {
+      const max = Number(filters.maxTonnage);
+      result = result.filter((v) => v.tonnage !== null && v.tonnage <= max);
+    }
+
+    if (filters.minBuildYear) {
+      const min = Number(filters.minBuildYear);
+      result = result.filter((v) => v.build_year !== null && v.build_year >= min);
+    }
+
+    if (filters.maxBuildYear) {
+      const max = Number(filters.maxBuildYear);
+      result = result.filter((v) => v.build_year !== null && v.build_year <= max);
+    }
+
     switch (filters.sort) {
       case "price_asc":
         result.sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity));
@@ -189,6 +225,12 @@ export default function Dashboard() {
     if (f.source) params.set("source", f.source);
     if (f.minPrice) params.set("minPrice", f.minPrice);
     if (f.maxPrice) params.set("maxPrice", f.maxPrice);
+    if (f.minLength) params.set("minLength", f.minLength);
+    if (f.maxLength) params.set("maxLength", f.maxLength);
+    if (f.minTonnage) params.set("minTonnage", f.minTonnage);
+    if (f.maxTonnage) params.set("maxTonnage", f.maxTonnage);
+    if (f.minBuildYear) params.set("minBuildYear", f.minBuildYear);
+    if (f.maxBuildYear) params.set("maxBuildYear", f.maxBuildYear);
     router.push(`/zoekopdrachten?${params.toString()}`);
   }, [router]);
 

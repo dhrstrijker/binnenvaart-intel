@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import type { User } from "@supabase/supabase-js";
 
 export interface FilterState {
@@ -9,6 +9,12 @@ export interface FilterState {
   source: string;
   minPrice: string;
   maxPrice: string;
+  minLength: string;
+  maxLength: string;
+  minTonnage: string;
+  maxTonnage: string;
+  minBuildYear: string;
+  maxBuildYear: string;
   sort: string;
   showRemoved: boolean;
 }
@@ -33,6 +39,14 @@ export default function Filters({
   const update = (partial: Partial<FilterState>) => {
     onFilterChange({ ...filters, ...partial });
   };
+
+  const hasAdvancedFilters =
+    filters.minLength || filters.maxLength ||
+    filters.minTonnage || filters.maxTonnage ||
+    filters.minBuildYear || filters.maxBuildYear;
+
+  const [expanded, setExpanded] = useState(false);
+  const showAdvanced = expanded || !!hasAdvancedFilters;
 
   return (
     <div className="rounded-xl bg-white p-4 shadow-md ring-1 ring-gray-100">
@@ -143,6 +157,100 @@ export default function Filters({
         </div>
       </div>
 
+      {/* Advanced filters toggle */}
+      <div className="mt-2">
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className="flex items-center gap-1.5 text-xs font-medium text-slate-500 transition hover:text-slate-700"
+        >
+          <svg
+            className={`h-3.5 w-3.5 transition-transform ${showAdvanced ? "rotate-90" : ""}`}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+          {showAdvanced ? "Minder filters" : "Meer filters"}
+          {!showAdvanced && hasAdvancedFilters && (
+            <span className="ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-cyan-100 text-[10px] font-bold text-cyan-700">!</span>
+          )}
+        </button>
+
+        {showAdvanced && (
+          <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+            <div>
+              <label htmlFor="filter-min-length" className="sr-only">Minimale lengte</label>
+              <input
+                id="filter-min-length"
+                type="number"
+                placeholder="Min lengte (m)"
+                value={filters.minLength}
+                onChange={(e) => update({ minLength: e.target.value })}
+                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 placeholder-slate-400 outline-none transition-colors focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
+              />
+            </div>
+            <div>
+              <label htmlFor="filter-max-length" className="sr-only">Maximale lengte</label>
+              <input
+                id="filter-max-length"
+                type="number"
+                placeholder="Max lengte (m)"
+                value={filters.maxLength}
+                onChange={(e) => update({ maxLength: e.target.value })}
+                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 placeholder-slate-400 outline-none transition-colors focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
+              />
+            </div>
+            <div>
+              <label htmlFor="filter-min-tonnage" className="sr-only">Minimale tonnage</label>
+              <input
+                id="filter-min-tonnage"
+                type="number"
+                placeholder="Min tonnage"
+                value={filters.minTonnage}
+                onChange={(e) => update({ minTonnage: e.target.value })}
+                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 placeholder-slate-400 outline-none transition-colors focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
+              />
+            </div>
+            <div>
+              <label htmlFor="filter-max-tonnage" className="sr-only">Maximale tonnage</label>
+              <input
+                id="filter-max-tonnage"
+                type="number"
+                placeholder="Max tonnage"
+                value={filters.maxTonnage}
+                onChange={(e) => update({ maxTonnage: e.target.value })}
+                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 placeholder-slate-400 outline-none transition-colors focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
+              />
+            </div>
+            <div>
+              <label htmlFor="filter-min-build-year" className="sr-only">Minimaal bouwjaar</label>
+              <input
+                id="filter-min-build-year"
+                type="number"
+                placeholder="Min bouwjaar"
+                value={filters.minBuildYear}
+                onChange={(e) => update({ minBuildYear: e.target.value })}
+                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 placeholder-slate-400 outline-none transition-colors focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
+              />
+            </div>
+            <div>
+              <label htmlFor="filter-max-build-year" className="sr-only">Maximaal bouwjaar</label>
+              <input
+                id="filter-max-build-year"
+                type="number"
+                placeholder="Max bouwjaar"
+                value={filters.maxBuildYear}
+                onChange={(e) => update({ maxBuildYear: e.target.value })}
+                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 placeholder-slate-400 outline-none transition-colors focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Status toggle + Result count + Save as search */}
       <div className="mt-3 flex items-center justify-between">
         <label className="flex items-center gap-2 text-xs text-slate-500 cursor-pointer select-none">
@@ -155,7 +263,7 @@ export default function Filters({
           Toon verkochte/verwijderde schepen
         </label>
         <div className="flex items-center gap-3">
-          {user && onSaveAsSearch && (filters.type || filters.source || filters.minPrice || filters.maxPrice || filters.search) && (
+          {user && onSaveAsSearch && (filters.type || filters.source || filters.minPrice || filters.maxPrice || filters.search || filters.minLength || filters.maxLength || filters.minTonnage || filters.maxTonnage || filters.minBuildYear || filters.maxBuildYear) && (
             <button
               onClick={() => onSaveAsSearch(filters)}
               className="flex items-center gap-1 rounded-lg border border-cyan-200 bg-cyan-50 px-2.5 py-1 text-xs font-medium text-cyan-700 transition hover:bg-cyan-100"

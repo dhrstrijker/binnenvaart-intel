@@ -41,6 +41,12 @@ export default function SearchTaskPage({ user, isPremium }: SearchTaskPageProps)
       if (searchParams.get("minPrice")) prefillFilters.minPrice = searchParams.get("minPrice")!;
       if (searchParams.get("maxPrice")) prefillFilters.maxPrice = searchParams.get("maxPrice")!;
       if (searchParams.get("search")) prefillFilters.search = searchParams.get("search")!;
+      if (searchParams.get("minLength")) prefillFilters.minLength = searchParams.get("minLength")!;
+      if (searchParams.get("maxLength")) prefillFilters.maxLength = searchParams.get("maxLength")!;
+      if (searchParams.get("minTonnage")) prefillFilters.minTonnage = searchParams.get("minTonnage")!;
+      if (searchParams.get("maxTonnage")) prefillFilters.maxTonnage = searchParams.get("maxTonnage")!;
+      if (searchParams.get("minBuildYear")) prefillFilters.minBuildYear = searchParams.get("minBuildYear")!;
+      if (searchParams.get("maxBuildYear")) prefillFilters.maxBuildYear = searchParams.get("maxBuildYear")!;
 
       setEditingSearch(null);
       setShowForm(true);
