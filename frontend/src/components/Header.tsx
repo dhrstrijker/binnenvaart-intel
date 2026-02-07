@@ -11,7 +11,9 @@ import type { User } from "@supabase/supabase-js";
 export default function Header() {
   const [user, setUser] = useState<User | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const mobileNavRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -35,6 +37,16 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [menuOpen]);
 
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (mobileNavRef.current && !mobileNavRef.current.contains(e.target as Node)) {
+        setMobileNavOpen(false);
+      }
+    }
+    if (mobileNavOpen) document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [mobileNavOpen]);
+
   async function handleSignOut() {
     const supabase = createClient();
     await supabase.auth.signOut();
@@ -57,8 +69,8 @@ export default function Header() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
         <NavisioLogo size="md" variant="light" />
 
-        {/* Navigation + Auth */}
-        <div className="flex items-center gap-4">
+        {/* Desktop: Navigation + Auth */}
+        <div className="hidden items-center gap-4 md:flex">
           <nav className="flex items-center gap-2">
             <NavLink href="/">Dashboard</NavLink>
             <NavLink href="/analytics">Analyse</NavLink>
@@ -125,7 +137,84 @@ export default function Header() {
             </div>
           )}
         </div>
+
+        {/* Mobile: Hamburger button */}
+        <button
+          onClick={() => setMobileNavOpen(!mobileNavOpen)}
+          className="flex items-center justify-center rounded-lg p-2 text-cyan-200 transition hover:bg-white/10 hover:text-white md:hidden"
+          aria-label={mobileNavOpen ? "Menu sluiten" : "Menu openen"}
+        >
+          {mobileNavOpen ? (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          )}
+        </button>
       </div>
+
+      {/* Mobile navigation menu */}
+      {mobileNavOpen && (
+        <div ref={mobileNavRef} className="border-t border-white/10 md:hidden">
+          <nav className="flex flex-col gap-1 px-4 py-3">
+            <NavLink href="/" onClick={() => setMobileNavOpen(false)}>Dashboard</NavLink>
+            <NavLink href="/analytics" onClick={() => setMobileNavOpen(false)}>Analyse</NavLink>
+            <NavLink href="/pricing" onClick={() => setMobileNavOpen(false)}>Prijzen</NavLink>
+          </nav>
+          <div className="border-t border-white/10 px-4 py-3">
+            {user ? (
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-cyan-600 text-xs font-bold text-white">
+                    {initials}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-white">
+                      {user.user_metadata?.full_name || user.email}
+                    </p>
+                    {user.user_metadata?.full_name && (
+                      <p className="truncate text-xs text-cyan-300">{user.email}</p>
+                    )}
+                  </div>
+                </div>
+                <Link
+                  href="/account"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="rounded-lg px-3 py-1.5 text-sm font-medium text-cyan-200 transition hover:bg-white/10 hover:text-white"
+                >
+                  Account
+                </Link>
+                <button
+                  onClick={handleSignOut}
+                  className="rounded-lg px-3 py-1.5 text-left text-sm font-medium text-red-400 transition hover:bg-white/10"
+                >
+                  Uitloggen
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                <Link
+                  href="/login"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="rounded-lg px-3 py-1.5 text-sm font-medium text-cyan-200 transition hover:bg-white/10 hover:text-white"
+                >
+                  Inloggen
+                </Link>
+                <Link
+                  href="/signup"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="rounded-lg bg-cyan-600 px-3 py-1.5 text-center text-sm font-semibold text-white transition hover:bg-cyan-500"
+                >
+                  Registreren
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   );
 }
