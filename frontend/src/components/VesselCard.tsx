@@ -36,10 +36,11 @@ function getPriceTrend(history: PriceHistory[]): PriceTrend {
 interface VesselCardProps {
   vessel: Vessel;
   priceHistory?: PriceHistory[];
+  isPremium?: boolean;
   onOpenDetail?: (vessel: Vessel) => void;
 }
 
-export default function VesselCard({ vessel, priceHistory = [], onOpenDetail }: VesselCardProps) {
+export default function VesselCard({ vessel, priceHistory = [], isPremium = false, onOpenDetail }: VesselCardProps) {
   const [imgError, setImgError] = React.useState(false);
   const trend = getPriceTrend(priceHistory);
 
@@ -162,28 +163,28 @@ export default function VesselCard({ vessel, priceHistory = [], onOpenDetail }: 
             <span className="text-xl font-extrabold text-slate-900">
               {formatPrice(vessel.price)}
             </span>
-            {trend === "down" && (
+            {isPremium && trend === "down" && (
               <span className="flex items-center gap-0.5 text-xs font-semibold text-emerald-600" title="Prijs gedaald">
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                 </svg>
               </span>
             )}
-            {trend === "up" && (
+            {isPremium && trend === "up" && (
               <span className="flex items-center gap-0.5 text-xs font-semibold text-red-500" title="Prijs gestegen">
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
                 </svg>
               </span>
             )}
-            {trend === "unchanged" && (
+            {isPremium && trend === "unchanged" && (
               <span className="flex items-center text-xs font-semibold text-slate-400" title="Prijs ongewijzigd">
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
                 </svg>
               </span>
             )}
-            <MiniSparkline history={priceHistory} />
+            {isPremium && <MiniSparkline history={priceHistory} />}
           </div>
           <span className="flex items-center gap-1 text-xs font-medium text-cyan-600 opacity-0 transition-opacity group-hover:opacity-100">
             Details

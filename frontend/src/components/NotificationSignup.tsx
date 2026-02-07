@@ -1,23 +1,32 @@
 "use client";
 
-import React, { useState } from "react";
-import { getSupabase } from "@/lib/supabase";
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
+import type { User } from "@supabase/supabase-js";
 
 export default function NotificationSignup() {
-  const [email, setEmail] = useState("");
+  const [user, setUser] = useState<User | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!email.trim()) return;
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+  }, []);
 
+  async function handleSubscribe() {
+    if (!user) return;
     setStatus("loading");
+
     try {
-      const supabase = getSupabase();
+      const supabase = createClient();
       const { error } = await supabase
         .from("notification_subscribers")
-        .insert({ email: email.trim().toLowerCase() });
+        .insert({
+          email: user.email!.toLowerCase(),
+          user_id: user.id,
+        });
 
       if (error) {
         if (error.code === "23505") {
@@ -32,7 +41,6 @@ export default function NotificationSignup() {
 
       setStatus("success");
       setMessage("Aangemeld! U ontvangt een e-mail bij wijzigingen.");
-      setEmail("");
     } catch {
       setStatus("error");
       setMessage("Er ging iets mis. Probeer het later opnieuw.");
@@ -62,31 +70,32 @@ export default function NotificationSignup() {
           Ontvang een melding bij nieuwe schepen en prijswijzigingen.
         </p>
 
-        {status === "success" ? (
+        {!user ? (
+          <div className="mt-4">
+            <Link
+              href="/login"
+              className="inline-block rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-50"
+            >
+              Log in om meldingen te ontvangen
+            </Link>
+          </div>
+        ) : status === "success" ? (
           <div className="mt-4 rounded-lg bg-emerald-500/20 px-4 py-3">
             <p className="text-sm font-medium text-emerald-300">{message}</p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="mt-4 flex gap-2">
-            <input
-              type="email"
-              required
-              placeholder="uw@email.nl"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                if (status === "error") setStatus("idle");
-              }}
-              className="min-w-0 flex-1 rounded-lg border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white placeholder-cyan-300/60 outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400"
-            />
+          <div className="mt-4">
+            <p className="mb-3 text-sm text-cyan-100">
+              Meldingen worden gestuurd naar <strong>{user.email}</strong>
+            </p>
             <button
-              type="submit"
+              onClick={handleSubscribe}
               disabled={status === "loading"}
               className="rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-50 disabled:opacity-50"
             >
-              {status === "loading" ? "..." : "Aanmelden"}
+              {status === "loading" ? "..." : "Aanmelden voor notificaties"}
             </button>
-          </form>
+          </div>
         )}
 
         {status === "error" && (

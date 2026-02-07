@@ -5,10 +5,12 @@ import Image from "next/image";
 import { Vessel, PriceHistory } from "@/lib/supabase";
 import { sourceLabel } from "@/lib/sources";
 import PriceHistoryChart from "./PriceHistoryChart";
+import PremiumGate from "./PremiumGate";
 
 interface VesselDetailProps {
   vessel: Vessel;
   history: PriceHistory[];
+  isPremium?: boolean;
   onClose: () => void;
 }
 
@@ -30,7 +32,7 @@ function formatDate(iso: string): string {
   });
 }
 
-export default function VesselDetail({ vessel, history, onClose }: VesselDetailProps) {
+export default function VesselDetail({ vessel, history, isPremium = false, onClose }: VesselDetailProps) {
   const [imgError, setImgError] = React.useState(false);
 
   // Close on Escape key
@@ -107,7 +109,7 @@ export default function VesselDetail({ vessel, history, onClose }: VesselDetailP
               <p className="text-xl font-extrabold text-slate-900">
                 {formatPrice(vessel.price)}
               </p>
-              {priceChange !== null && priceChange !== 0 && (
+              {isPremium && priceChange !== null && priceChange !== 0 && (
                 <p
                   className={`text-xs font-semibold ${
                     priceChange < 0 ? "text-emerald-600" : "text-red-500"
@@ -135,58 +137,60 @@ export default function VesselDetail({ vessel, history, onClose }: VesselDetailP
             <SpecItem label="Tonnage" value={vessel.tonnage ? `${vessel.tonnage}t` : "-"} />
           </div>
 
-          {/* Price history chart */}
-          {history.length >= 2 && (
-            <div className="mt-6">
-              <h3 className="text-sm font-semibold text-slate-700">Prijsverloop</h3>
-              <div className="mt-2 rounded-lg border border-slate-100 bg-slate-50 p-3" style={{ height: 160 }}>
-                <PriceHistoryChart history={history} width={580} height={140} />
+          {/* Price history chart (premium) */}
+          <PremiumGate isPremium={isPremium}>
+            {history.length >= 2 && (
+              <div className="mt-6">
+                <h3 className="text-sm font-semibold text-slate-700">Prijsverloop</h3>
+                <div className="mt-2 rounded-lg border border-slate-100 bg-slate-50 p-3" style={{ height: 160 }}>
+                  <PriceHistoryChart history={history} width={580} height={140} />
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Price change log */}
-          {history.length > 0 && (
-            <div className="mt-5">
-              <h3 className="text-sm font-semibold text-slate-700">Prijswijzigingen</h3>
-              <div className="mt-2 max-h-48 overflow-y-auto rounded-lg border border-slate-100">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-slate-100 bg-slate-50 text-left text-xs text-slate-500">
-                      <th className="px-3 py-2 font-medium">Datum</th>
-                      <th className="px-3 py-2 font-medium text-right">Prijs</th>
-                      <th className="px-3 py-2 font-medium text-right">Verschil</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {history.map((h, i) => {
-                      const diff = i > 0 ? h.price - history[i - 1].price : null;
-                      return (
-                        <tr key={h.id} className="border-b border-slate-50 last:border-b-0">
-                          <td className="px-3 py-2 text-slate-600">{formatDate(h.recorded_at)}</td>
-                          <td className="px-3 py-2 text-right font-medium text-slate-900">
-                            {formatPrice(h.price)}
-                          </td>
-                          <td className="px-3 py-2 text-right font-medium">
-                            {diff === null ? (
-                              <span className="text-slate-400">&mdash;</span>
-                            ) : diff === 0 ? (
-                              <span className="text-slate-400">0</span>
-                            ) : (
-                              <span className={diff < 0 ? "text-emerald-600" : "text-red-500"}>
-                                {diff < 0 ? "" : "+"}
-                                {formatPrice(diff)}
-                              </span>
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+            {/* Price change log */}
+            {history.length > 0 && (
+              <div className="mt-5">
+                <h3 className="text-sm font-semibold text-slate-700">Prijswijzigingen</h3>
+                <div className="mt-2 max-h-48 overflow-y-auto rounded-lg border border-slate-100">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-slate-100 bg-slate-50 text-left text-xs text-slate-500">
+                        <th className="px-3 py-2 font-medium">Datum</th>
+                        <th className="px-3 py-2 font-medium text-right">Prijs</th>
+                        <th className="px-3 py-2 font-medium text-right">Verschil</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {history.map((h, i) => {
+                        const diff = i > 0 ? h.price - history[i - 1].price : null;
+                        return (
+                          <tr key={h.id} className="border-b border-slate-50 last:border-b-0">
+                            <td className="px-3 py-2 text-slate-600">{formatDate(h.recorded_at)}</td>
+                            <td className="px-3 py-2 text-right font-medium text-slate-900">
+                              {formatPrice(h.price)}
+                            </td>
+                            <td className="px-3 py-2 text-right font-medium">
+                              {diff === null ? (
+                                <span className="text-slate-400">&mdash;</span>
+                              ) : diff === 0 ? (
+                                <span className="text-slate-400">0</span>
+                              ) : (
+                                <span className={diff < 0 ? "text-emerald-600" : "text-red-500"}>
+                                  {diff < 0 ? "" : "+"}
+                                  {formatPrice(diff)}
+                                </span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </PremiumGate>
 
           {/* Cross-source comparison */}
           {vessel.linked_sources && vessel.linked_sources.length >= 2 && (

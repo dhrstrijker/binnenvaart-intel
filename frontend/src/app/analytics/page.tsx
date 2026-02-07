@@ -2,8 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import { getSupabase, Vessel, PriceHistory } from "@/lib/supabase";
+import { useSubscription } from "@/lib/useSubscription";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import PremiumGate from "@/components/PremiumGate";
 import MarketOverview from "@/components/analytics/MarketOverview";
 import SupplyByType from "@/components/analytics/TypeBreakdown";
 import TimeOnMarket from "@/components/analytics/PriceDistribution";
@@ -16,31 +18,40 @@ export default function AnalyticsPage() {
   const [priceHistory, setPriceHistory] = useState<PriceHistory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { user, isPremium, isLoading: subLoading } = useSubscription();
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
       try {
         const supabase = getSupabase();
-        const [vesselsRes, priceRes] = await Promise.all([
-          supabase.from("vessels").select("id, name, type, length_m, width_m, tonnage, build_year, price, url, image_url, source, source_id, scraped_at, first_seen_at, updated_at, status, canonical_vessel_id, linked_sources"),
-          supabase
-            .from("price_history")
-            .select("*")
-            .order("recorded_at", { ascending: true }),
-        ]);
+
+        const vesselsRes = await supabase
+          .from("vessels")
+          .select("id, name, type, length_m, width_m, tonnage, build_year, price, url, image_url, source, source_id, scraped_at, first_seen_at, updated_at, status, canonical_vessel_id, linked_sources");
 
         if (vesselsRes.error) {
           setError(vesselsRes.error.message);
           return;
         }
-        if (priceRes.error) {
-          setError(priceRes.error.message);
-          return;
-        }
-
         setVessels(vesselsRes.data ?? []);
-        setPriceHistory(priceRes.data ?? []);
+
+        // Only fetch price history for premium users
+        if (user && isPremium) {
+          const priceRes = await supabase
+            .from("price_history")
+            .select("*")
+            .order("recorded_at", { ascending: true });
+
+          if (priceRes.error) {
+            // Non-fatal: analytics still work without price history
+            console.warn("Could not load price history:", priceRes.error.message);
+          } else {
+            setPriceHistory(priceRes.data ?? []);
+          }
+        } else {
+          setPriceHistory([]);
+        }
       } catch (e) {
         setError(
           e instanceof Error ? e.message : "Kon geen verbinding maken"
@@ -49,8 +60,10 @@ export default function AnalyticsPage() {
       setLoading(false);
     }
 
-    fetchData();
-  }, []);
+    if (!subLoading) {
+      fetchData();
+    }
+  }, [user, isPremium, subLoading]);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -100,23 +113,28 @@ export default function AnalyticsPage() {
         {/* Analytics content */}
         {!loading && !error && (
           <div className="space-y-6">
-            {/* KPI overview cards */}
+            {/* KPI overview cards - free */}
             <MarketOverview vessels={vessels} />
 
-            {/* Supply by type + Time on market */}
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              <SupplyByType vessels={vessels} />
-              <TimeOnMarket vessels={vessels} />
-            </div>
+            {/* Premium analytics */}
+            <PremiumGate isPremium={isPremium}>
+              {/* Supply by type + Time on market */}
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <SupplyByType vessels={vessels} />
+                <TimeOnMarket vessels={vessels} />
+              </div>
 
-            {/* Price trends by type (full-width) */}
-            <PriceTrends priceHistory={priceHistory} vessels={vessels} />
+              {/* Price trends by type (full-width) */}
+              <div className="mt-6">
+                <PriceTrends priceHistory={priceHistory} vessels={vessels} />
+              </div>
 
-            {/* Price pressure + Competitive position */}
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              <PricePressure vessels={vessels} priceHistory={priceHistory} />
-              <CompetitivePosition vessels={vessels} />
-            </div>
+              {/* Price pressure + Competitive position */}
+              <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <PricePressure vessels={vessels} priceHistory={priceHistory} />
+                <CompetitivePosition vessels={vessels} />
+              </div>
+            </PremiumGate>
           </div>
         )}
       </div>

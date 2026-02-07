@@ -2,9 +2,11 @@
 
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { getSupabase, Vessel, PriceHistory } from "@/lib/supabase";
+import { useSubscription } from "@/lib/useSubscription";
 import VesselCard from "./VesselCard";
 import VesselDetail from "./VesselDetail";
 import Filters, { FilterState } from "./Filters";
+import PremiumGate from "./PremiumGate";
 
 const INITIAL_FILTERS: FilterState = {
   search: "",
@@ -35,6 +37,7 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterState>(INITIAL_FILTERS);
   const [selectedVessel, setSelectedVessel] = useState<Vessel | null>(null);
+  const { user, isPremium, isLoading: subLoading } = useSubscription();
 
   const handleOpenDetail = useCallback((vessel: Vessel) => {
     setSelectedVessel(vessel);
@@ -50,36 +53,39 @@ export default function Dashboard() {
       try {
         const supabase = getSupabase();
 
-        // Fetch vessels and price history in parallel
-        const [vesselsRes, historyRes] = await Promise.all([
-          supabase
-            .from("vessels")
-            .select("id, name, type, length_m, width_m, tonnage, build_year, price, url, image_url, source, source_id, scraped_at, first_seen_at, updated_at, status, canonical_vessel_id, linked_sources")
-            .order("scraped_at", { ascending: false }),
-          supabase
-            .from("price_history")
-            .select("*")
-            .order("recorded_at", { ascending: true }),
-        ]);
+        // Always fetch vessels
+        const vesselsRes = await supabase
+          .from("vessels")
+          .select("id, name, type, length_m, width_m, tonnage, build_year, price, url, image_url, source, source_id, scraped_at, first_seen_at, updated_at, status, canonical_vessel_id, linked_sources")
+          .order("scraped_at", { ascending: false });
 
         if (vesselsRes.error) {
           setError(vesselsRes.error.message);
         } else {
-          // Only show canonical/unique vessels (filter out duplicates)
           const all = vesselsRes.data ?? [];
           setVessels(all.filter((v) => v.canonical_vessel_id === null || v.canonical_vessel_id === undefined));
         }
 
-        // Group price history by vessel_id
-        if (!historyRes.error && historyRes.data) {
-          const grouped: Record<string, PriceHistory[]> = {};
-          for (const entry of historyRes.data) {
-            if (!grouped[entry.vessel_id]) {
-              grouped[entry.vessel_id] = [];
+        // Only fetch price history if user is authenticated and premium
+        // RLS blocks anon/non-premium anyway, but skip the request to avoid empty errors
+        if (user && isPremium) {
+          const historyRes = await supabase
+            .from("price_history")
+            .select("*")
+            .order("recorded_at", { ascending: true });
+
+          if (!historyRes.error && historyRes.data) {
+            const grouped: Record<string, PriceHistory[]> = {};
+            for (const entry of historyRes.data) {
+              if (!grouped[entry.vessel_id]) {
+                grouped[entry.vessel_id] = [];
+              }
+              grouped[entry.vessel_id].push(entry);
             }
-            grouped[entry.vessel_id].push(entry);
+            setPriceHistoryMap(grouped);
           }
-          setPriceHistoryMap(grouped);
+        } else {
+          setPriceHistoryMap({});
         }
       } catch (e) {
         setError(
@@ -89,8 +95,11 @@ export default function Dashboard() {
       setLoading(false);
     }
 
-    fetchData();
-  }, []);
+    // Wait for subscription check to finish before fetching
+    if (!subLoading) {
+      fetchData();
+    }
+  }, [user, isPremium, subLoading]);
 
   const availableTypes = useMemo(() => {
     const types = new Set(vessels.map((v) => v.type).filter(Boolean));
@@ -274,6 +283,7 @@ export default function Dashboard() {
               key={vessel.id}
               vessel={vessel}
               priceHistory={priceHistoryMap[vessel.id] ?? []}
+              isPremium={isPremium}
               onOpenDetail={handleOpenDetail}
             />
           ))}
@@ -285,7 +295,6 @@ export default function Dashboard() {
         <VesselDetail
           vessel={selectedVessel}
           history={(() => {
-            // Collect price history from all linked sources
             const ids = [selectedVessel.id];
             if (selectedVessel.linked_sources) {
               for (const ls of selectedVessel.linked_sources) {
@@ -303,6 +312,7 @@ export default function Dashboard() {
               new Date(a.recorded_at).getTime() - new Date(b.recorded_at).getTime()
             );
           })()}
+          isPremium={isPremium}
           onClose={handleCloseDetail}
         />
       )}
