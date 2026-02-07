@@ -9,6 +9,7 @@ import PriceHistoryChart from "./PriceHistoryChart";
 import PremiumGate from "./PremiumGate";
 import VesselCard from "./VesselCard";
 import MarineTrafficMap from "./MarineTrafficMap";
+import FavoriteButton from "./FavoriteButton";
 import { useSubscription } from "@/lib/useSubscription";
 
 interface VesselPageContentProps {
@@ -140,20 +141,11 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
 
         {/* Action buttons top-right */}
         <div className="absolute top-3 right-3 flex gap-2">
-          <button
-            type="button"
-            onClick={() => {
-              if (!user) {
-                window.location.href = "/signup";
-              }
-            }}
-            className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/90 text-slate-500 shadow-sm backdrop-blur-sm transition-colors hover:text-red-500"
-            title="Bewaar als favoriet"
-          >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
-          </button>
+          <FavoriteButton
+            vesselId={vessel.id}
+            user={user}
+            className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/90 text-slate-500 shadow-sm backdrop-blur-sm transition-colors hover:text-red-500 disabled:opacity-50"
+          />
           <div className="relative">
             <button
               type="button"

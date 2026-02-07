@@ -175,6 +175,23 @@ CREATE POLICY "Users can manage own watchlist"
   ON watchlist FOR ALL TO authenticated
   USING ((SELECT auth.uid()) = user_id);
 
+-- Favorites for bookmarking vessels (separate from watchlist notifications)
+CREATE TABLE favorites (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  vessel_id UUID REFERENCES vessels(id) ON DELETE CASCADE NOT NULL,
+  added_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, vessel_id)
+);
+
+CREATE INDEX idx_favorites_user ON favorites(user_id);
+CREATE INDEX idx_favorites_vessel ON favorites(vessel_id);
+
+ALTER TABLE favorites ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can manage own favorites"
+  ON favorites FOR ALL TO authenticated
+  USING ((SELECT auth.uid()) = user_id);
+
 -- Notification history for tracking sent notifications
 CREATE TABLE notification_history (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,

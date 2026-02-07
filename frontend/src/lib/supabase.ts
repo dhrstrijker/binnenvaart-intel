@@ -37,6 +37,13 @@ export interface PriceHistory {
   recorded_at: string;
 }
 
+export interface Favorite {
+  id: string;
+  user_id: string;
+  vessel_id: string;
+  added_at: string;
+}
+
 export interface ActivityLogEntry {
   id: string;
   vessel_id: string;

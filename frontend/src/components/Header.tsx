@@ -81,6 +81,7 @@ export default function Header() {
             <NavLink href="/">Dashboard</NavLink>
             <NavLink href="/analytics">Analyse</NavLink>
             <NavLink href="/pricing">Prijzen</NavLink>
+            {user && <NavLink href="/favorieten">Favorieten</NavLink>}
           </nav>
 
           <div className="hidden items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 sm:flex">
@@ -170,6 +171,7 @@ export default function Header() {
             <NavLink href="/" onClick={() => setMobileNavOpen(false)}>Dashboard</NavLink>
             <NavLink href="/analytics" onClick={() => setMobileNavOpen(false)}>Analyse</NavLink>
             <NavLink href="/pricing" onClick={() => setMobileNavOpen(false)}>Prijzen</NavLink>
+            {user && <NavLink href="/favorieten" onClick={() => setMobileNavOpen(false)}>Favorieten</NavLink>}
           </nav>
           <div className="border-t border-white/10 px-4 py-3">
             {user ? (
