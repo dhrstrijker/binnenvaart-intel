@@ -438,3 +438,180 @@ def send_personalized_notifications(stats: dict, changes: list[dict]) -> None:
             "%d legacy abonnees krijgen generieke samenvatting.", len(legacy_subs)
         )
         send_summary_email(stats, changes)
+
+
+def get_saved_search_matches(search: dict, all_changes: list[dict]) -> list[dict]:
+    """Filter changes matching saved search criteria."""
+    filters = search.get("filters") or {}
+    matches = list(all_changes)
+
+    if filters.get("search"):
+        q = filters["search"].lower()
+        matches = [c for c in matches if q in c.get("vessel", {}).get("name", "").lower()]
+
+    if filters.get("type"):
+        matches = [c for c in matches if c.get("vessel", {}).get("type") == filters["type"]]
+
+    if filters.get("source"):
+        matches = [c for c in matches if c.get("vessel", {}).get("source") == filters["source"]]
+
+    if filters.get("minPrice"):
+        min_price = float(filters["minPrice"])
+        matches = [c for c in matches if (c.get("vessel", {}).get("price") or 0) >= min_price]
+
+    if filters.get("maxPrice"):
+        max_price = float(filters["maxPrice"])
+        matches = [c for c in matches if (c.get("vessel", {}).get("price") or float("inf")) <= max_price]
+
+    return matches
+
+
+def build_digest_email(subscriber: dict, all_matches: list[dict], label: str) -> str:
+    """Build digest HTML email grouping watchlist + saved search results."""
+    now = datetime.now(timezone.utc).strftime("%d-%m-%Y %H:%M UTC")
+    unsubscribe_token = subscriber.get("unsubscribe_token", "")
+
+    price_changes = [c for c in all_matches if c["kind"] == "price_changed"]
+    new_vessels = [c for c in all_matches if c["kind"] == "inserted"]
+    removed_vessels = [c for c in all_matches if c["kind"] == "removed"]
+
+    sections = ""
+
+    if price_changes:
+        rows = "\n".join(_build_vessel_row(c) for c in price_changes)
+        sections += f"""
+        <div style="margin-bottom:16px;">
+          <h3 style="margin:0 0 8px;color:#d97706;font-size:14px;text-transform:uppercase;">
+            Prijswijzigingen ({len(price_changes)})
+          </h3>
+          <table style="width:100%;border-collapse:collapse;">{rows}</table>
+        </div>"""
+
+    if new_vessels:
+        rows = "\n".join(_build_vessel_row(c) for c in new_vessels)
+        sections += f"""
+        <div style="margin-bottom:16px;">
+          <h3 style="margin:0 0 8px;color:#059669;font-size:14px;text-transform:uppercase;">
+            Nieuwe schepen ({len(new_vessels)})
+          </h3>
+          <table style="width:100%;border-collapse:collapse;">{rows}</table>
+        </div>"""
+
+    if removed_vessels:
+        rows = "\n".join(_build_vessel_row(c) for c in removed_vessels)
+        sections += f"""
+        <div style="margin-bottom:16px;">
+          <h3 style="margin:0 0 8px;color:#ef4444;font-size:14px;text-transform:uppercase;">
+            Verkocht / Verwijderd ({len(removed_vessels)})
+          </h3>
+          <table style="width:100%;border-collapse:collapse;">{rows}</table>
+        </div>"""
+
+    return f"""
+<!DOCTYPE html>
+<html lang="nl">
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <div style="max-width:600px;margin:0 auto;padding:20px;">
+    <!-- Header -->
+    <div style="background:#0f172a;border-radius:12px 12px 0 0;padding:24px;text-align:center;">
+      <h1 style="margin:0;color:#ffffff;font-size:22px;letter-spacing:-0.03em;">NAVISIO</h1>
+      <p style="margin:4px 0 0;color:#06b6d4;font-size:13px;">{label} Samenvatting</p>
+    </div>
+
+    <!-- Content -->
+    <div style="background:#ffffff;padding:20px 24px;">
+      <p style="margin:0 0 16px;color:#475569;font-size:14px;">
+        Er zijn {len(all_matches)} wijziging{"en" if len(all_matches) != 1 else ""} gedetecteerd
+        in uw watchlist en opgeslagen zoekopdrachten op {now}.
+      </p>
+      {sections}
+    </div>
+
+    <!-- Footer -->
+    <div style="background:#f8fafc;border-radius:0 0 12px 12px;padding:16px 24px;text-align:center;border-top:1px solid #e2e8f0;">
+      <p style="margin:0;color:#94a3b8;font-size:11px;">
+        U ontvangt dit bericht omdat u {label.lower()} samenvattingen heeft ingeschakeld.
+        <br><a href="https://navisio.nl/api/unsubscribe?token={unsubscribe_token}"
+          style="color:#06b6d4;text-decoration:underline;">Uitschrijven</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>"""
+
+
+def send_digest(frequency: str) -> None:
+    """Send digest emails (daily or weekly) to subscribers with that frequency preference.
+
+    Combines watchlist changes + saved search matches into one email per user.
+    """
+    if not resend.api_key:
+        logger.warning("RESEND_API_KEY niet ingesteld, digest overgeslagen.")
+        return
+
+    from db import get_subscribers_with_frequency, get_user_saved_searches, get_user_watchlist_vessel_ids, get_changes_since, save_notification_history
+    from datetime import timedelta
+
+    cutoff_days = 1 if frequency == "daily" else 7
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=cutoff_days)).isoformat()
+
+    recent_changes = get_changes_since(cutoff)
+    if not recent_changes:
+        logger.info("Geen recente wijzigingen voor %s digest.", frequency)
+        return
+
+    subscribers = get_subscribers_with_frequency(frequency)
+    if not subscribers:
+        logger.info("Geen abonnees voor %s digest.", frequency)
+        return
+
+    for sub in subscribers:
+        user_matches = []
+        seen_vessel_ids = set()
+
+        # Watchlist matches
+        watchlist_ids = get_user_watchlist_vessel_ids(sub["user_id"])
+        for change in recent_changes:
+            vid = change.get("vessel", {}).get("id")
+            if vid in watchlist_ids and vid not in seen_vessel_ids:
+                user_matches.append(change)
+                seen_vessel_ids.add(vid)
+
+        # Saved search matches
+        searches = get_user_saved_searches(sub["user_id"], frequency=frequency)
+        for search in searches:
+            search_matches = get_saved_search_matches(search, recent_changes)
+            for match in search_matches:
+                vid = match.get("vessel", {}).get("id")
+                if vid not in seen_vessel_ids:
+                    user_matches.append(match)
+                    seen_vessel_ids.add(vid)
+
+        if not user_matches:
+            continue
+
+        label = "Dagelijkse" if frequency == "daily" else "Wekelijkse"
+        html = build_digest_email(sub, user_matches, label)
+        subject = f"Navisio: {label} samenvatting — {len(user_matches)} wijziging{'en' if len(user_matches) != 1 else ''}"
+
+        try:
+            result = resend.Emails.send({
+                "from": FROM_ADDRESS,
+                "to": sub["email"],
+                "subject": subject,
+                "html": html,
+                "headers": {
+                    "List-Unsubscribe": f"<https://navisio.nl/api/unsubscribe?token={sub['unsubscribe_token']}>"
+                }
+            })
+            message_id = result.get("id") if isinstance(result, dict) else None
+            save_notification_history(
+                sub["user_id"],
+                [c["vessel"]["id"] for c in user_matches if "vessel" in c],
+                f"{frequency}_digest",
+                message_id,
+            )
+            logger.info("%s digest verstuurd naar %s", label, sub["email"])
+        except Exception:
+            logger.exception("Fout bij %s digest naar %s", frequency, sub["email"])

@@ -1,3 +1,4 @@
+import argparse
 import logging
 from datetime import datetime, timezone
 
@@ -7,7 +8,7 @@ import scrape_pcshipbrokers
 import scrape_gtsschepen
 import scrape_gsk
 from db import clear_changes, get_changes, mark_removed, run_dedup
-from notifications import send_personalized_notifications
+from notifications import send_personalized_notifications, send_digest
 
 logging.basicConfig(
     level=logging.INFO,
@@ -31,6 +32,15 @@ def _empty_stats():
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--digest-only", choices=["daily", "weekly"], help="Only send digest, skip scraping")
+    args = parser.parse_args()
+
+    if args.digest_only:
+        logger.info("Running in digest-only mode: %s", args.digest_only)
+        send_digest(args.digest_only)
+        return
+
     logger.info("Starting scrape...")
     clear_changes()
 
@@ -82,6 +92,10 @@ def main():
     changes = get_changes()
     logger.info("Changes detected: %d", len(changes))
     send_personalized_notifications(combined_stats, changes)
+
+    # Send daily digest after scraping
+    logger.info("Sending daily digest...")
+    send_digest("daily")
 
 
 if __name__ == "__main__":

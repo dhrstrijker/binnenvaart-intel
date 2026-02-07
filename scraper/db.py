@@ -340,3 +340,62 @@ def save_notification_history(
             "resend_message_id": message_id,
         }
     ).execute()
+
+
+def get_subscribers_with_frequency(frequency: str) -> list[dict]:
+    """Get verified subscribers whose preferences include the given frequency."""
+    res = (
+        supabase.table("notification_subscribers")
+        .select("id, user_id, email, preferences, unsubscribe_token")
+        .eq("active", True)
+        .not_.is_("verified_at", "null")
+        .not_.is_("user_id", "null")
+        .execute()
+    )
+    # Filter by frequency preference in Python since JSONB filtering is complex
+    return [s for s in (res.data or []) if (s.get("preferences") or {}).get("frequency") == frequency]
+
+
+def get_user_saved_searches(user_id: str, frequency: str | None = None) -> list[dict]:
+    """Get active saved searches for a user, optionally filtered by frequency."""
+    query = supabase.table("saved_searches").select("*").eq("user_id", user_id).eq("active", True)
+    if frequency:
+        query = query.eq("frequency", frequency)
+    return (query.execute()).data or []
+
+
+def get_changes_since(cutoff_iso: str) -> list[dict]:
+    """Get vessel changes (from price_history) since a given ISO timestamp.
+    Returns change dicts compatible with the notification system format."""
+    # Get price history entries since cutoff
+    res = (
+        supabase.table("price_history")
+        .select("vessel_id, price, recorded_at")
+        .gte("recorded_at", cutoff_iso)
+        .order("recorded_at", desc=False)
+        .execute()
+    )
+    if not res.data:
+        return []
+
+    # Get the associated vessels
+    vessel_ids = list(set(row["vessel_id"] for row in res.data))
+    vessels_res = (
+        supabase.table("vessels")
+        .select("id, name, type, source, price, url, length_m, status")
+        .in_("id", vessel_ids)
+        .execute()
+    )
+    vessel_map = {v["id"]: v for v in (vessels_res.data or [])}
+
+    changes = []
+    for entry in res.data:
+        vessel = vessel_map.get(entry["vessel_id"])
+        if not vessel:
+            continue
+        changes.append({
+            "kind": "price_changed",
+            "vessel": vessel,
+            "new_price": entry["price"],
+        })
+    return changes

@@ -7,6 +7,7 @@ import { useSubscription } from "@/lib/useSubscription";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import NotificationSettings from "@/components/NotificationSettings";
+import SavedSearchManager from "@/components/SavedSearchManager";
 
 export default function AccountPage() {
   const router = useRouter();
@@ -119,6 +120,11 @@ export default function AccountPage() {
         {/* Notification settings */}
         <div className="mt-6">
           <NotificationSettings user={user} />
+        </div>
+
+        {/* Saved searches */}
+        <div className="mt-6">
+          <SavedSearchManager user={user} />
         </div>
 
         {/* Sign out */}

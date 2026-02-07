@@ -187,3 +187,24 @@ CREATE TABLE notification_history (
 
 CREATE INDEX idx_notification_history_user ON notification_history(user_id);
 CREATE INDEX idx_notification_history_sent_at ON notification_history(sent_at);
+
+-- Saved searches for custom notifications
+CREATE TABLE saved_searches (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) NOT NULL,
+  name TEXT NOT NULL,
+  filters JSONB DEFAULT '{}'::jsonb,
+  frequency TEXT NOT NULL DEFAULT 'daily' CHECK (frequency IN ('immediate', 'daily', 'weekly')),
+  active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_saved_searches_user ON saved_searches(user_id);
+CREATE INDEX idx_saved_searches_active ON saved_searches(active);
+
+ALTER TABLE saved_searches ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can manage own saved searches"
+  ON saved_searches FOR ALL TO authenticated
+  USING ((SELECT auth.uid()) = user_id)
+  WITH CHECK ((SELECT auth.uid()) = user_id);
