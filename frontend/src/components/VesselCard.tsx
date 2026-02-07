@@ -99,11 +99,6 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
               NIEUW
             </span>
           )}
-          {vessel.type && (
-            <span className="rounded-md bg-white/90 px-2 py-0.5 text-xs font-semibold text-slate-700 shadow-sm backdrop-blur-sm">
-              {vessel.type}
-            </span>
-          )}
         </div>
 
         {/* Source badge */}
