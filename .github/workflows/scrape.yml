@@ -18,8 +18,28 @@ jobs:
         with:
           python-version: "3.13"
       - run: pip install -r requirements.txt
-      - run: python main.py
+      - name: Run scraper
+        run: python main.py
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+
+      # Fallback: notify on workflow-level failure (e.g. pip install fails,
+      # Python segfaults, or any unhandled crash before alerting.py runs)
+      - name: Send failure alert
+        if: failure()
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+        run: |
+          curl -s -X POST "https://api.resend.com/emails" \
+            -H "Authorization: Bearer $RESEND_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"from\": \"onboarding@resend.dev\",
+              \"to\": \"$ALERT_EMAIL\",
+              \"subject\": \"Scraper workflow failed\",
+              \"html\": \"<h2>GitHub Actions scraper workflow failed</h2><p>Check logs: <a href='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'>View Run</a></p>\"
+            }"

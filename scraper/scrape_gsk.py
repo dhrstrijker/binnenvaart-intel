@@ -54,129 +54,17 @@ query GetVessels($skip: Int!, $limit: Int!) {
 }
 """
 
-DETAIL_QUERY = """
-query GetVesselBySlug($slug: String!) {
-  getVesselBySlug(slug: $slug) {
-    description { locale value }
-    general {
-      euroNumber
-      welded
-      riveted
-      shipyard
-      vesselDimensions { length width draft depth }
-      buildInformation { locale value }
-      particularities { locale value }
-      tonnage { maxTonnage at1m90 at2m20 at2m50 at2m80 at3m00 }
-      certificates { title validUntil }
-      pushCertificate
-      oneManCertified
-      oneManRadarCertified
-      numberOfHolds
-      cargoholdCapacity
-      trimFill
-      doubleHull
-      semiDoubleHull
-      cargoholdTopDim
-      cargoholdTopLength
-      cargoholdTopWidth
-      cargoholdBottomDim
-      cargoholdBottomLength
-      cargoholdBottomWidth
-      innerBottomMaterial
-      innerBottomThickness
-      innerBottomYearOfBuild
-      containers
-      washBulkhead
-      midDeckConnection
-      heightCoaming
-      framesCovered
-      cargoholdBeams
-      cargoholdHatchesType
-      cargoholdHatchesMake
-      cargoholdYearOfBuild
-      hatchCraneType
-      hatchCraneMake
-      hatchCraneYearOfBuild
-      airdraftWithBallast
-      airdraftWithoutBallast
-      airdraftWheelhouseLowered
-    }
-    wheelhouse {
-      wheelhouseMaterial { locale value }
-      wheelhouseModel
-      wheelhouseYearOfBuild
-      wheelhouseElevating
-      wheelhouseFoldable
-      wheelhouseColumn
-      wheelhouseScissors
-      wheelhouseInnerPassage
-      wheelhouseSightHeight
-      tanksSternFuel
-      tanksSternFreshWater
-      tanksSternDirtyWater
-      tanksSternDirtyOil
-      tanksSternOther
-      tanksForeshipFuel
-      tanksForeshipFreshWater
-      tanksForeshipDirtyWater
-      tanksForeshipDirtyOil
-      tanksForeshipOther
-      ballastTanksCapacityBack
-      ballastTanksCapacityMiddle
-      ballastTanksCapacityFront
-      ballastTanksCapacityDoubleHull
-    }
-    technics {
-      engines {
-        description make type power powerType tpm yearOfBuild
-        revision runningHours environmentalClassification
-        remarks { locale value }
-      }
-      gearboxes {
-        make type reduction yearOfBuild revision runningHours
-        remarks { locale value }
-      }
-      generators {
-        make type power kva yearOfBuild revision runningHours
-        remarks { locale value }
-      }
-      bowthrusterMake
-      bowthrusterSystem
-    }
-    steering {
-      steeringGear { make type system rudders }
-      propellor { make type material sparePropellor nozzle }
-      bowthruster { make type yearOfBuild }
-    }
-    equipment {
-      additionalEquipment { locale value }
-      winchesForeShip { make type wireDrum chainDisks }
-      winchesStern { make type wireDrum chainDisks }
-      retractableMooringPole { make type length yearOfBuild }
-      carCrane { make type length weight yearOfBuild }
-      mastForeShip
-      mastStern
-      pump { number capacity make description { locale value } }
-      ballastPump { number capacity make description { locale value } }
-      deckWashPump { number capacity make description { locale value } }
-      otherPumpEquipment
-      nauticalEquipment {
-        radars { type make yearOfBuild }
-        radios { type make yearOfBuild }
-        gps ais camerasYearOfBuild
-        pilot { type make yearOfBuild }
-        echoSounder { type make yearOfBuild }
-        steeringIndicator { type make yearOfBuild }
-        otherNauticalEquipment
-      }
-      electricalEquipment {
-        heating airconditioning solarPanels batteries
-        shoreConnection shaftGenerator otherElectricalEquipment
-      }
-    }
-  }
+# Vessel data sections to fetch (skip metadata/media: id, gallery, broker, etc.)
+DETAIL_SECTIONS = {
+    "description", "general", "wheelhouse", "technics", "steering",
+    "equipment", "tankerDetails", "recreation", "lifestory", "passengerShip",
 }
-"""
+
+# GraphQL scalar types that need no sub-selection
+SCALAR_TYPES = {"String", "Int", "Float", "Boolean", "Date", "ID", "MongoID"}
+
+# Cache for the dynamically-built detail query
+_detail_query_cache = None
 
 # GSK API type enum -> Dutch vessel type
 TYPE_MAP = {
@@ -264,291 +152,155 @@ def _clean_detail(obj):
     return obj
 
 
-def parse_detail(detail_data: dict) -> dict | None:
-    """Parse the raw GraphQL detail response into a flat raw_details dict."""
-    if not detail_data:
+def _resolve_titles_recursive(obj):
+    """Walk the response and resolve VesselTitle arrays/objects to plain strings.
+
+    VesselTitle looks like [{locale: "nl", value: "..."}, {locale: "en", value: "..."}]
+    or a single {locale: "nl", value: "..."}.
+    """
+    if isinstance(obj, list):
+        # Check if this list looks like a VesselTitle array
+        if obj and isinstance(obj[0], dict) and "locale" in obj[0]:
+            return _resolve_title(obj)
+        return [_resolve_titles_recursive(item) for item in obj]
+    if isinstance(obj, dict):
+        # Check if this is a single VesselTitle object
+        if "locale" in obj and "value" in obj and len(obj) == 2:
+            return obj.get("value") or None
+        return {k: _resolve_titles_recursive(v) for k, v in obj.items()}
+    return obj
+
+
+def _unwrap_type(type_info):
+    """Unwrap NON_NULL and LIST wrappers to get the base type name and kind."""
+    t = type_info
+    while t and t.get("kind") in ("NON_NULL", "LIST"):
+        t = t.get("ofType") or {}
+    return t.get("name"), t.get("kind")
+
+
+# Cache for the full schema (type_name -> fields list)
+_schema_cache = None
+
+
+def _fetch_full_schema():
+    """Fetch the entire GraphQL schema in a single introspection call."""
+    global _schema_cache
+    if _schema_cache is not None:
+        return _schema_cache
+
+    logger.info("Fetching full GSK GraphQL schema...")
+    query = """{
+      __schema {
+        types {
+          name
+          kind
+          fields {
+            name
+            type {
+              name kind
+              ofType { name kind ofType { name kind ofType { name kind } } }
+            }
+          }
+        }
+      }
+    }"""
+    resp = _fetch_with_retry(GRAPHQL_URL, {"query": query}, retries=5)
+    data = resp.json()
+    types = (data.get("data") or {}).get("__schema", {}).get("types") or []
+
+    _schema_cache = {}
+    for t in types:
+        name = t.get("name")
+        if name and t.get("fields"):
+            _schema_cache[name] = t["fields"]
+        elif name:
+            # Enum/scalar/input — store empty list to distinguish from unknown
+            _schema_cache[name] = []
+
+    logger.info("Cached %d types from schema.", len(_schema_cache))
+    return _schema_cache
+
+
+def _build_selection(type_name, schema, visited=None, max_depth=4):
+    """Recursively build a GraphQL selection set for a type from cached schema."""
+    if visited is None:
+        visited = set()
+    if type_name in visited or max_depth <= 0 or type_name in SCALAR_TYPES or not type_name:
         return None
 
-    specs = {}
+    fields = schema.get(type_name) or []
+    if not fields:
+        return None  # Enum or unknown type — treated as leaf by caller
 
-    # Description
-    desc = _resolve_title(detail_data.get("description"))
-    if desc:
-        specs["description"] = desc
+    visited.add(type_name)
+    parts = []
 
-    # General section
-    gen = detail_data.get("general") or {}
-    if gen.get("euroNumber"):
-        specs["euro_number"] = gen["euroNumber"]
-    if gen.get("welded") is not None:
-        specs["welded"] = gen["welded"]
-    if gen.get("riveted") is not None:
-        specs["riveted"] = gen["riveted"]
-    if gen.get("shipyard"):
-        specs["shipyard"] = gen["shipyard"]
+    for field in fields:
+        actual_type, actual_kind = _unwrap_type(field["type"])
+        if actual_type in SCALAR_TYPES or actual_kind == "ENUM":
+            parts.append(field["name"])
+        elif actual_type in schema:
+            sub = _build_selection(actual_type, schema, visited.copy(), max_depth - 1)
+            if sub:
+                parts.append(f'{field["name"]} {{ {sub} }}')
+        # else: unknown type, skip
 
-    dims = gen.get("vesselDimensions") or {}
-    if dims.get("depth") is not None:
-        specs["depth"] = dims["depth"]
+    visited.discard(type_name)
+    return " ".join(parts) if parts else None
 
-    build_info = _resolve_title(gen.get("buildInformation"))
-    if build_info:
-        specs["build_information"] = build_info
 
-    particularities = _resolve_title(gen.get("particularities"))
-    if particularities:
-        specs["particularities"] = particularities
+def _get_detail_query():
+    """Build (or return cached) the full detail query via schema introspection.
 
-    # Tonnage at various drafts
-    tonnage = gen.get("tonnage") or {}
-    tonnage_details = {}
-    for key in ("maxTonnage", "at1m90", "at2m20", "at2m50", "at2m80", "at3m00"):
-        if tonnage.get(key) is not None:
-            tonnage_details[key] = tonnage[key]
-    if tonnage_details:
-        specs["tonnage_details"] = tonnage_details
+    Fetches the entire schema in ONE API call, then builds the query
+    from the cached type definitions — no per-type requests needed.
+    """
+    global _detail_query_cache
+    if _detail_query_cache:
+        return _detail_query_cache
 
-    # Certificates
-    certs = gen.get("certificates") or []
-    cert_list = [c for c in certs if c.get("title")]
-    if cert_list:
-        specs["certificates"] = cert_list
+    schema = _fetch_full_schema()
+    vessel_fields = schema.get("Vessel") or []
 
-    for flag in ("pushCertificate", "oneManCertified", "oneManRadarCertified"):
-        if gen.get(flag) is not None:
-            specs[flag] = gen[flag]
+    parts = []
+    for field in vessel_fields:
+        if field["name"] not in DETAIL_SECTIONS:
+            continue
 
-    # Cargo holds
-    cargo = {}
-    for key in ("numberOfHolds", "cargoholdCapacity", "trimFill", "doubleHull", "semiDoubleHull",
-                "cargoholdTopDim", "cargoholdTopLength", "cargoholdTopWidth",
-                "cargoholdBottomDim", "cargoholdBottomLength", "cargoholdBottomWidth",
-                "innerBottomMaterial", "innerBottomThickness", "innerBottomYearOfBuild",
-                "washBulkhead", "midDeckConnection", "heightCoaming",
-                "framesCovered", "cargoholdBeams",
-                "cargoholdHatchesType", "cargoholdHatchesMake", "cargoholdYearOfBuild",
-                "hatchCraneType", "hatchCraneMake", "hatchCraneYearOfBuild"):
-        if gen.get(key) is not None:
-            cargo[key] = gen[key]
-    if cargo:
-        specs["cargohold"] = cargo
+        actual_type, actual_kind = _unwrap_type(field["type"])
 
-    # Airdraft
-    airdraft = {}
-    for key in ("airdraftWithBallast", "airdraftWithoutBallast", "airdraftWheelhouseLowered"):
-        if gen.get(key) is not None:
-            airdraft[key] = gen[key]
-    if airdraft:
-        specs["airdraft"] = airdraft
+        if actual_type in SCALAR_TYPES or actual_kind == "ENUM":
+            parts.append(field["name"])
+        else:
+            sub = _build_selection(actual_type, schema, set(), max_depth=4)
+            if sub:
+                parts.append(f'{field["name"]} {{ {sub} }}')
+            else:
+                parts.append(field["name"])
 
-    # Containers (String field in GSK)
-    if gen.get("containers"):
-        specs["containers"] = gen["containers"]
-
-    # Wheelhouse
-    wh = detail_data.get("wheelhouse") or {}
-    wheelhouse = {}
-    wh_material = _resolve_title(wh.get("wheelhouseMaterial"))
-    if wh_material:
-        wheelhouse["material"] = wh_material
-    if wh.get("wheelhouseModel"):
-        wheelhouse["model"] = wh["wheelhouseModel"]
-    if wh.get("wheelhouseYearOfBuild") is not None:
-        wheelhouse["yearOfBuild"] = wh["wheelhouseYearOfBuild"]
-    for key in ("wheelhouseElevating", "wheelhouseFoldable", "wheelhouseColumn",
-                "wheelhouseScissors", "wheelhouseInnerPassage"):
-        if wh.get(key) is not None:
-            # Strip 'wheelhouse' prefix for cleaner output
-            short_key = key[len("wheelhouse"):]
-            short_key = short_key[0].lower() + short_key[1:]
-            wheelhouse[short_key] = wh[key]
-    if wh.get("wheelhouseSightHeight"):
-        wheelhouse["sightHeight"] = wh["wheelhouseSightHeight"]
-
-    # Tanks
-    tanks = {}
-    for key in ("tanksSternFuel", "tanksSternFreshWater", "tanksSternDirtyWater",
-                "tanksSternDirtyOil", "tanksSternOther",
-                "tanksForeshipFuel", "tanksForeshipFreshWater",
-                "tanksForeshipDirtyWater", "tanksForeshipDirtyOil", "tanksForeshipOther"):
-        if wh.get(key) is not None:
-            tanks[key] = wh[key]
-    if tanks:
-        wheelhouse["tanks"] = tanks
-
-    # Ballast
-    ballast = {}
-    for key in ("ballastTanksCapacityBack", "ballastTanksCapacityMiddle",
-                "ballastTanksCapacityFront", "ballastTanksCapacityDoubleHull"):
-        if wh.get(key) is not None:
-            ballast[key] = wh[key]
-    if ballast:
-        wheelhouse["ballast"] = ballast
-
-    if wheelhouse:
-        specs["wheelhouse"] = wheelhouse
-
-    # Technics
-    tech = detail_data.get("technics") or {}
-    engines = tech.get("engines") or []
-    if engines:
-        parsed_engines = []
-        for eng in engines:
-            e = {}
-            for k, v in eng.items():
-                if k == "remarks":
-                    # remarks is LIST<VesselTitle>
-                    resolved = _resolve_title(v)
-                    if resolved:
-                        e["remarks"] = resolved
-                elif v is not None:
-                    e[k] = v
-            if e:
-                parsed_engines.append(e)
-        if parsed_engines:
-            specs["engines"] = parsed_engines
-    gearboxes = tech.get("gearboxes") or []
-    if gearboxes:
-        parsed_gb = []
-        for gb in gearboxes:
-            g = {}
-            for k, v in gb.items():
-                if k == "remarks":
-                    resolved = _resolve_title(v)
-                    if resolved:
-                        g["remarks"] = resolved
-                elif v is not None:
-                    g[k] = v
-            if g:
-                parsed_gb.append(g)
-        if parsed_gb:
-            specs["gearboxes"] = parsed_gb
-    generators = tech.get("generators") or []
-    if generators:
-        parsed_gen = []
-        for gen_item in generators:
-            g = {}
-            for k, v in gen_item.items():
-                if k == "remarks":
-                    resolved = _resolve_title(v)
-                    if resolved:
-                        g["remarks"] = resolved
-                elif v is not None:
-                    g[k] = v
-            if g:
-                parsed_gen.append(g)
-        if parsed_gen:
-            specs["generators"] = parsed_gen
-    if tech.get("bowthrusterMake"):
-        specs["bowthruster_make"] = tech["bowthrusterMake"]
-    if tech.get("bowthrusterSystem"):
-        specs["bowthruster_system"] = tech["bowthrusterSystem"]
-
-    # Steering
-    steer = detail_data.get("steering") or {}
-    steering = {}
-    sg = steer.get("steeringGear") or {}
-    sg_data = {k: v for k, v in sg.items() if v is not None}
-    if sg_data:
-        steering["steeringGear"] = sg_data
-
-    prop = steer.get("propellor") or {}
-    propellor = {k: v for k, v in prop.items() if v is not None}
-    if propellor:
-        steering["propellor"] = propellor
-
-    bt = steer.get("bowthruster") or {}
-    bowthruster = {k: v for k, v in bt.items() if v is not None}
-    if bowthruster:
-        steering["bowthruster"] = bowthruster
-
-    if steering:
-        specs["steering"] = steering
-
-    # Equipment
-    equip = detail_data.get("equipment") or {}
-    equipment = {}
-
-    # Winches
-    for key in ("winchesForeShip", "winchesStern"):
-        w = equip.get(key)
-        if w and any(v is not None for v in w.values()):
-            equipment[key] = {k: v for k, v in w.items() if v is not None}
-
-    # Retractable mooring pole
-    pole = equip.get("retractableMooringPole")
-    if pole and any(v is not None for v in pole.values()):
-        equipment["retractableMooringPole"] = {k: v for k, v in pole.items() if v is not None}
-
-    # Car crane
-    crane = equip.get("carCrane")
-    if crane and any(v is not None for v in crane.values()):
-        equipment["carCrane"] = {k: v for k, v in crane.items() if v is not None}
-
-    # Masts
-    for key in ("mastForeShip", "mastStern"):
-        if equip.get(key):
-            equipment[key] = equip[key]
-
-    # Pumps
-    for key in ("pump", "ballastPump", "deckWashPump"):
-        p = equip.get(key)
-        if p:
-            pump_data = {}
-            for pk, pv in p.items():
-                if pk == "description":
-                    desc = _resolve_title(pv)
-                    if desc:
-                        pump_data["description"] = desc
-                elif pv is not None:
-                    pump_data[pk] = pv
-            if pump_data:
-                equipment[key] = pump_data
-
-    if equip.get("otherPumpEquipment"):
-        equipment["otherPumpEquipment"] = equip["otherPumpEquipment"]
-
-    # Nautical equipment
-    naut = equip.get("nauticalEquipment") or {}
-    nautical = {}
-    for key in ("radars", "radios", "pilot", "echoSounder", "steeringIndicator"):
-        item = naut.get(key)
-        if item and any(v is not None for v in item.values()):
-            nautical[key] = {k: v for k, v in item.items() if v is not None}
-    for key in ("gps", "ais", "camerasYearOfBuild", "otherNauticalEquipment"):
-        if naut.get(key):
-            nautical[key] = naut[key]
-    if nautical:
-        equipment["nauticalEquipment"] = nautical
-
-    # Electrical equipment
-    elec = equip.get("electricalEquipment") or {}
-    electrical = {}
-    for key in ("heating", "airconditioning", "solarPanels", "batteries",
-                "shaftGenerator", "otherElectricalEquipment"):
-        if elec.get(key):
-            electrical[key] = elec[key]
-    if elec.get("shoreConnection") is not None:
-        electrical["shoreConnection"] = elec["shoreConnection"]
-    if electrical:
-        equipment["electricalEquipment"] = electrical
-
-    # Additional equipment
-    add_eq = _resolve_title(equip.get("additionalEquipment"))
-    if add_eq:
-        equipment["additionalEquipment"] = add_eq
-
-    if equipment:
-        specs["equipment"] = equipment
-
-    return _clean_detail(specs)
+    selection = "\n    ".join(parts)
+    _detail_query_cache = (
+        "query GetVesselBySlug($slug: String!) {\n"
+        "  getVesselBySlug(slug: $slug) {\n"
+        f"    {selection}\n"
+        "  }\n"
+        "}"
+    )
+    logger.info("Built detail query with %d sections.", len(parts))
+    return _detail_query_cache
 
 
 def _fetch_detail(slug: str) -> dict | None:
-    """Fetch full vessel details via getVesselBySlug GraphQL query."""
+    """Fetch full vessel details via dynamically-built GraphQL query.
+
+    Introspects the schema once to build a query covering ALL fields,
+    then resolves VesselTitle objects and cleans nulls/empties.
+    """
+    query = _get_detail_query()
     try:
         resp = _fetch_with_retry(GRAPHQL_URL, {
-            "query": DETAIL_QUERY,
+            "query": query,
             "variables": {"slug": slug},
         })
     except requests.RequestException:
@@ -561,7 +313,8 @@ def _fetch_detail(slug: str) -> dict | None:
         logger.warning("No detail data returned for slug: %s", slug)
         return None
 
-    return parse_detail(vessel_data)
+    resolved = _resolve_titles_recursive(vessel_data)
+    return _clean_detail(resolved)
 
 
 def parse_vessel(vessel: dict) -> dict | None:

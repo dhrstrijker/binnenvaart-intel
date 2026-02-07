@@ -7,6 +7,7 @@ import scrape_galle
 import scrape_pcshipbrokers
 import scrape_gtsschepen
 import scrape_gsk
+import alerting
 from db import clear_changes, get_changes, mark_removed, run_dedup
 from notifications import send_personalized_notifications, send_digest
 
@@ -50,8 +51,9 @@ def main():
         run_start = datetime.now(timezone.utc).isoformat()
         try:
             stats = module.scrape()
-        except Exception:
+        except Exception as e:
             logger.exception("%s scraper failed", name)
+            alerting.alert_scraper_failure(name, str(e))
             stats = _empty_stats()
 
         logger.info(
@@ -59,14 +61,26 @@ def main():
             name, stats["total"], stats["inserted"], stats["price_changed"],
             stats["unchanged"], stats.get("error", 0),
         )
+
+        # Circuit breaker: decide whether mark_removed() is safe to call
         if stats["total"] == 0:
-            logger.warning(
-                "⚠ %s returned 0 vessels — site structure may have changed!", name,
+            logger.warning("⚠ %s returned 0 vessels — skipping mark_removed", name)
+            alerting.alert_zero_vessels(name, alerting.get_historical_avg(source_key))
+            alerting.log_scraper_run(source_key, 0, "error")
+        elif not alerting.should_allow_mark_removed(source_key, stats["total"]):
+            historical_avg = alerting.get_historical_avg(source_key)
+            logger.error(
+                "🛑 %s returned %d vessels (expected ~%d) — mark_removed BLOCKED!",
+                name, stats["total"], historical_avg,
             )
+            alerting.alert_vessel_count_drop(name, stats["total"], historical_avg)
+            alerting.log_scraper_run(source_key, stats["total"], "blocked")
         else:
-            # Mark vessels not seen in this run as removed
+            # Safe: count is within normal range
             removed = mark_removed(source_key, run_start)
             removed_total += removed
+            alerting.log_scraper_run(source_key, stats["total"], "success")
+            alerting.resolve_open_alerts(source_key)
 
         all_stats.append(stats)
 
