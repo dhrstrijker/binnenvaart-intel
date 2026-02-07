@@ -487,6 +487,38 @@ def get_saved_search_matches(search: dict, all_changes: list[dict]) -> list[dict
         max_price = float(filters["maxPrice"])
         matches = [c for c in matches if (c.get("vessel", {}).get("price") or float("inf")) <= max_price]
 
+    if filters.get("minLength"):
+        min_len = float(filters["minLength"])
+        matches = [c for c in matches if (c.get("vessel", {}).get("length_m") or 0) >= min_len]
+
+    if filters.get("maxLength"):
+        max_len = float(filters["maxLength"])
+        matches = [c for c in matches if (c.get("vessel", {}).get("length_m") or float("inf")) <= max_len]
+
+    if filters.get("minWidth"):
+        min_w = float(filters["minWidth"])
+        matches = [c for c in matches if (c.get("vessel", {}).get("width_m") or 0) >= min_w]
+
+    if filters.get("maxWidth"):
+        max_w = float(filters["maxWidth"])
+        matches = [c for c in matches if (c.get("vessel", {}).get("width_m") or float("inf")) <= max_w]
+
+    if filters.get("minBuildYear"):
+        min_by = int(filters["minBuildYear"])
+        matches = [c for c in matches if (c.get("vessel", {}).get("build_year") or 0) >= min_by]
+
+    if filters.get("maxBuildYear"):
+        max_by = int(filters["maxBuildYear"])
+        matches = [c for c in matches if (c.get("vessel", {}).get("build_year") or 9999) <= max_by]
+
+    if filters.get("minTonnage"):
+        min_t = float(filters["minTonnage"])
+        matches = [c for c in matches if (c.get("vessel", {}).get("tonnage") or 0) >= min_t]
+
+    if filters.get("maxTonnage"):
+        max_t = float(filters["maxTonnage"])
+        matches = [c for c in matches if (c.get("vessel", {}).get("tonnage") or float("inf")) <= max_t]
+
     return matches
 
 

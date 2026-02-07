@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useMemo, useRef, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { getSupabase, Vessel, PriceHistory } from "@/lib/supabase";
 import { useSubscription } from "@/lib/useSubscription";
 import { useActivityLog } from "@/lib/useActivityLog";
@@ -38,6 +39,7 @@ export default function Dashboard() {
   const [filters, setFilters] = useState<FilterState>(INITIAL_FILTERS);
   const [visibleCount, setVisibleCount] = useState(24);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
   const { user, isPremium, isLoading: subLoading } = useSubscription();
   const { entries: activityEntries, loading: activityLoading } = useActivityLog(3);
 
@@ -182,6 +184,16 @@ export default function Dashboard() {
     return () => observer.disconnect();
   }, [loadMore, loading, filtered.length]);
 
+  const handleSaveAsSearch = useCallback((f: FilterState) => {
+    const params = new URLSearchParams({ prefill: "1" });
+    if (f.search) params.set("search", f.search);
+    if (f.type) params.set("type", f.type);
+    if (f.source) params.set("source", f.source);
+    if (f.minPrice) params.set("minPrice", f.minPrice);
+    if (f.maxPrice) params.set("maxPrice", f.maxPrice);
+    router.push(`/zoekopdrachten?${params.toString()}`);
+  }, [router]);
+
   const visibleVessels = filtered.slice(0, visibleCount);
   const hasMore = visibleCount < filtered.length;
 
@@ -324,6 +336,8 @@ export default function Dashboard() {
         onFilterChange={setFilters}
         availableTypes={availableTypes}
         vesselCount={filtered.length}
+        user={user}
+        onSaveAsSearch={handleSaveAsSearch}
       />
 
       {/* Loading state */}

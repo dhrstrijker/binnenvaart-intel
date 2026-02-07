@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import type { User } from "@supabase/supabase-js";
 
 export interface FilterState {
   search: string;
@@ -17,6 +18,8 @@ interface FiltersProps {
   onFilterChange: (filters: FilterState) => void;
   availableTypes: string[];
   vesselCount: number;
+  user?: User | null;
+  onSaveAsSearch?: (filters: FilterState) => void;
 }
 
 export default function Filters({
@@ -24,6 +27,8 @@ export default function Filters({
   onFilterChange,
   availableTypes,
   vesselCount,
+  user,
+  onSaveAsSearch,
 }: FiltersProps) {
   const update = (partial: Partial<FilterState>) => {
     onFilterChange({ ...filters, ...partial });
@@ -138,7 +143,7 @@ export default function Filters({
         </div>
       </div>
 
-      {/* Status toggle + Result count */}
+      {/* Status toggle + Result count + Save as search */}
       <div className="mt-3 flex items-center justify-between">
         <label className="flex items-center gap-2 text-xs text-slate-500 cursor-pointer select-none">
           <input
@@ -149,9 +154,22 @@ export default function Filters({
           />
           Toon verkochte/verwijderde schepen
         </label>
-        <span className="text-xs text-slate-400">
-          {vesselCount} {vesselCount === 1 ? "schip" : "schepen"} gevonden
-        </span>
+        <div className="flex items-center gap-3">
+          {user && onSaveAsSearch && (filters.type || filters.source || filters.minPrice || filters.maxPrice || filters.search) && (
+            <button
+              onClick={() => onSaveAsSearch(filters)}
+              className="flex items-center gap-1 rounded-lg border border-cyan-200 bg-cyan-50 px-2.5 py-1 text-xs font-medium text-cyan-700 transition hover:bg-cyan-100"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              Opslaan als zoekopdracht
+            </button>
+          )}
+          <span className="text-xs text-slate-400">
+            {vesselCount} {vesselCount === 1 ? "schip" : "schepen"} gevonden
+          </span>
+        </div>
       </div>
     </div>
   );

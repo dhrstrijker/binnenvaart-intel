@@ -484,7 +484,7 @@ def get_changes_since(cutoff_iso: str) -> list[dict]:
     vessel_ids = list(set(row["vessel_id"] for row in res.data))
     vessels_res = (
         supabase.table("vessels")
-        .select("id, name, type, source, price, url, length_m, status")
+        .select("id, name, type, source, price, url, length_m, width_m, build_year, tonnage, status")
         .in_("id", vessel_ids)
         .execute()
     )

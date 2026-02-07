@@ -20,6 +20,10 @@ class TestSavedSearchMatches(unittest.TestCase):
                     "type": "Tankschip",
                     "source": "rensendriessen",
                     "price": 150000,
+                    "length_m": 65.0,
+                    "width_m": 8.2,
+                    "build_year": 1995,
+                    "tonnage": 1200,
                 },
                 "new_price": 150000,
             },
@@ -31,6 +35,10 @@ class TestSavedSearchMatches(unittest.TestCase):
                     "type": "Duw/Sleepboot",
                     "source": "galle",
                     "price": 200000,
+                    "length_m": 25.0,
+                    "width_m": 6.5,
+                    "build_year": 2010,
+                    "tonnage": None,
                 },
             },
             {
@@ -41,6 +49,10 @@ class TestSavedSearchMatches(unittest.TestCase):
                     "type": "Tankschip",
                     "source": "pcshipbrokers",
                     "price": 100000,
+                    "length_m": 80.0,
+                    "width_m": 9.5,
+                    "build_year": 1988,
+                    "tonnage": 1800,
                 },
             },
             {
@@ -51,6 +63,10 @@ class TestSavedSearchMatches(unittest.TestCase):
                     "type": "Beunschip",
                     "source": "rensendriessen",
                     "price": 250000,
+                    "length_m": 55.0,
+                    "width_m": 7.8,
+                    "build_year": 2005,
+                    "tonnage": 950,
                 },
                 "new_price": 250000,
             },
@@ -105,6 +121,102 @@ class TestSavedSearchMatches(unittest.TestCase):
         matches = get_saved_search_matches(search, self.changes)
         self.assertEqual(len(matches), 1)
         self.assertEqual(matches[0]["vessel"]["name"], "De Hoop")
+
+    def test_get_saved_search_matches_length_min(self):
+        """Test that minLength filter works."""
+        search = {"filters": {"minLength": "50"}}
+        matches = get_saved_search_matches(search, self.changes)
+        # v1=65, v3=80, v4=55 match (>=50); v2=25 does not
+        self.assertEqual(len(matches), 3)
+        names = {m["vessel"]["name"] for m in matches}
+        self.assertIn("De Hoop", names)
+        self.assertIn("Rotterdam", names)
+        self.assertIn("Groningen", names)
+
+    def test_get_saved_search_matches_length_max(self):
+        """Test that maxLength filter works."""
+        search = {"filters": {"maxLength": "60"}}
+        matches = get_saved_search_matches(search, self.changes)
+        # v2=25, v4=55 match (<=60); v1=65, v3=80 do not
+        self.assertEqual(len(matches), 2)
+        names = {m["vessel"]["name"] for m in matches}
+        self.assertIn("Amstel", names)
+        self.assertIn("Groningen", names)
+
+    def test_get_saved_search_matches_length_range(self):
+        """Test min+max length combined."""
+        search = {"filters": {"minLength": "50", "maxLength": "70"}}
+        matches = get_saved_search_matches(search, self.changes)
+        # v1=65, v4=55 match (50-70)
+        self.assertEqual(len(matches), 2)
+
+    def test_get_saved_search_matches_width_min(self):
+        """Test that minWidth filter works."""
+        search = {"filters": {"minWidth": "8"}}
+        matches = get_saved_search_matches(search, self.changes)
+        # v1=8.2, v3=9.5 match; v2=6.5, v4=7.8 do not
+        self.assertEqual(len(matches), 2)
+
+    def test_get_saved_search_matches_width_max(self):
+        """Test that maxWidth filter works."""
+        search = {"filters": {"maxWidth": "7"}}
+        matches = get_saved_search_matches(search, self.changes)
+        # v2=6.5 matches; v1=8.2, v3=9.5, v4=7.8 do not
+        self.assertEqual(len(matches), 1)
+        self.assertEqual(matches[0]["vessel"]["name"], "Amstel")
+
+    def test_get_saved_search_matches_build_year_min(self):
+        """Test that minBuildYear filter works."""
+        search = {"filters": {"minBuildYear": "2000"}}
+        matches = get_saved_search_matches(search, self.changes)
+        # v2=2010, v4=2005 match; v1=1995, v3=1988 do not
+        self.assertEqual(len(matches), 2)
+        names = {m["vessel"]["name"] for m in matches}
+        self.assertIn("Amstel", names)
+        self.assertIn("Groningen", names)
+
+    def test_get_saved_search_matches_build_year_max(self):
+        """Test that maxBuildYear filter works."""
+        search = {"filters": {"maxBuildYear": "1995"}}
+        matches = get_saved_search_matches(search, self.changes)
+        # v1=1995, v3=1988 match; v2=2010, v4=2005 do not
+        self.assertEqual(len(matches), 2)
+        names = {m["vessel"]["name"] for m in matches}
+        self.assertIn("De Hoop", names)
+        self.assertIn("Rotterdam", names)
+
+    def test_get_saved_search_matches_tonnage_min(self):
+        """Test that minTonnage filter works."""
+        search = {"filters": {"minTonnage": "1000"}}
+        matches = get_saved_search_matches(search, self.changes)
+        # v1=1200, v3=1800 match; v2=None(=0), v4=950 do not
+        self.assertEqual(len(matches), 2)
+
+    def test_get_saved_search_matches_tonnage_max(self):
+        """Test that maxTonnage filter works."""
+        search = {"filters": {"maxTonnage": "1000"}}
+        matches = get_saved_search_matches(search, self.changes)
+        # v4=950 matches; v1=1200, v3=1800 do not; v2=None treated as inf
+        self.assertEqual(len(matches), 1)
+        self.assertEqual(matches[0]["vessel"]["name"], "Groningen")
+
+    def test_get_saved_search_matches_combined_new_and_existing(self):
+        """Test combining new filters (length, build_year) with existing ones (type, price)."""
+        search = {
+            "filters": {
+                "type": "Tankschip",
+                "minPrice": "100000",
+                "minLength": "70",
+                "minBuildYear": "1985",
+                "maxBuildYear": "1995",
+            }
+        }
+        matches = get_saved_search_matches(search, self.changes)
+        # Must be Tankschip, price>=100k, length>=70, build_year 1985-1995
+        # v1: Tankschip, 150k, 65m (fails length)
+        # v3: Tankschip, 100k, 80m, 1988 (passes all)
+        self.assertEqual(len(matches), 1)
+        self.assertEqual(matches[0]["vessel"]["name"], "Rotterdam")
 
 
 class TestDigestEmail(unittest.TestCase):

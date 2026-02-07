@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useSubscription } from "@/lib/useSubscription";
+import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import NotificationSettings from "@/components/NotificationSettings";
-import SavedSearchManager from "@/components/SavedSearchManager";
 
 export default function AccountPage() {
   const router = useRouter();
@@ -123,8 +123,22 @@ export default function AccountPage() {
         </div>
 
         {/* Saved searches */}
-        <div className="mt-6">
-          <SavedSearchManager user={user} isPremium={isPremium} />
+        <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">
+            Zoekopdrachten
+          </h2>
+          <p className="mt-2 text-sm text-slate-500">
+            Beheer je opgeslagen zoekopdrachten en meldingen op de speciale pagina.
+          </p>
+          <Link
+            href="/zoekopdrachten"
+            className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-cyan-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-cyan-700"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+            </svg>
+            Naar zoekopdrachten
+          </Link>
         </div>
 
         {/* Sign out */}
