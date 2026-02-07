@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useAuthModal } from "@/lib/AuthModalContext";
 import type { User } from "@supabase/supabase-js";
 
 interface WatchlistButtonProps {
@@ -14,6 +15,7 @@ interface WatchlistButtonProps {
 export default function WatchlistButton({ vesselId, user, className, onToggle }: WatchlistButtonProps) {
   const [isWatched, setIsWatched] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { openAuthModal } = useAuthModal();
 
   useEffect(() => {
     if (!user) return;
@@ -29,16 +31,8 @@ export default function WatchlistButton({ vesselId, user, className, onToggle }:
       });
   }, [user, vesselId]);
 
-  const toggle = useCallback(
-    async (e: React.MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (!user) {
-        window.location.href = "/signup";
-        return;
-      }
-
+  const doToggle = useCallback(
+    async (currentUser: User) => {
       if (loading) return;
 
       const prev = isWatched;
@@ -51,7 +45,7 @@ export default function WatchlistButton({ vesselId, user, className, onToggle }:
           const { error } = await supabase
             .from("watchlist")
             .delete()
-            .eq("user_id", user.id)
+            .eq("user_id", currentUser.id)
             .eq("vessel_id", vesselId);
           if (error) {
             setIsWatched(prev);
@@ -61,7 +55,7 @@ export default function WatchlistButton({ vesselId, user, className, onToggle }:
         } else {
           const { error } = await supabase
             .from("watchlist")
-            .insert({ user_id: user.id, vessel_id: vesselId });
+            .insert({ user_id: currentUser.id, vessel_id: vesselId });
           if (error) {
             setIsWatched(prev);
           } else {
@@ -73,7 +67,37 @@ export default function WatchlistButton({ vesselId, user, className, onToggle }:
       }
       setLoading(false);
     },
-    [user, vesselId, isWatched, loading, onToggle]
+    [vesselId, isWatched, loading, onToggle]
+  );
+
+  const toggle = useCallback(
+    async (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (!user) {
+        openAuthModal({
+          message: "Log in om meldingen voor dit schip te ontvangen",
+          onSuccess: async () => {
+            // After auth, get fresh user and toggle
+            const supabase = createClient();
+            const { data } = await supabase.auth.getUser();
+            if (data.user) {
+              // Insert into watchlist for the newly authenticated user
+              await supabase
+                .from("watchlist")
+                .insert({ user_id: data.user.id, vessel_id: vesselId });
+              setIsWatched(true);
+              onToggle?.(vesselId, true);
+            }
+          },
+        });
+        return;
+      }
+
+      await doToggle(user);
+    },
+    [user, doToggle, openAuthModal, vesselId, onToggle]
   );
 
   return (
@@ -81,7 +105,7 @@ export default function WatchlistButton({ vesselId, user, className, onToggle }:
       onClick={toggle}
       disabled={loading}
       className={className ?? "flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:text-amber-500 disabled:opacity-50"}
-      title={!user ? "Maak een account om meldingen in te stellen" : isWatched ? "Prijsmelding uitschakelen" : "Prijsmelding inschakelen"}
+      title={!user ? "Log in om meldingen in te stellen" : isWatched ? "Prijsmelding uitschakelen" : "Prijsmelding inschakelen"}
     >
       {isWatched ? (
         <svg className="h-5 w-5 text-amber-500" viewBox="0 0 24 24" fill="currentColor">

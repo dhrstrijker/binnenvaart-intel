@@ -275,3 +275,27 @@ CREATE POLICY "Authenticated read last 14 days"
 CREATE POLICY "Premium read full history"
   ON activity_log FOR SELECT TO authenticated
   USING ((SELECT is_premium()));
+
+-- Auto-enroll users into notification_subscribers when they add to watchlist or saved_searches
+CREATE OR REPLACE FUNCTION auto_enroll_notification_subscriber()
+RETURNS TRIGGER AS $$
+DECLARE
+  _email TEXT;
+BEGIN
+  SELECT email INTO _email FROM auth.users WHERE id = NEW.user_id;
+  IF _email IS NOT NULL THEN
+    INSERT INTO notification_subscribers (email, user_id, verified_at, active)
+    VALUES (_email, NEW.user_id, NOW(), true)
+    ON CONFLICT (email) DO NOTHING;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER watchlist_auto_enroll
+  AFTER INSERT ON watchlist
+  FOR EACH ROW EXECUTE FUNCTION auto_enroll_notification_subscriber();
+
+CREATE TRIGGER saved_search_auto_enroll
+  AFTER INSERT ON saved_searches
+  FOR EACH ROW EXECUTE FUNCTION auto_enroll_notification_subscriber();

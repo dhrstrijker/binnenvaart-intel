@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import NavisioLogo from "./NavisioLogo";
 import NavLink from "./NavLink";
+import { useAuthModal } from "@/lib/AuthModalContext";
 import type { User } from "@supabase/supabase-js";
 
 export default function Header() {
@@ -16,6 +17,7 @@ export default function Header() {
   const mobileNavRef = useRef<HTMLDivElement>(null);
   const mobileToggleRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
+  const { openAuthModal } = useAuthModal();
 
   useEffect(() => {
     const supabase = createClient();
@@ -81,7 +83,7 @@ export default function Header() {
             <NavLink href="/">Dashboard</NavLink>
             <NavLink href="/analytics">Analyse</NavLink>
             <NavLink href="/pricing">Prijzen</NavLink>
-            {user && <NavLink href="/favorieten">Favorieten</NavLink>}
+            <NavLink href="/favorieten">Favorieten</NavLink>
             {user && <NavLink href="/zoekopdrachten">Zoekopdrachten</NavLink>}
           </nav>
 
@@ -130,18 +132,18 @@ export default function Header() {
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <Link
-                href="/login"
+              <button
+                onClick={() => openAuthModal()}
                 className="rounded-lg px-3 py-1.5 text-sm font-medium text-cyan-200 transition hover:bg-white/10 hover:text-white"
               >
                 Inloggen
-              </Link>
-              <Link
-                href="/signup"
+              </button>
+              <button
+                onClick={() => openAuthModal()}
                 className="rounded-lg bg-cyan-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-cyan-500"
               >
                 Registreren
-              </Link>
+              </button>
             </div>
           )}
         </div>
@@ -172,7 +174,7 @@ export default function Header() {
             <NavLink href="/" onClick={() => setMobileNavOpen(false)}>Dashboard</NavLink>
             <NavLink href="/analytics" onClick={() => setMobileNavOpen(false)}>Analyse</NavLink>
             <NavLink href="/pricing" onClick={() => setMobileNavOpen(false)}>Prijzen</NavLink>
-            {user && <NavLink href="/favorieten" onClick={() => setMobileNavOpen(false)}>Favorieten</NavLink>}
+            <NavLink href="/favorieten" onClick={() => setMobileNavOpen(false)}>Favorieten</NavLink>
             {user && <NavLink href="/zoekopdrachten" onClick={() => setMobileNavOpen(false)}>Zoekopdrachten</NavLink>}
           </nav>
           <div className="border-t border-white/10 px-4 py-3">
@@ -207,20 +209,18 @@ export default function Header() {
               </div>
             ) : (
               <div className="flex flex-col gap-2">
-                <Link
-                  href="/login"
-                  onClick={() => setMobileNavOpen(false)}
-                  className="rounded-lg px-3 py-1.5 text-sm font-medium text-cyan-200 transition hover:bg-white/10 hover:text-white"
+                <button
+                  onClick={() => { setMobileNavOpen(false); openAuthModal(); }}
+                  className="rounded-lg px-3 py-1.5 text-left text-sm font-medium text-cyan-200 transition hover:bg-white/10 hover:text-white"
                 >
                   Inloggen
-                </Link>
-                <Link
-                  href="/signup"
-                  onClick={() => setMobileNavOpen(false)}
+                </button>
+                <button
+                  onClick={() => { setMobileNavOpen(false); openAuthModal(); }}
                   className="rounded-lg bg-cyan-600 px-3 py-1.5 text-center text-sm font-semibold text-white transition hover:bg-cyan-500"
                 >
                   Registreren
-                </Link>
+                </button>
               </div>
             )}
           </div>

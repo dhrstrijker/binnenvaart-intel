@@ -21,6 +21,7 @@ interface NotificationSettingsProps {
 }
 
 export default function NotificationSettings({ user }: NotificationSettingsProps) {
+  const [masterEnabled, setMasterEnabled] = useState(true);
   const [prefs, setPrefs] = useState<NotificationPreferences>(DEFAULT_PREFS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -30,12 +31,15 @@ export default function NotificationSettings({ user }: NotificationSettingsProps
     const supabase = createClient();
     supabase
       .from("notification_subscribers")
-      .select("preferences")
+      .select("active, preferences")
       .eq("user_id", user.id)
       .maybeSingle()
       .then(({ data }) => {
-        if (data?.preferences) {
-          setPrefs({ ...DEFAULT_PREFS, ...(data.preferences as NotificationPreferences) });
+        if (data) {
+          setMasterEnabled(data.active ?? true);
+          if (data.preferences) {
+            setPrefs({ ...DEFAULT_PREFS, ...(data.preferences as NotificationPreferences) });
+          }
         }
         setLoading(false);
       });
@@ -53,7 +57,7 @@ export default function NotificationSettings({ user }: NotificationSettingsProps
           user_id: user.id,
           email: user.email,
           preferences: prefs,
-          active: true,
+          active: masterEnabled,
         },
         { onConflict: "user_id" }
       );
@@ -90,7 +94,18 @@ export default function NotificationSettings({ user }: NotificationSettingsProps
         Kies welke meldingen je per e-mail wilt ontvangen.
       </p>
 
-      <div className="mt-4 space-y-3">
+      {/* Master toggle */}
+      <div className="mt-4 border-b border-slate-100 pb-4">
+        <ToggleRow
+          label="E-mailnotificaties ontvangen"
+          description="Schakel alle e-mailmeldingen in of uit."
+          checked={masterEnabled}
+          onChange={() => { setMasterEnabled((v) => !v); setSaved(false); }}
+        />
+      </div>
+
+      {/* Sub-toggles, dimmed when master is off */}
+      <div className={`mt-4 space-y-3 transition-opacity ${masterEnabled ? "opacity-100" : "opacity-40 pointer-events-none"}`}>
         <ToggleRow
           label="Nieuwe schepen"
           description="Ontvang een melding wanneer er nieuwe schepen worden gevonden."
