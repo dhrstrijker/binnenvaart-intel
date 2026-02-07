@@ -378,14 +378,16 @@ export default function Dashboard() {
       )}
 
       {/* Filters */}
-      <Filters
-        filters={filters}
-        onFilterChange={setFilters}
-        availableTypes={availableTypes}
-        vesselCount={filtered.length}
-        user={user}
-        onSaveAsSearch={handleSaveAsSearch}
-      />
+      <div className="sticky top-0 z-20 -mx-4 px-4 sm:-mx-6 sm:px-6 pt-2 pb-2 bg-gradient-to-b from-slate-50 from-80% to-transparent">
+        <Filters
+          filters={filters}
+          onFilterChange={setFilters}
+          availableTypes={availableTypes}
+          vesselCount={filtered.length}
+          user={user}
+          onSaveAsSearch={handleSaveAsSearch}
+        />
+      </div>
 
       {/* Loading state */}
       {loading && (
