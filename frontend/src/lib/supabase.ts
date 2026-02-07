@@ -33,6 +33,7 @@ export interface Vessel {
   scraped_at: string;
   first_seen_at: string;
   updated_at: string;
+  status: string;
   raw_details?: Record<string, unknown> | null;
   image_urls?: Array<{ original?: string; thumbnail?: string; sorting_no?: number } | string> | null;
   canonical_vessel_id?: string | null;

@@ -55,6 +55,27 @@ def get_changes() -> list[dict]:
     return list(_changes)
 
 
+def mark_removed(source: str, run_start: str) -> int:
+    """Mark vessels from *source* not seen since *run_start* as removed.
+
+    Returns the number of vessels marked removed.
+    """
+    resp = (
+        supabase.table("vessels")
+        .update({"status": "removed", "updated_at": datetime.now(timezone.utc).isoformat()})
+        .eq("source", source)
+        .eq("status", "active")
+        .lt("scraped_at", run_start)
+        .execute()
+    )
+    count = len(resp.data) if resp.data else 0
+    if count > 0:
+        logger.info("Marked %d %s vessels as removed", count, source)
+        for row in resp.data:
+            _changes.append({"kind": "removed", "vessel": row})
+    return count
+
+
 def upsert_vessel(vessel: dict) -> str:
     """Upsert a vessel record and track price changes.
 
@@ -84,6 +105,7 @@ def upsert_vessel(vessel: dict) -> str:
     try:
         if not existing.data:
             vessel["scraped_at"] = now
+            vessel["status"] = "active"
             row = supabase.table("vessels").insert(vessel).execute()
             vessel_id = row.data[0]["id"]
 
@@ -110,7 +132,7 @@ def upsert_vessel(vessel: dict) -> str:
                 enrichment[field] = vessel[field]
 
         if old_price != new_price:
-            update_data = {"price": new_price, "scraped_at": now, "updated_at": now}
+            update_data = {"price": new_price, "scraped_at": now, "updated_at": now, "status": "active"}
             update_data.update(enrichment)
             supabase.table("vessels").update(update_data).eq(
                 "id", vessel_id
@@ -133,7 +155,7 @@ def upsert_vessel(vessel: dict) -> str:
             })
             return "price_changed"
 
-        update_data = {"scraped_at": now}
+        update_data = {"scraped_at": now, "status": "active"}
         update_data.update(enrichment)
         supabase.table("vessels").update(update_data).eq(
             "id", vessel_id

@@ -13,6 +13,7 @@ const INITIAL_FILTERS: FilterState = {
   minPrice: "",
   maxPrice: "",
   sort: "newest",
+  showRemoved: false,
 };
 
 function formatAvgPrice(vessels: Vessel[]): string {
@@ -53,7 +54,7 @@ export default function Dashboard() {
         const [vesselsRes, historyRes] = await Promise.all([
           supabase
             .from("vessels")
-            .select("id, name, type, length_m, width_m, tonnage, build_year, price, url, image_url, source, source_id, scraped_at, first_seen_at, updated_at, canonical_vessel_id, linked_sources")
+            .select("id, name, type, length_m, width_m, tonnage, build_year, price, url, image_url, source, source_id, scraped_at, first_seen_at, updated_at, status, canonical_vessel_id, linked_sources")
             .order("scraped_at", { ascending: false }),
           supabase
             .from("price_history")
@@ -98,6 +99,10 @@ export default function Dashboard() {
 
   const filtered = useMemo(() => {
     let result = [...vessels];
+
+    if (!filters.showRemoved) {
+      result = result.filter((v) => v.status !== "removed");
+    }
 
     if (filters.search) {
       const q = filters.search.toLowerCase();

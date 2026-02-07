@@ -9,6 +9,7 @@ export interface FilterState {
   minPrice: string;
   maxPrice: string;
   sort: string;
+  showRemoved: boolean;
 }
 
 interface FiltersProps {
@@ -115,9 +116,20 @@ export default function Filters({
         </select>
       </div>
 
-      {/* Result count */}
-      <div className="mt-3 text-xs text-slate-400">
-        {vesselCount} {vesselCount === 1 ? "schip" : "schepen"} gevonden
+      {/* Status toggle + Result count */}
+      <div className="mt-3 flex items-center justify-between">
+        <label className="flex items-center gap-2 text-xs text-slate-500 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={filters.showRemoved}
+            onChange={(e) => update({ showRemoved: e.target.checked })}
+            className="h-3.5 w-3.5 rounded border-slate-300 text-cyan-500 focus:ring-cyan-400"
+          />
+          Toon verkochte/verwijderde schepen
+        </label>
+        <span className="text-xs text-slate-400">
+          {vesselCount} {vesselCount === 1 ? "schip" : "schepen"} gevonden
+        </span>
       </div>
     </div>
   );

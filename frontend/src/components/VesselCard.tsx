@@ -56,7 +56,7 @@ export default function VesselCard({ vessel, priceHistory = [], onOpenDetail }: 
       target="_blank"
       rel="noopener noreferrer"
       onClick={handleClick}
-      className="group block overflow-hidden rounded-xl bg-white shadow-md ring-1 ring-gray-100 transition-all duration-200 hover:shadow-xl hover:ring-cyan-200 hover:-translate-y-0.5 cursor-pointer"
+      className={`group block overflow-hidden rounded-xl bg-white shadow-md ring-1 ring-gray-100 transition-all duration-200 hover:shadow-xl hover:ring-cyan-200 hover:-translate-y-0.5 cursor-pointer${vessel.status === "removed" ? " opacity-60" : ""}`}
     >
       {/* Image */}
       <div className="relative aspect-[16/10] w-full bg-slate-100 overflow-hidden">
@@ -89,7 +89,12 @@ export default function VesselCard({ vessel, priceHistory = [], onOpenDetail }: 
 
         {/* Badges overlay */}
         <div className="absolute top-2.5 left-2.5 flex gap-1.5">
-          {isNew(vessel.first_seen_at) && (
+          {vessel.status === "removed" && (
+            <span className="rounded-md bg-red-500 px-2 py-0.5 text-xs font-bold text-white shadow-sm">
+              VERKOCHT
+            </span>
+          )}
+          {vessel.status !== "removed" && isNew(vessel.first_seen_at) && (
             <span className="rounded-md bg-emerald-500 px-2 py-0.5 text-xs font-bold text-white shadow-sm">
               NIEUW
             </span>

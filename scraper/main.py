@@ -1,11 +1,12 @@
 import logging
+from datetime import datetime, timezone
 
 import scrape_rensendriessen
 import scrape_galle
 import scrape_pcshipbrokers
 import scrape_gtsschepen
 import scrape_gsk
-from db import clear_changes, get_changes, run_dedup
+from db import clear_changes, get_changes, mark_removed, run_dedup
 from notifications import send_summary_email
 
 logging.basicConfig(
@@ -15,12 +16,13 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# (display name, module, DB source key)
 SCRAPERS = [
-    ("RensenDriessen", scrape_rensendriessen),
-    ("Galle", scrape_galle),
-    ("PC Shipbrokers", scrape_pcshipbrokers),
-    ("GTS Schepen", scrape_gtsschepen),
-    ("GSK Brokers", scrape_gsk),
+    ("RensenDriessen", scrape_rensendriessen, "rensendriessen"),
+    ("Galle", scrape_galle, "galle"),
+    ("PC Shipbrokers", scrape_pcshipbrokers, "pcshipbrokers"),
+    ("GTS Schepen", scrape_gtsschepen, "gtsschepen"),
+    ("GSK Brokers", scrape_gsk, "gsk"),
 ]
 
 
@@ -33,7 +35,9 @@ def main():
     clear_changes()
 
     all_stats = []
-    for name, module in SCRAPERS:
+    removed_total = 0
+    for name, module, source_key in SCRAPERS:
+        run_start = datetime.now(timezone.utc).isoformat()
         try:
             stats = module.scrape()
         except Exception:
@@ -49,10 +53,15 @@ def main():
             logger.warning(
                 "⚠ %s returned 0 vessels — site structure may have changed!", name,
             )
+        else:
+            # Mark vessels not seen in this run as removed
+            removed = mark_removed(source_key, run_start)
+            removed_total += removed
+
         all_stats.append(stats)
 
     total = sum(s["total"] for s in all_stats)
-    logger.info("Done. %d vessels processed.", total)
+    logger.info("Done. %d vessels processed, %d marked removed.", total, removed_total)
 
     # Run deduplication across sources
     try:

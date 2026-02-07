@@ -51,6 +51,9 @@ def _build_vessel_row(change: dict) -> str:
     if kind == "inserted":
         badge = '<span style="background:#059669;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;">Nieuw</span>'
         price_cell = _format_price(vessel.get("price"))
+    elif kind == "removed":
+        badge = '<span style="background:#ef4444;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;">Verkocht</span>'
+        price_cell = _format_price(vessel.get("price"))
     else:
         old_price = change.get("old_price")
         new_price = change.get("new_price")
@@ -67,11 +70,11 @@ def _build_vessel_row(change: dict) -> str:
     return f"""
     <tr style="border-bottom:1px solid #e2e8f0;">
       <td style="padding:12px 8px;">
-        <a href="{url}" style="color:#1e3a5f;font-weight:600;text-decoration:none;">{name}</a>
+        <a href="{url}" style="color:#0f172a;font-weight:600;text-decoration:none;">{name}</a>
         <br><span style="color:#94a3b8;font-size:12px;">{source} {specs_str}</span>
       </td>
       <td style="padding:12px 8px;text-align:center;">{badge}</td>
-      <td style="padding:12px 8px;text-align:right;font-weight:600;color:#1e3a5f;">{price_cell}</td>
+      <td style="padding:12px 8px;text-align:right;font-weight:600;color:#0f172a;">{price_cell}</td>
     </tr>"""
 
 
@@ -80,6 +83,7 @@ def _build_summary_html(stats: dict, changes: list[dict]) -> str:
     total_changes = len(changes)
     new_count = sum(1 for c in changes if c["kind"] == "inserted")
     price_count = sum(1 for c in changes if c["kind"] == "price_changed")
+    removed_count = sum(1 for c in changes if c["kind"] == "removed")
     now = datetime.now(timezone.utc).strftime("%d-%m-%Y %H:%M UTC")
 
     rows = "\n".join(_build_vessel_row(c) for c in changes[:50])
@@ -91,9 +95,9 @@ def _build_summary_html(stats: dict, changes: list[dict]) -> str:
 <body style="margin:0;padding:0;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
   <div style="max-width:600px;margin:0 auto;padding:20px;">
     <!-- Header -->
-    <div style="background:#1e3a5f;border-radius:12px 12px 0 0;padding:24px;text-align:center;">
-      <h1 style="margin:0;color:#ffffff;font-size:22px;">Binnenvaart Intel</h1>
-      <p style="margin:4px 0 0;color:#93c5fd;font-size:13px;">Scheepvaart marktplaats monitor</p>
+    <div style="background:#0f172a;border-radius:12px 12px 0 0;padding:24px;text-align:center;">
+      <h1 style="margin:0;color:#ffffff;font-size:22px;letter-spacing:-0.03em;">NAVISIO</h1>
+      <p style="margin:4px 0 0;color:#06b6d4;font-size:13px;">Scheepsmarkt Intelligence</p>
     </div>
 
     <!-- Stats -->
@@ -102,7 +106,7 @@ def _build_summary_html(stats: dict, changes: list[dict]) -> str:
       <table style="width:100%;border-collapse:collapse;">
         <tr>
           <td style="text-align:center;padding:8px;">
-            <div style="font-size:24px;font-weight:700;color:#1e3a5f;">{total_changes}</div>
+            <div style="font-size:24px;font-weight:700;color:#0f172a;">{total_changes}</div>
             <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;">Wijzigingen</div>
           </td>
           <td style="text-align:center;padding:8px;">
@@ -114,8 +118,8 @@ def _build_summary_html(stats: dict, changes: list[dict]) -> str:
             <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;">Prijswijzigingen</div>
           </td>
           <td style="text-align:center;padding:8px;">
-            <div style="font-size:24px;font-weight:700;color:#475569;">{stats.get('total', 0)}</div>
-            <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;">Totaal verwerkt</div>
+            <div style="font-size:24px;font-weight:700;color:#ef4444;">{removed_count}</div>
+            <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;">Verkocht</div>
           </td>
         </tr>
       </table>
@@ -141,7 +145,7 @@ def _build_summary_html(stats: dict, changes: list[dict]) -> str:
     <!-- Footer -->
     <div style="background:#f8fafc;border-radius:0 0 12px 12px;padding:16px 24px;text-align:center;border-top:1px solid #e2e8f0;">
       <p style="margin:0;color:#94a3b8;font-size:11px;">
-        U ontvangt dit bericht omdat u zich heeft aangemeld voor Binnenvaart Intel alerts.
+        U ontvangt dit bericht omdat u zich heeft aangemeld voor Navisio alerts.
       </p>
     </div>
   </div>
@@ -170,7 +174,7 @@ def send_summary_email(stats: dict, changes: list[dict]) -> None:
         return
 
     count = len(changes)
-    subject = f"Binnenvaart Intel: {count} wijziging{'en' if count != 1 else ''} gedetecteerd"
+    subject = f"Navisio: {count} wijziging{'en' if count != 1 else ''} gedetecteerd"
     html = _build_summary_html(stats, changes)
 
     for email in subscribers:
