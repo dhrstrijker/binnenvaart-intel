@@ -13,6 +13,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const mobileNavRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -35,6 +36,16 @@ export default function Header() {
     if (menuOpen) document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, [menuOpen]);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (mobileNavRef.current && !mobileNavRef.current.contains(e.target as Node)) {
+        setMobileNavOpen(false);
+      }
+    }
+    if (mobileNavOpen) document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [mobileNavOpen]);
 
   async function handleSignOut() {
     const supabase = createClient();
@@ -138,7 +149,7 @@ export default function Header() {
         <button
           onClick={() => setMobileNavOpen(!mobileNavOpen)}
           className="flex items-center justify-center rounded-lg p-2 text-cyan-200 transition hover:bg-white/10 hover:text-white md:hidden"
-          aria-label="Menu openen"
+          aria-label={mobileNavOpen ? "Menu sluiten" : "Menu openen"}
         >
           {mobileNavOpen ? (
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -154,11 +165,11 @@ export default function Header() {
 
       {/* Mobile navigation menu */}
       {mobileNavOpen && (
-        <div className="border-t border-white/10 md:hidden">
+        <div ref={mobileNavRef} className="border-t border-white/10 md:hidden">
           <nav className="flex flex-col gap-1 px-4 py-3">
-            <NavLink href="/">Dashboard</NavLink>
-            <NavLink href="/analytics">Analyse</NavLink>
-            <NavLink href="/pricing">Prijzen</NavLink>
+            <NavLink href="/" onClick={() => setMobileNavOpen(false)}>Dashboard</NavLink>
+            <NavLink href="/analytics" onClick={() => setMobileNavOpen(false)}>Analyse</NavLink>
+            <NavLink href="/pricing" onClick={() => setMobileNavOpen(false)}>Prijzen</NavLink>
           </nav>
           <div className="border-t border-white/10 px-4 py-3">
             {user ? (
@@ -184,7 +195,7 @@ export default function Header() {
                   Account
                 </Link>
                 <button
-                  onClick={() => { handleSignOut(); setMobileNavOpen(false); }}
+                  onClick={handleSignOut}
                   className="rounded-lg px-3 py-1.5 text-left text-sm font-medium text-red-400 transition hover:bg-white/10"
                 >
                   Uitloggen
