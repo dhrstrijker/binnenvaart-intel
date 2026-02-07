@@ -8,7 +8,6 @@ import { useActivityLog } from "@/lib/useActivityLog";
 import { useLocalFavorites } from "@/lib/useLocalFavorites";
 import { useAuthNudge } from "@/lib/useAuthNudge";
 import { useAuthModal } from "@/lib/AuthModalContext";
-import { SOURCE_CONFIG } from "@/lib/sources";
 import VesselCard from "./VesselCard";
 import AuthNudgeToast from "./AuthNudgeToast";
 import Filters, { FilterState } from "./Filters";
@@ -273,107 +272,135 @@ export default function Dashboard() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
       <h1 className="sr-only">Binnenvaartschepen te koop</h1>
-      {/* Broker sources */}
-      <div className="mb-6 flex flex-wrap items-center gap-2">
-        <span className="text-xs font-medium text-slate-400 uppercase tracking-wide mr-1">Bronnen</span>
-        {Object.entries(SOURCE_CONFIG).map(([key, { label, color }]) => (
-          <span
-            key={key}
-            className={`rounded-full px-3 py-1 text-xs font-semibold ${color}`}
-          >
-            {label}
-          </span>
-        ))}
-      </div>
-
       {/* Recent Market Activity */}
       {!activityLoading && activityEntries.length > 0 && (
         <div className="mb-6 rounded-xl bg-white shadow-md ring-1 ring-gray-100 overflow-hidden">
-          <div className="p-4">
-            <h2 className="text-sm font-semibold text-slate-700 mb-3">
-              Recente marktactiviteit
-            </h2>
-            <div className="flex flex-col gap-2">
-              {activityEntries.map((entry) => {
-                const timeAgo = formatTimeAgo(new Date(entry.recorded_at));
-                const dotColor =
-                  entry.event_type === "inserted"
-                    ? "bg-emerald-500"
-                    : entry.event_type === "price_changed"
-                      ? "bg-amber-500"
-                      : entry.event_type === "sold"
-                        ? "bg-amber-600"
-                        : "bg-red-500";
-                const label =
-                  entry.event_type === "inserted"
-                    ? "Nieuw"
-                    : entry.event_type === "price_changed"
-                      ? "Prijswijziging"
-                      : entry.event_type === "sold"
-                        ? "Verkocht"
-                        : "Verwijderd";
-                return (
-                  <div
-                    key={entry.id}
-                    className="flex items-center gap-2 text-xs"
-                  >
-                    <div className={`h-2 w-2 flex-shrink-0 rounded-full ${dotColor}`} />
-                    <span className="truncate font-medium text-slate-700">
-                      {entry.vessel_name}
-                    </span>
-                    <span className="flex-shrink-0 text-slate-400">{label}</span>
-                    {entry.event_type === "price_changed" &&
-                      entry.old_price != null &&
-                      entry.new_price != null && (
-                        <span className="flex-shrink-0 text-slate-500">
-                          {new Intl.NumberFormat("nl-NL", {
-                            style: "currency",
-                            currency: "EUR",
-                            minimumFractionDigits: 0,
-                            maximumFractionDigits: 0,
-                          }).format(entry.old_price)}{" "}
-                          &rarr;{" "}
-                          {new Intl.NumberFormat("nl-NL", {
-                            style: "currency",
-                            currency: "EUR",
-                            minimumFractionDigits: 0,
-                            maximumFractionDigits: 0,
-                          }).format(entry.new_price)}
+          {/* Header */}
+          <div className="flex items-center gap-2 px-4 pt-4 pb-3">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-cyan-50">
+              <svg className="h-4 w-4 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+            </div>
+            <h2 className="text-sm font-semibold text-slate-800">Recente marktactiviteit</h2>
+          </div>
+
+          {/* Entries */}
+          <div className="flex flex-col divide-y divide-slate-50">
+            {activityEntries.map((entry) => {
+              const timeAgo = formatTimeAgo(new Date(entry.recorded_at));
+              const fmtPrice = (p: number) =>
+                new Intl.NumberFormat("nl-NL", {
+                  style: "currency",
+                  currency: "EUR",
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                }).format(p);
+
+              const isInserted = entry.event_type === "inserted";
+              const isPriceChanged = entry.event_type === "price_changed";
+              const isSold = entry.event_type === "sold";
+
+              const pillClass = isInserted
+                ? "bg-emerald-50 text-emerald-700"
+                : isPriceChanged
+                  ? "bg-amber-50 text-amber-700"
+                  : isSold
+                    ? "bg-orange-50 text-orange-700"
+                    : "bg-red-50 text-red-700";
+              const pillLabel = isInserted
+                ? "Nieuw"
+                : isPriceChanged
+                  ? "Prijswijziging"
+                  : isSold
+                    ? "Verkocht"
+                    : "Verwijderd";
+              const iconPath = isInserted
+                ? "M12 4v16m8-8H4"
+                : isPriceChanged
+                  ? "M7 7h10v10"
+                  : isSold
+                    ? "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    : "M6 18L18 6M6 6l12 12";
+              const iconColor = isInserted
+                ? "text-emerald-500"
+                : isPriceChanged
+                  ? "text-amber-500"
+                  : isSold
+                    ? "text-orange-500"
+                    : "text-red-500";
+
+              const priceWentDown = isPriceChanged && entry.old_price != null && entry.new_price != null && entry.new_price < entry.old_price;
+              const priceWentUp = isPriceChanged && entry.old_price != null && entry.new_price != null && entry.new_price > entry.old_price;
+
+              return (
+                <div key={entry.id} className="flex items-start gap-3 px-4 py-2.5">
+                  {/* Icon */}
+                  <div className="mt-0.5 flex-shrink-0">
+                    <svg className={`h-4 w-4 ${iconColor}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d={iconPath} />
+                    </svg>
+                  </div>
+
+                  {/* Content */}
+                  <div className="min-w-0 flex-1">
+                    {/* Row 1: name + time */}
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="truncate text-sm font-semibold text-slate-800">{entry.vessel_name}</span>
+                      <span className="flex-shrink-0 text-xs text-slate-400">{timeAgo}</span>
+                    </div>
+                    {/* Row 2: pill + price info */}
+                    <div className="mt-1 flex flex-wrap items-center gap-2">
+                      <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold ${pillClass}`}>
+                        {pillLabel}
+                      </span>
+                      {isPriceChanged && entry.old_price != null && entry.new_price != null && (
+                        <span className="flex items-center gap-1 text-xs text-slate-500">
+                          <span className="line-through decoration-slate-300">{fmtPrice(entry.old_price)}</span>
+                          {priceWentDown && (
+                            <svg className="h-3 w-3 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                            </svg>
+                          )}
+                          {priceWentUp && (
+                            <svg className="h-3 w-3 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                            </svg>
+                          )}
+                          <span className={priceWentDown ? "font-semibold text-emerald-600" : priceWentUp ? "font-semibold text-red-600" : ""}>{fmtPrice(entry.new_price)}</span>
                         </span>
                       )}
-                    {entry.event_type === "inserted" && entry.new_price != null && (
-                      <span className="flex-shrink-0 text-slate-500">
-                        {new Intl.NumberFormat("nl-NL", {
-                          style: "currency",
-                          currency: "EUR",
-                          minimumFractionDigits: 0,
-                          maximumFractionDigits: 0,
-                        }).format(entry.new_price)}
-                      </span>
-                    )}
-                    <span className="ml-auto flex-shrink-0 text-slate-400">{timeAgo}</span>
+                      {isInserted && entry.new_price != null && (
+                        <span className="text-xs font-medium text-slate-500">{fmtPrice(entry.new_price)}</span>
+                      )}
+                    </div>
                   </div>
-                );
-              })}
-            </div>
-            {/* CTA based on auth tier */}
-            {!user && (
+                </div>
+              );
+            })}
+          </div>
+
+          {/* CTA based on auth tier */}
+          {!user && (
+            <div className="px-4 pb-4 pt-2">
               <button
                 onClick={() => openAuthModal()}
-                className="mt-3 block w-full text-center text-xs font-medium text-cyan-600 hover:text-cyan-500"
+                className="w-full rounded-lg bg-cyan-50 px-3 py-2 text-xs font-semibold text-cyan-700 transition-colors hover:bg-cyan-100"
               >
                 Maak een gratis account voor meer activiteit &rarr;
               </button>
-            )}
-            {user && !isPremium && (
+            </div>
+          )}
+          {user && !isPremium && (
+            <div className="px-4 pb-4 pt-2">
               <a
                 href="/pricing"
-                className="mt-3 block text-center text-xs font-medium text-cyan-600 hover:text-cyan-500"
+                className="block w-full rounded-lg bg-cyan-50 px-3 py-2 text-center text-xs font-semibold text-cyan-700 transition-colors hover:bg-cyan-100"
               >
                 Upgrade voor volledige geschiedenis &rarr;
               </a>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
 
