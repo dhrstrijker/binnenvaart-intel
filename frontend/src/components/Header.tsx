@@ -14,6 +14,7 @@ export default function Header() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const mobileNavRef = useRef<HTMLDivElement>(null);
+  const mobileToggleRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -39,7 +40,10 @@ export default function Header() {
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (mobileNavRef.current && !mobileNavRef.current.contains(e.target as Node)) {
+      if (
+        mobileNavRef.current && !mobileNavRef.current.contains(e.target as Node) &&
+        mobileToggleRef.current && !mobileToggleRef.current.contains(e.target as Node)
+      ) {
         setMobileNavOpen(false);
       }
     }
@@ -140,6 +144,7 @@ export default function Header() {
 
         {/* Mobile: Hamburger button */}
         <button
+          ref={mobileToggleRef}
           onClick={() => setMobileNavOpen(!mobileNavOpen)}
           className="flex items-center justify-center rounded-lg p-2 text-cyan-200 transition hover:bg-white/10 hover:text-white md:hidden"
           aria-label={mobileNavOpen ? "Menu sluiten" : "Menu openen"}
