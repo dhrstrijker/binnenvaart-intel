@@ -142,6 +142,11 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
         <div className="absolute top-3 right-3 flex gap-2">
           <button
             type="button"
+            onClick={() => {
+              if (!user) {
+                window.location.href = "/signup";
+              }
+            }}
             className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/90 text-slate-500 shadow-sm backdrop-blur-sm transition-colors hover:text-red-500"
             title="Bewaar als favoriet"
           >
