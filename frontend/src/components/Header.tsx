@@ -55,14 +55,7 @@ export default function Header() {
   return (
     <header className="bg-slate-950 shadow-lg">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
-        <div className="flex items-center gap-3">
-          <div>
-            <NavisioLogo size="md" variant="light" />
-            <p className="mt-0.5 text-xs text-cyan-200">
-              Scheepsmarkt intelligence
-            </p>
-          </div>
-        </div>
+        <NavisioLogo size="md" variant="light" />
 
         {/* Navigation + Auth */}
         <div className="flex items-center gap-4">
