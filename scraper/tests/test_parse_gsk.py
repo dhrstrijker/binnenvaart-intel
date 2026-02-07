@@ -168,3 +168,15 @@ class TestParseVessel:
     def test_price_dropped_in_raw_details(self):
         v = parse_vessel(_make_vessel({"general": {"priceDropped": True}}))
         assert v["raw_details"]["price_dropped"] is True
+
+    def test_empty_name_skipped(self):
+        v = parse_vessel(_make_vessel({"vesselName": ""}))
+        assert v is None
+
+    def test_none_name_skipped(self):
+        v = parse_vessel(_make_vessel({"vesselName": None}))
+        assert v is None
+
+    def test_whitespace_name_skipped(self):
+        v = parse_vessel(_make_vessel({"vesselName": "   "}))
+        assert v is None

@@ -114,6 +114,11 @@ def parse_vessel(vessel: dict) -> dict | None:
     if general.get("status") != "FOR_SALE":
         return None
 
+    name = (vessel.get("vesselName") or "").strip()
+    if not name:
+        logger.debug("Skipping vessel with empty name (id=%s)", vessel.get("id"))
+        return None
+
     slug = vessel.get("slug")
     legacy_id = vessel.get("legacyId")
 
@@ -194,7 +199,7 @@ def parse_vessel(vessel: dict) -> dict | None:
     return {
         "source": "gsk",
         "source_id": str(slug) if slug else str(vessel.get("id")),
-        "name": vessel.get("vesselName"),
+        "name": name,
         "type": vessel_type,
         "length_m": length_m,
         "width_m": width_m,
