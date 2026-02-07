@@ -36,3 +36,14 @@ export interface PriceHistory {
   price: number;
   recorded_at: string;
 }
+
+export interface ActivityLogEntry {
+  id: string;
+  vessel_id: string;
+  event_type: "inserted" | "price_changed" | "removed";
+  vessel_name: string;
+  vessel_source: string;
+  old_price: number | null;
+  new_price: number | null;
+  recorded_at: string;
+}

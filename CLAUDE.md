@@ -84,6 +84,7 @@ Three tables in Supabase (project: `alafvkqfqlrznoqmabpf`):
 - **vessels**: id (UUID), name, type, length_m, width_m, tonnage, build_year, price, url, image_url, source, source_id, raw_details (JSONB), image_urls (JSONB), scraped_at, first_seen_at, updated_at. UNIQUE(source, source_id).
 - **price_history**: id (UUID), vessel_id (FK), price, recorded_at. Tracks every price change.
 - **notification_subscribers**: id (UUID), email (UNIQUE), created_at, active. Public signup via frontend.
+- **activity_log**: id (UUID), vessel_id (FK), event_type ('inserted'|'price_changed'|'removed'), vessel_name, vessel_source, old_price, new_price, recorded_at. Time-windowed RLS: anon=2 days, authenticated=14 days, premium=full history.
 
 All tables have RLS enabled. Anonymous read access on all. Anonymous insert on notification_subscribers.
 

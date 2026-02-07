@@ -55,6 +55,28 @@ def get_changes() -> list[dict]:
     return list(_changes)
 
 
+def _log_activity(
+    vessel_id: str,
+    event_type: str,
+    vessel_name: str,
+    vessel_source: str,
+    old_price: float | None = None,
+    new_price: float | None = None,
+) -> None:
+    """Log an activity event (fire-and-forget, never breaks the scraper)."""
+    try:
+        supabase.table("activity_log").insert({
+            "vessel_id": vessel_id,
+            "event_type": event_type,
+            "vessel_name": vessel_name,
+            "vessel_source": vessel_source,
+            "old_price": old_price,
+            "new_price": new_price,
+        }).execute()
+    except Exception:
+        logger.exception("Failed to log activity for %s/%s", vessel_source, vessel_name)
+
+
 def mark_removed(source: str, run_start: str) -> int:
     """Mark vessels from *source* not seen since *run_start* as removed.
 
@@ -73,6 +95,13 @@ def mark_removed(source: str, run_start: str) -> int:
         logger.info("Marked %d %s vessels as removed", count, source)
         for row in resp.data:
             _changes.append({"kind": "removed", "vessel": row})
+            _log_activity(
+                vessel_id=row["id"],
+                event_type="removed",
+                vessel_name=row.get("name", ""),
+                vessel_source=source,
+                old_price=row.get("price"),
+            )
     return count
 
 
@@ -119,6 +148,13 @@ def upsert_vessel(vessel: dict) -> str:
                 ).execute()
 
             _changes.append({"kind": "inserted", "vessel": vessel})
+            _log_activity(
+                vessel_id=vessel_id,
+                event_type="inserted",
+                vessel_name=vessel.get("name", ""),
+                vessel_source=source,
+                new_price=vessel.get("price"),
+            )
             return "inserted"
 
         vessel_id = existing.data[0]["id"]
@@ -153,6 +189,14 @@ def upsert_vessel(vessel: dict) -> str:
                 "old_price": old_price,
                 "new_price": new_price,
             })
+            _log_activity(
+                vessel_id=vessel_id,
+                event_type="price_changed",
+                vessel_name=vessel.get("name", ""),
+                vessel_source=source,
+                old_price=old_price,
+                new_price=new_price,
+            )
             return "price_changed"
 
         update_data = {"scraped_at": now, "status": "active"}

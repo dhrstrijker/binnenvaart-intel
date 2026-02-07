@@ -230,3 +230,31 @@ CREATE POLICY "Authenticated users can read own events"
       SELECT id FROM notification_history WHERE user_id = (SELECT auth.uid())
     )
   );
+
+-- Activity log for tracking vessel events (time-windowed RLS)
+CREATE TABLE activity_log (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  vessel_id UUID REFERENCES vessels(id) ON DELETE CASCADE,
+  event_type TEXT NOT NULL CHECK (event_type IN ('inserted', 'price_changed', 'removed')),
+  vessel_name TEXT NOT NULL,
+  vessel_source TEXT NOT NULL,
+  old_price NUMERIC,
+  new_price NUMERIC,
+  recorded_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_activity_log_recorded ON activity_log(recorded_at DESC);
+
+ALTER TABLE activity_log ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anonymous read last 2 days"
+  ON activity_log FOR SELECT TO anon
+  USING (recorded_at > NOW() - INTERVAL '2 days');
+
+CREATE POLICY "Authenticated read last 14 days"
+  ON activity_log FOR SELECT TO authenticated
+  USING (recorded_at > NOW() - INTERVAL '14 days');
+
+CREATE POLICY "Premium read full history"
+  ON activity_log FOR SELECT TO authenticated
+  USING ((SELECT is_premium()));
