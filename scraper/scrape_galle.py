@@ -64,13 +64,141 @@ def extract_image_url(card) -> str | None:
     return match.group(1) if match else None
 
 
+def _parse_detail_specs(soup) -> dict:
+    """Parse all specs from a detail page's .product-specs container.
+
+    The detail page uses this HTML structure:
+        <div class="product-specs">
+          <h7>Algemeen</h7>
+          <div class="spec-row">
+            <label class="spec-label">type schip</label>
+            <label class="spec-value">Motorvrachtschip</label>
+          </div>
+          ...
+          <h7>Buikdenning
+            Staal 12mm          (text-only sections embed content in h7)
+          </h7>
+        </div>
+
+    Returns a dict of all specs, keyed by lowercase label.  Section headers
+    are prefixed to avoid collisions (e.g. "luiken > type").
+    Text-only sections are stored as "section_name" key with the text value.
+    """
+    container = soup.select_one(".product-specs")
+    if not container:
+        return {}
+
+    all_specs = {}
+    current_section = ""
+
+    for child in container.children:
+        if not hasattr(child, "name") or child.name is None:
+            continue
+
+        if child.name == "h7":
+            full_text = child.get_text(strip=True)
+            # Some sections embed their content directly in the h7 tag
+            # e.g. <h7>Buikdenning\nStaal 12mm</h7>
+            lines = [l.strip() for l in full_text.split("\n") if l.strip()]
+            current_section = lines[0].lower() if lines else ""
+            if len(lines) > 1:
+                # Text-only section: store the content after the header
+                all_specs[current_section] = " ".join(lines[1:])
+
+        elif "spec-row" in (child.get("class") or []):
+            label_el = child.select_one(".spec-label")
+            value_el = child.select_one(".spec-value")
+            if label_el and value_el:
+                label = label_el.get_text(strip=True).lower()
+                value = value_el.get_text(strip=True)
+                if label and value:
+                    # Prefix with section to avoid collisions
+                    # (e.g. "luiken > bouwjaar" vs top-level "bouwjaar")
+                    if current_section and current_section != "algemeen":
+                        key = f"{current_section} > {label}"
+                    else:
+                        key = label
+                    all_specs[key] = value
+
+    return all_specs
+
+
+def _parse_detail_images(soup) -> list[str]:
+    """Extract all gallery image URLs from a detail page."""
+    image_urls = []
+
+    for img in soup.select("img[src]"):
+        src = img.get("src", "")
+        if "/uploads/" in src or "/scheepsaanbod/" in src:
+            if not src.startswith("http"):
+                src = f"https://gallemakelaars.nl{src}"
+            if src not in image_urls:
+                image_urls.append(src)
+
+    for div in soup.select("[style*='background-image']"):
+        style = div.get("style", "")
+        match = re.search(r"background-image:\s*url\(['\"]?(.+?)['\"]?\)", style)
+        if match:
+            src = match.group(1)
+            if not src.startswith("http"):
+                src = f"https://gallemakelaars.nl{src}"
+            if src not in image_urls:
+                image_urls.append(src)
+
+    return image_urls
+
+
+def _parse_dutch_number(raw: str):
+    """Parse a Dutch-formatted number where dot=thousands, comma=decimal.
+
+    Handles the ambiguity when only a comma is present:
+      "1.815,000" → 1815.0  (dot+comma = standard Dutch)
+      "932,000"   → 932.0   (comma only, trailing zeros = decimal)
+      "4,284"     → 4284.0  (comma only, non-zero fraction = thousands separator)
+      "2826"      → 2826.0  (no separators)
+    """
+    cleaned = raw.lower().replace("ton", "").strip()
+    if not cleaned:
+        return None
+
+    has_dot = "." in cleaned
+    has_comma = "," in cleaned
+
+    if has_dot and has_comma:
+        # Standard Dutch: "1.815,000" → remove dots, comma→dot
+        cleaned = cleaned.replace(".", "").replace(",", ".")
+    elif has_comma:
+        parts = cleaned.split(",")
+        if len(parts) == 2 and len(parts[1]) == 3 and parts[1] != "000":
+            # "4,284" → comma is thousands separator → 4284
+            cleaned = cleaned.replace(",", "")
+        else:
+            # "932,000" → comma is decimal → 932.0
+            cleaned = cleaned.replace(",", ".")
+    elif has_dot:
+        # Only dot: "2.826" → thousands separator → 2826
+        cleaned = cleaned.replace(".", "")
+
+    try:
+        return float(cleaned)
+    except ValueError:
+        return None
+
+
+def _parse_tonnage(specs: dict):
+    """Extract tonnage from specs, trying 'maximum diepgang (t)' first."""
+    for key in ("maximum diepgang (t)", "tonnenmaat > maximum diepgang (t)",
+                "maximaal laadvermogen"):
+        raw = specs.get(key)
+        if raw:
+            result = _parse_dutch_number(raw)
+            if result is not None:
+                return result
+    return None
+
+
 def _fetch_detail(detail_url: str) -> dict:
     """Fetch a vessel detail page and extract all specs + images.
-
-    The detail page has a specs table with rows like:
-        <td>type schip</td><td>Motorvrachtschip</td>
-        <td>bouwjaar</td><td>2002</td>
-        <td>maximaal laadvermogen</td><td>2.826 ton</td>
 
     Returns type, build_year, tonnage (parsed), plus raw_details (all specs)
     and image_urls (all gallery images).
@@ -85,17 +213,7 @@ def _fetch_detail(detail_url: str) -> dict:
 
     soup = BeautifulSoup(resp.text, "html.parser")
 
-    # Capture ALL table rows as raw_details dict
-    all_specs = {}
-    for row in soup.select("tr"):
-        cells = row.find_all("td")
-        if len(cells) < 2:
-            continue
-        label = cells[0].get_text(strip=True).lower()
-        value = cells[1].get_text(strip=True)
-        if label and value:
-            all_specs[label] = value
-
+    all_specs = _parse_detail_specs(soup)
     if all_specs:
         result["raw_details"] = all_specs
 
@@ -109,34 +227,9 @@ def _fetch_detail(detail_url: str) -> dict:
         except ValueError:
             pass
 
-    if all_specs.get("maximaal laadvermogen"):
-        tonnage_str = all_specs["maximaal laadvermogen"].lower().replace("ton", "").replace(".", "").strip()
-        try:
-            result["tonnage"] = float(tonnage_str)
-        except ValueError:
-            pass
+    result["tonnage"] = _parse_tonnage(all_specs)
 
-    # Extract all gallery image URLs
-    image_urls = []
-    for img in soup.select("img[src]"):
-        src = img.get("src", "")
-        if "/uploads/" in src or "/scheepsaanbod/" in src:
-            if not src.startswith("http"):
-                src = f"https://gallemakelaars.nl{src}"
-            if src not in image_urls:
-                image_urls.append(src)
-
-    # Also check for background-image URLs in gallery divs
-    for div in soup.select("[style*='background-image']"):
-        style = div.get("style", "")
-        match = re.search(r"background-image:\s*url\(['\"]?(.+?)['\"]?\)", style)
-        if match:
-            src = match.group(1)
-            if not src.startswith("http"):
-                src = f"https://gallemakelaars.nl{src}"
-            if src not in image_urls:
-                image_urls.append(src)
-
+    image_urls = _parse_detail_images(soup)
     if image_urls:
         result["image_urls"] = image_urls
 

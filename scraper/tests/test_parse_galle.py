@@ -1,6 +1,10 @@
 from bs4 import BeautifulSoup
 
-from scrape_galle import parse_price, parse_dimensions, extract_image_url, parse_card
+from scrape_galle import (
+    parse_price, parse_dimensions, extract_image_url, parse_card,
+    _parse_detail_specs, _parse_detail_images, _parse_tonnage,
+    _parse_dutch_number,
+)
 
 
 class TestParsePrice:
@@ -119,3 +123,230 @@ class TestParseCard:
         result = parse_card(card)
         assert result["url"] == "https://gallemakelaars.nl/scheepsaanbod/absolute"
         assert result["source_id"] == "absolute"
+
+
+DETAIL_HTML = '''
+<html><body>
+<div class="product-specs">
+  <h7>Algemeen</h7>
+  <div class="spec-row">
+    <label class="spec-label">naam</label>
+    <label class="spec-value">Isella</label>
+  </div>
+  <div class="spec-row">
+    <label class="spec-label">type schip</label>
+    <label class="spec-value">Motorvrachtschip</label>
+  </div>
+  <div class="spec-row">
+    <label class="spec-label">bouwjaar</label>
+    <label class="spec-value">1970</label>
+  </div>
+  <div class="spec-row">
+    <label class="spec-label">scheepswerf</label>
+    <label class="spec-value">De Schroef te Sluiskil</label>
+  </div>
+  <h7>Tonnenmaat</h7>
+  <div class="spec-row">
+    <label class="spec-label">maximum diepgang (t)</label>
+    <label class="spec-value">1.815,000</label>
+  </div>
+  <div class="spec-row">
+    <label class="spec-label">op 2m00 (t)</label>
+    <label class="spec-value">932,000</label>
+  </div>
+  <h7>Afmetingen</h7>
+  <div class="spec-row">
+    <label class="spec-label">lengte (m)</label>
+    <label class="spec-value">85,00</label>
+  </div>
+  <div class="spec-row">
+    <label class="spec-label">breedte (m)</label>
+    <label class="spec-value">9,50</label>
+  </div>
+  <h7>Ruimen</h7>
+  <div class="spec-row">
+    <label class="spec-label">containers (TEU)</label>
+    <label class="spec-value">54</label>
+  </div>
+  <h7>Buikdenning
+    Staal 12mm
+  </h7>
+  <h7>Kopschroef
+    fabr. De Groot/Van Ballegooy, Scania 450 pk bj. 1999
+  </h7>
+  <h7>Luiken</h7>
+  <div class="spec-row">
+    <label class="spec-label">type</label>
+    <label class="spec-value">friese kap aluminium luiken</label>
+  </div>
+  <div class="spec-row">
+    <label class="spec-label">bouwjaar</label>
+    <label class="spec-value">2006</label>
+  </div>
+  <h7>Hoofdmotor(en)</h7>
+  <div class="spec-row">
+    <label class="spec-label">fabr. merk</label>
+    <label class="spec-value">Scania</label>
+  </div>
+  <div class="spec-row">
+    <label class="spec-label">pk</label>
+    <label class="spec-value">550</label>
+  </div>
+  <div class="spec-row">
+    <label class="spec-label">kw</label>
+    <label class="spec-value">404</label>
+  </div>
+</div>
+<img src="/uploads/ships/photo1.jpg">
+<img src="/uploads/ships/photo2.jpg">
+<div style="background-image: url('/uploads/ships/photo3.jpg')"></div>
+<img src="/static/logo.png">
+</body></html>
+'''
+
+
+class TestParseDetailSpecs:
+    def _soup(self, html=DETAIL_HTML):
+        return BeautifulSoup(html, "html.parser")
+
+    def test_algemeen_fields(self):
+        specs = _parse_detail_specs(self._soup())
+        assert specs["naam"] == "Isella"
+        assert specs["type schip"] == "Motorvrachtschip"
+        assert specs["bouwjaar"] == "1970"
+        assert specs["scheepswerf"] == "De Schroef te Sluiskil"
+
+    def test_tonnenmaat_prefixed(self):
+        specs = _parse_detail_specs(self._soup())
+        assert specs["tonnenmaat > maximum diepgang (t)"] == "1.815,000"
+        assert specs["tonnenmaat > op 2m00 (t)"] == "932,000"
+
+    def test_afmetingen_prefixed(self):
+        specs = _parse_detail_specs(self._soup())
+        assert specs["afmetingen > lengte (m)"] == "85,00"
+        assert specs["afmetingen > breedte (m)"] == "9,50"
+
+    def test_text_only_sections(self):
+        specs = _parse_detail_specs(self._soup())
+        assert specs["buikdenning"] == "Staal 12mm"
+        assert "De Groot/Van Ballegooy" in specs["kopschroef"]
+
+    def test_luiken_prefixed(self):
+        specs = _parse_detail_specs(self._soup())
+        assert specs["luiken > type"] == "friese kap aluminium luiken"
+        assert specs["luiken > bouwjaar"] == "2006"
+
+    def test_motor_prefixed(self):
+        specs = _parse_detail_specs(self._soup())
+        assert specs["hoofdmotor(en) > fabr. merk"] == "Scania"
+        assert specs["hoofdmotor(en) > pk"] == "550"
+        assert specs["hoofdmotor(en) > kw"] == "404"
+
+    def test_no_collision_bouwjaar(self):
+        """bouwjaar appears in Algemeen and Luiken — they should not collide."""
+        specs = _parse_detail_specs(self._soup())
+        assert specs["bouwjaar"] == "1970"
+        assert specs["luiken > bouwjaar"] == "2006"
+
+    def test_empty_page(self):
+        soup = BeautifulSoup("<html><body></body></html>", "html.parser")
+        assert _parse_detail_specs(soup) == {}
+
+    def test_no_spec_rows(self):
+        soup = BeautifulSoup('<div class="product-specs"><h7>Algemeen</h7></div>', "html.parser")
+        specs = _parse_detail_specs(soup)
+        assert specs == {}
+
+
+class TestParseDetailImages:
+    def _soup(self, html=DETAIL_HTML):
+        return BeautifulSoup(html, "html.parser")
+
+    def test_extracts_upload_images(self):
+        images = _parse_detail_images(self._soup())
+        assert "https://gallemakelaars.nl/uploads/ships/photo1.jpg" in images
+        assert "https://gallemakelaars.nl/uploads/ships/photo2.jpg" in images
+
+    def test_extracts_background_images(self):
+        images = _parse_detail_images(self._soup())
+        assert "https://gallemakelaars.nl/uploads/ships/photo3.jpg" in images
+
+    def test_skips_non_upload_images(self):
+        images = _parse_detail_images(self._soup())
+        assert not any("logo.png" in url for url in images)
+
+    def test_no_duplicates(self):
+        images = _parse_detail_images(self._soup())
+        assert len(images) == len(set(images))
+
+    def test_empty_page(self):
+        soup = BeautifulSoup("<html><body></body></html>", "html.parser")
+        assert _parse_detail_images(soup) == []
+
+
+class TestParseDutchNumber:
+    def test_dot_and_comma(self):
+        """Standard Dutch: '1.815,000' → 1815.0"""
+        assert _parse_dutch_number("1.815,000") == 1815.0
+
+    def test_dot_and_comma_with_fraction(self):
+        """'3.921,758' → 3921.758"""
+        assert _parse_dutch_number("3.921,758") == 3921.758
+
+    def test_comma_thousands(self):
+        """'4,284' → 4284 (comma as thousands separator, non-zero digits)"""
+        assert _parse_dutch_number("4,284") == 4284.0
+
+    def test_comma_decimal_zeros(self):
+        """'932,000' → 932.0 (trailing zeros = decimal)"""
+        assert _parse_dutch_number("932,000") == 932.0
+
+    def test_plain_number(self):
+        assert _parse_dutch_number("2826") == 2826.0
+
+    def test_dot_only(self):
+        """'2.826' → 2826 (dot as thousands separator)"""
+        assert _parse_dutch_number("2.826") == 2826.0
+
+    def test_with_ton_suffix(self):
+        assert _parse_dutch_number("2.826 ton") == 2826.0
+
+    def test_comma_short_decimal(self):
+        """'4,28' → 4.28 (less than 3 digits after comma = decimal)"""
+        assert _parse_dutch_number("4,28") == 4.28
+
+    def test_empty(self):
+        assert _parse_dutch_number("") is None
+
+    def test_invalid(self):
+        assert _parse_dutch_number("n/a") is None
+
+
+class TestParseTonnage:
+    def test_standard_dutch(self):
+        specs = {"tonnenmaat > maximum diepgang (t)": "1.815,000"}
+        assert _parse_tonnage(specs) == 1815.0
+
+    def test_plain_number(self):
+        specs = {"tonnenmaat > maximum diepgang (t)": "2826"}
+        assert _parse_tonnage(specs) == 2826.0
+
+    def test_with_ton_suffix(self):
+        specs = {"maximaal laadvermogen": "2.826 ton"}
+        assert _parse_tonnage(specs) == 2826.0
+
+    def test_direct_key(self):
+        specs = {"maximum diepgang (t)": "900,000"}
+        assert _parse_tonnage(specs) == 900.0
+
+    def test_comma_thousands(self):
+        """'4,284' should parse as 4284 tonnes, not 4.284"""
+        specs = {"tonnenmaat > maximum diepgang (t)": "4,284"}
+        assert _parse_tonnage(specs) == 4284.0
+
+    def test_missing(self):
+        assert _parse_tonnage({}) is None
+
+    def test_invalid_value(self):
+        specs = {"tonnenmaat > maximum diepgang (t)": "n/a"}
+        assert _parse_tonnage(specs) is None
