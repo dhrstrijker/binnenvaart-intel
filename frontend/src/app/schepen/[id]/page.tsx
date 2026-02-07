@@ -63,9 +63,7 @@ export default async function VesselPage({ params }: PageProps) {
     permanentRedirect(`/schepen/${vessel.canonical_vessel_id}`);
   }
 
-  const similarVessels = vessel.status === "removed"
-    ? await getSimilarVessels(vessel, 6)
-    : [];
+  const similarVessels = await getSimilarVessels(vessel, 6);
 
   const title = buildVesselTitle(vessel);
   const description = buildVesselDescription(vessel);
