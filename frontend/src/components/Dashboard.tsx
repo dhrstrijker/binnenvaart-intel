@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { getSupabase, Vessel, PriceHistory } from "@/lib/supabase";
 import { useSubscription } from "@/lib/useSubscription";
 import { useActivityLog } from "@/lib/useActivityLog";
@@ -36,6 +36,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterState>(INITIAL_FILTERS);
+  const [visibleCount, setVisibleCount] = useState(24);
+  const sentinelRef = useRef<HTMLDivElement>(null);
   const { user, isPremium, isLoading: subLoading } = useSubscription();
   const { entries: activityEntries, loading: activityLoading } = useActivityLog(user ? 20 : 4);
 
@@ -153,6 +155,35 @@ export default function Dashboard() {
     return result;
   }, [vessels, filters]);
 
+  // Reset visible count when filters change
+  useEffect(() => {
+    setVisibleCount(24);
+  }, [filters]);
+
+  // IntersectionObserver to load more vessels on scroll
+  const loadMore = useCallback(() => {
+    setVisibleCount((prev) => prev + 24);
+  }, []);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMore();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [loadMore]);
+
+  const visibleVessels = filtered.slice(0, visibleCount);
+  const hasMore = visibleCount < filtered.length;
 
   if (error) {
     return (
@@ -326,17 +357,29 @@ export default function Dashboard() {
 
       {/* Vessel grid */}
       {!loading && filtered.length > 0 && (
-        <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {filtered.map((vessel) => (
-            <VesselCard
-              key={vessel.id}
-              vessel={vessel}
-              priceHistory={priceHistoryMap[vessel.id] ?? []}
-              isPremium={isPremium}
-              user={user}
-            />
-          ))}
-        </div>
+        <>
+          <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {visibleVessels.map((vessel) => (
+              <VesselCard
+                key={vessel.id}
+                vessel={vessel}
+                priceHistory={priceHistoryMap[vessel.id] ?? []}
+                isPremium={isPremium}
+                user={user}
+              />
+            ))}
+          </div>
+
+          {/* Scroll sentinel + loading indicator */}
+          <div ref={sentinelRef} className="mt-6 flex flex-col items-center gap-2 py-4">
+            {hasMore && (
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-cyan-500" />
+            )}
+            <p className="text-xs text-slate-400">
+              {visibleVessels.length} van {filtered.length} schepen
+            </p>
+          </div>
+        </>
       )}
 
     </div>
