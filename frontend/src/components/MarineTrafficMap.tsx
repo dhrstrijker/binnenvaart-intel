@@ -9,7 +9,8 @@ export default function MarineTrafficMap({
   mmsi = "244100879",
   className = "",
 }: MarineTrafficMapProps) {
-  const src = `https://www.marinetraffic.com/en/ais/embed/zoom:14/cenx:4.5/ceny:51.9/maptype:1/shownames:false/mmsi:${mmsi}/clicktoact:false`;
+  const safeMmsi = /^\d+$/.test(mmsi) ? mmsi : "244100879";
+  const src = `https://www.marinetraffic.com/en/ais/embed/zoom:14/cenx:4.5/ceny:51.9/maptype:1/shownames:false/mmsi:${safeMmsi}/clicktoact:false`;
 
   return (
     <div
@@ -22,6 +23,7 @@ export default function MarineTrafficMap({
         loading="lazy"
         style={{ border: "none" }}
         title="MarineTraffic kaart"
+        sandbox="allow-scripts allow-same-origin"
       />
     </div>
   );

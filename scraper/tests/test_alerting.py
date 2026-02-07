@@ -141,6 +141,7 @@ class TestAlertDeduplication:
 class TestSendEmailAlert:
     def test_sends_via_resend(self):
         with patch.object(alerting, "ALERT_EMAIL", "test@example.com"), \
+             patch.object(alerting.resend, "api_key", "re_test_key"), \
              patch.object(alerting.resend.Emails, "send") as mock_send:
             alerting.send_email_alert("Test subject", "<p>body</p>")
         mock_send.assert_called_once()

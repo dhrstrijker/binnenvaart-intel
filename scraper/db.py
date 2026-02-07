@@ -467,31 +467,54 @@ def get_user_saved_searches(user_id: str, frequency: str | None = None) -> list[
 
 
 def get_changes_since(cutoff_iso: str) -> list[dict]:
-    """Get vessel changes (from price_history) since a given ISO timestamp.
-    Returns change dicts compatible with the notification system format."""
-    # Get price history entries since cutoff
-    res = (
+    """Get vessel changes since a given ISO timestamp.
+
+    Combines price_history (price_changed) with activity_log (inserted/removed/sold).
+    Returns change dicts compatible with the notification system format.
+    """
+    changes: list[dict] = []
+    all_vessel_ids: set[str] = set()
+
+    # 1. Price history entries (price_changed)
+    price_res = (
         supabase.table("price_history")
         .select("vessel_id, price, recorded_at")
         .gte("recorded_at", cutoff_iso)
         .order("recorded_at", desc=False)
         .execute()
     )
-    if not res.data:
+    price_entries = price_res.data or []
+    for row in price_entries:
+        all_vessel_ids.add(row["vessel_id"])
+
+    # 2. Activity log entries (inserted/removed/sold)
+    activity_res = (
+        supabase.table("activity_log")
+        .select("vessel_id, event_type, old_price, new_price, recorded_at")
+        .in_("event_type", ["inserted", "removed", "sold"])
+        .gte("recorded_at", cutoff_iso)
+        .order("recorded_at", desc=False)
+        .execute()
+    )
+    activity_entries = activity_res.data or []
+    for row in activity_entries:
+        if row.get("vessel_id"):
+            all_vessel_ids.add(row["vessel_id"])
+
+    if not all_vessel_ids:
         return []
 
-    # Get the associated vessels
-    vessel_ids = list(set(row["vessel_id"] for row in res.data))
+    # 3. Fetch all associated vessels in one query
     vessels_res = (
         supabase.table("vessels")
         .select("id, name, type, source, price, url, length_m, width_m, build_year, tonnage, status")
-        .in_("id", vessel_ids)
+        .in_("id", list(all_vessel_ids))
         .execute()
     )
     vessel_map = {v["id"]: v for v in (vessels_res.data or [])}
 
-    changes = []
-    for entry in res.data:
+    # 4. Build price_changed entries
+    for entry in price_entries:
         vessel = vessel_map.get(entry["vessel_id"])
         if not vessel:
             continue
@@ -499,5 +522,26 @@ def get_changes_since(cutoff_iso: str) -> list[dict]:
             "kind": "price_changed",
             "vessel": vessel,
             "new_price": entry["price"],
+            "recorded_at": entry["recorded_at"],
         })
+
+    # 5. Build activity_log entries
+    for entry in activity_entries:
+        vessel = vessel_map.get(entry.get("vessel_id"))
+        if not vessel:
+            continue
+        change: dict = {
+            "kind": entry["event_type"],
+            "vessel": vessel,
+            "recorded_at": entry["recorded_at"],
+        }
+        if entry.get("new_price") is not None:
+            change["new_price"] = entry["new_price"]
+        if entry.get("old_price") is not None:
+            change["old_price"] = entry["old_price"]
+        changes.append(change)
+
+    # 6. Sort combined list by recorded_at
+    changes.sort(key=lambda c: c.get("recorded_at", ""))
+
     return changes

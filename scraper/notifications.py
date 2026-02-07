@@ -7,6 +7,8 @@ Sends alerts to subscribers when the scraper detects vessel changes
 import logging
 import os
 from datetime import datetime, timezone
+from html import escape
+from urllib.parse import quote, urlparse
 
 import resend
 from dotenv import load_dotenv
@@ -24,7 +26,20 @@ logger = logging.getLogger(__name__)
 
 resend.api_key = os.environ.get("RESEND_API_KEY", "")
 
-FROM_ADDRESS = "onboarding@resend.dev"
+FROM_ADDRESS = os.environ.get("FROM_ADDRESS", "Navisio <notifications@navisio.nl>")
+
+SAFE_URL_SCHEMES = {"http", "https", ""}
+
+
+def _safe_url(url: str) -> str:
+    """Validate URL protocol - block javascript: and other dangerous schemes."""
+    try:
+        parsed = urlparse(url)
+        if parsed.scheme.lower() not in SAFE_URL_SCHEMES:
+            return "#"
+    except Exception:
+        return "#"
+    return url
 
 # Maps change kind to the per-vessel watchlist flag that controls it
 KIND_TO_WATCHLIST_FLAG = {
@@ -56,9 +71,9 @@ def _build_vessel_row(change: dict) -> str:
     """Build an HTML table row for a single vessel change."""
     kind = change["kind"]
     vessel = change["vessel"]
-    name = vessel.get("name", "Onbekend")
-    url = vessel.get("url", "#")
-    source = vessel.get("source", "")
+    name = escape(vessel.get("name", "Onbekend"))
+    url = escape(_safe_url(vessel.get("url", "#")), quote=True)
+    source = escape(vessel.get("source", ""))
 
     if kind == "inserted":
         badge = '<span style="background:#059669;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;">Nieuw</span>'
@@ -74,7 +89,7 @@ def _build_vessel_row(change: dict) -> str:
 
     specs = []
     if vessel.get("type"):
-        specs.append(vessel["type"])
+        specs.append(escape(vessel["type"]))
     if vessel.get("length_m"):
         specs.append(f'{vessel["length_m"]}m')
     specs_str = " &middot; ".join(specs) if specs else ""
@@ -328,7 +343,7 @@ def build_personalized_email(subscriber: dict, user_changes: list[dict]) -> str:
     <div style="background:#f8fafc;border-radius:0 0 12px 12px;padding:16px 24px;text-align:center;border-top:1px solid #e2e8f0;">
       <p style="margin:0;color:#94a3b8;font-size:11px;">
         U ontvangt dit bericht omdat u watchlist-meldingen heeft ingeschakeld.
-        <br><a href="https://navisio.nl/api/unsubscribe?token={unsubscribe_token}"
+        <br><a href="https://navisio.nl/api/unsubscribe?token={escape(quote(unsubscribe_token), quote=True)}"
           style="color:#06b6d4;text-decoration:underline;">Uitschrijven</a>
       </p>
     </div>
@@ -358,7 +373,7 @@ def build_verification_html(verification_url: str) -> str:
         Klik op de onderstaande knop om uw e-mailadres te bevestigen
         en meldingen te activeren.
       </p>
-      <a href="{verification_url}"
+      <a href="{escape(verification_url, quote=True)}"
          style="display:inline-block;background:#06b6d4;color:#ffffff;
                 font-weight:600;font-size:15px;padding:12px 32px;
                 border-radius:8px;text-decoration:none;">
@@ -387,7 +402,7 @@ def send_verification_email(email: str, verification_token: str) -> None:
         logger.warning("RESEND_API_KEY niet ingesteld, verificatie-e-mail overgeslagen.")
         return
 
-    verification_url = f"https://navisio.nl/api/verify-email?token={verification_token}"
+    verification_url = f"https://navisio.nl/api/verify-email?token={quote(verification_token)}"
     try:
         resend.Emails.send(
             {
@@ -441,7 +456,7 @@ def send_personalized_notifications(stats: dict, changes: list[dict]) -> None:
                     "subject": subject,
                     "html": html,
                     "headers": {
-                        "List-Unsubscribe": f"<https://navisio.nl/api/unsubscribe?token={sub['unsubscribe_token']}>"
+                        "List-Unsubscribe": f"<https://navisio.nl/api/unsubscribe?token={quote(sub['unsubscribe_token'])}>"
                     },
                 }
             )
@@ -572,7 +587,7 @@ def build_digest_email(subscriber: dict, all_matches: list[dict], label: str) ->
     <!-- Header -->
     <div style="background:#0f172a;border-radius:12px 12px 0 0;padding:24px;text-align:center;">
       <h1 style="margin:0;color:#ffffff;font-size:22px;letter-spacing:-0.03em;">NAVISIO</h1>
-      <p style="margin:4px 0 0;color:#06b6d4;font-size:13px;">{label} Samenvatting</p>
+      <p style="margin:4px 0 0;color:#06b6d4;font-size:13px;">{escape(label)} Samenvatting</p>
     </div>
 
     <!-- Content -->
@@ -587,8 +602,8 @@ def build_digest_email(subscriber: dict, all_matches: list[dict], label: str) ->
     <!-- Footer -->
     <div style="background:#f8fafc;border-radius:0 0 12px 12px;padding:16px 24px;text-align:center;border-top:1px solid #e2e8f0;">
       <p style="margin:0;color:#94a3b8;font-size:11px;">
-        U ontvangt dit bericht omdat u {label.lower()} samenvattingen heeft ingeschakeld.
-        <br><a href="https://navisio.nl/api/unsubscribe?token={unsubscribe_token}"
+        U ontvangt dit bericht omdat u {escape(label.lower())} samenvattingen heeft ingeschakeld.
+        <br><a href="https://navisio.nl/api/unsubscribe?token={escape(quote(unsubscribe_token), quote=True)}"
           style="color:#06b6d4;text-decoration:underline;">Uitschrijven</a>
       </p>
     </div>
@@ -663,7 +678,7 @@ def send_digest(frequency: str) -> None:
                 "subject": subject,
                 "html": html,
                 "headers": {
-                    "List-Unsubscribe": f"<https://navisio.nl/api/unsubscribe?token={sub['unsubscribe_token']}>"
+                    "List-Unsubscribe": f"<https://navisio.nl/api/unsubscribe?token={quote(sub['unsubscribe_token'])}>"
                 }
             })
             message_id = result.get("id") if isinstance(result, dict) else None

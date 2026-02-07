@@ -56,7 +56,7 @@ export default function Dashboard() {
           .order("scraped_at", { ascending: false });
 
         if (vesselsRes.error) {
-          setError(vesselsRes.error.message);
+          setError("Er is een fout opgetreden bij het laden van de gegevens.");
         } else {
           const all = vesselsRes.data ?? [];
           setVessels(all.filter((v) => v.canonical_vessel_id === null || v.canonical_vessel_id === undefined));
@@ -83,10 +83,8 @@ export default function Dashboard() {
         } else {
           setPriceHistoryMap({});
         }
-      } catch (e) {
-        setError(
-          e instanceof Error ? e.message : "Kon geen verbinding maken"
-        );
+      } catch {
+        setError("Er is een fout opgetreden bij het laden van de gegevens.");
       }
       setLoading(false);
     }

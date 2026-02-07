@@ -13,3 +13,15 @@ export function sourceLabel(source: string): string {
 export function sourceColor(source: string): string {
   return SOURCE_CONFIG[source]?.color ?? "bg-gray-100 text-gray-800";
 }
+
+/** Validate URL protocol — block javascript: and other dangerous schemes. */
+export function safeUrl(url: string | null | undefined): string {
+  if (!url) return "#";
+  try {
+    const u = new URL(url, "https://placeholder.invalid");
+    if (u.protocol !== "https:" && u.protocol !== "http:") return "#";
+  } catch {
+    return "#";
+  }
+  return url;
+}

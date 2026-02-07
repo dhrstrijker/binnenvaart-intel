@@ -26,7 +26,7 @@ export default function LoginPage() {
     });
 
     if (error) {
-      setError(error.message);
+      setError("Inloggen mislukt. Controleer je gegevens en probeer het opnieuw.");
       setLoading(false);
       return;
     }
@@ -42,7 +42,7 @@ export default function LoginPage() {
         redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
-    if (error) setError(error.message);
+    if (error) setError("Inloggen met Google mislukt. Probeer het later opnieuw.");
   }
 
   return (

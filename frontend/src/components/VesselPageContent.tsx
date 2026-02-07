@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Vessel, PriceHistory, getSupabase } from "@/lib/supabase";
-import { sourceLabel, sourceColor } from "@/lib/sources";
+import { sourceLabel, sourceColor, safeUrl } from "@/lib/sources";
 import PriceHistoryChart from "./PriceHistoryChart";
 import PremiumGate from "./PremiumGate";
 import VesselCard from "./VesselCard";
@@ -242,7 +242,7 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
             vessel.linked_sources!.map((ls) => (
               <a
                 key={ls.vessel_id}
-                href={ls.url}
+                href={safeUrl(ls.url)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-slate-800"
@@ -255,7 +255,7 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
             ))
           ) : (
             <a
-              href={vessel.url}
+              href={safeUrl(vessel.url)}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-slate-800"

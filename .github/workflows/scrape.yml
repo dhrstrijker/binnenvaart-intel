@@ -6,6 +6,9 @@ on:
     - cron: "0 7,19 * * *"
   workflow_dispatch: # Allow manual trigger from GitHub UI
 
+permissions:
+  contents: read
+
 jobs:
   scrape:
     runs-on: ubuntu-latest
@@ -13,8 +16,8 @@ jobs:
       run:
         working-directory: scraper
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
         with:
           python-version: "3.13"
       - run: pip install -r requirements.txt
@@ -33,13 +36,13 @@ jobs:
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
+          payload=$(jq -n \
+            --arg to "$ALERT_EMAIL" \
+            --arg url "$RUN_URL" \
+            '{from:"onboarding@resend.dev",to:$to,subject:"Scraper workflow failed",html:("<h2>GitHub Actions scraper workflow failed</h2><p>Check logs: <a href=\"" + $url + "\">View Run</a></p>")}')
           curl -s -X POST "https://api.resend.com/emails" \
             -H "Authorization: Bearer $RESEND_API_KEY" \
             -H "Content-Type: application/json" \
-            -d "{
-              \"from\": \"onboarding@resend.dev\",
-              \"to\": \"$ALERT_EMAIL\",
-              \"subject\": \"Scraper workflow failed\",
-              \"html\": \"<h2>GitHub Actions scraper workflow failed</h2><p>Check logs: <a href='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'>View Run</a></p>\"
-            }"
+            -d "$payload"

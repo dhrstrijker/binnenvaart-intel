@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import Image from "next/image";
 import { Vessel, PriceHistory } from "@/lib/supabase";
-import { sourceLabel } from "@/lib/sources";
+import { sourceLabel, safeUrl } from "@/lib/sources";
 import PriceHistoryChart from "./PriceHistoryChart";
 import PremiumGate from "./PremiumGate";
 
@@ -220,7 +220,7 @@ export default function VesselDetail({ vessel, history, isPremium = false, onClo
                         </td>
                         <td className="px-3 py-2 text-right">
                           <a
-                            href={ls.url}
+                            href={safeUrl(ls.url)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-xs font-semibold text-cyan-600 hover:text-cyan-800"
@@ -242,7 +242,7 @@ export default function VesselDetail({ vessel, history, isPremium = false, onClo
               vessel.linked_sources.map((ls) => (
                 <a
                   key={ls.vessel_id}
-                  href={ls.url}
+                  href={safeUrl(ls.url)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-slate-900"
@@ -255,7 +255,7 @@ export default function VesselDetail({ vessel, history, isPremium = false, onClo
               ))
             ) : (
               <a
-                href={vessel.url}
+                href={safeUrl(vessel.url)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-slate-900"

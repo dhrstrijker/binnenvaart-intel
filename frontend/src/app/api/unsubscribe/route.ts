@@ -39,6 +39,10 @@ export async function GET(request: NextRequest) {
   );
 }
 
+function escapeHtml(str: string): string {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
 function htmlPage(message: string): string {
   return `<!DOCTYPE html>
 <html lang="nl">
@@ -56,7 +60,7 @@ function htmlPage(message: string): string {
 <body>
   <div class="card">
     <h1>Navisio</h1>
-    <p>${message}</p>
+    <p>${escapeHtml(message)}</p>
   </div>
 </body>
 </html>`;

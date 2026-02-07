@@ -9,6 +9,7 @@ export default function NotificationSignup() {
   const [user, setUser] = useState<User | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const [consent, setConsent] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -16,8 +17,11 @@ export default function NotificationSignup() {
   }, []);
 
   async function handleSubscribe() {
-    if (!user) return;
+    if (!user || !consent) return;
     setStatus("loading");
+
+    const verificationToken = crypto.randomUUID();
+    const unsubscribeToken = crypto.randomUUID();
 
     try {
       const supabase = createClient();
@@ -26,12 +30,14 @@ export default function NotificationSignup() {
         .insert({
           email: user.email!.toLowerCase(),
           user_id: user.id,
+          verification_token: verificationToken,
+          unsubscribe_token: unsubscribeToken,
         });
 
       if (error) {
         if (error.code === "23505") {
           setStatus("success");
-          setMessage("Dit e-mailadres is al aangemeld.");
+          setMessage("Dit e-mailadres is al aangemeld. Controleer je inbox voor de verificatiemail.");
         } else {
           setStatus("error");
           setMessage("Er ging iets mis. Probeer het later opnieuw.");
@@ -39,8 +45,18 @@ export default function NotificationSignup() {
         return;
       }
 
+      // Send verification email via API route
+      await fetch("/api/send-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: user.email!.toLowerCase(),
+          verificationToken,
+        }),
+      });
+
       setStatus("success");
-      setMessage("Aangemeld! U ontvangt een e-mail bij wijzigingen.");
+      setMessage("Verificatiemail verstuurd! Controleer je inbox om je aanmelding te bevestigen.");
     } catch {
       setStatus("error");
       setMessage("Er ging iets mis. Probeer het later opnieuw.");
@@ -88,9 +104,21 @@ export default function NotificationSignup() {
             <p className="mb-3 text-sm text-cyan-100">
               Meldingen worden gestuurd naar <strong>{user.email}</strong>
             </p>
+            <label className="mb-3 flex items-start gap-2 text-left">
+              <input
+                type="checkbox"
+                checked={consent}
+                onChange={(e) => setConsent(e.target.checked)}
+                className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-600 bg-slate-800 text-cyan-400 focus:ring-cyan-400"
+              />
+              <span className="text-xs text-cyan-200/80">
+                Ik ga akkoord met het ontvangen van e-mailnotificaties over
+                nieuwe schepen en prijswijzigingen.
+              </span>
+            </label>
             <button
               onClick={handleSubscribe}
-              disabled={status === "loading"}
+              disabled={status === "loading" || !consent}
               className="rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-50 disabled:opacity-50"
             >
               {status === "loading" ? "..." : "Aanmelden voor notificaties"}

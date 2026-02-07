@@ -15,7 +15,8 @@ export function buildSavedSearchQuery(filters: SavedSearchFilters) {
     .not("status", "in", '("removed","sold")');
 
   if (filters.search) {
-    query = query.ilike("name", `%${filters.search}%`);
+    const escaped = filters.search.replace(/[%_\\]/g, '\\$&');
+    query = query.ilike("name", `%${escaped}%`);
   }
   if (filters.type) {
     query = query.eq("type", filters.type);
