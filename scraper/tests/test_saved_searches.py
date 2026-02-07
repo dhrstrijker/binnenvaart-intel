@@ -211,7 +211,7 @@ class TestSendDigest(unittest.TestCase):
             }
         ]
 
-        mock_watchlist.return_value = ["v1"]
+        mock_watchlist.return_value = {"v1": {"notify_price_change": True, "notify_status_change": True}}
         mock_saved_searches.return_value = []
 
         send_digest("daily")
@@ -264,7 +264,7 @@ class TestSendDigest(unittest.TestCase):
             }
         ]
 
-        mock_watchlist.return_value = []
+        mock_watchlist.return_value = {}
         mock_saved_searches.return_value = [
             {"filters": {"type": "Tankschip"}, "frequency": "daily"}
         ]
@@ -319,7 +319,7 @@ class TestSendDigest(unittest.TestCase):
         ]
 
         # Same vessel in both watchlist and saved search
-        mock_watchlist.return_value = ["v1"]
+        mock_watchlist.return_value = {"v1": {"notify_price_change": True, "notify_status_change": True}}
         mock_saved_searches.return_value = [
             {"filters": {"type": "Tankschip"}, "frequency": "daily"}
         ]

@@ -410,15 +410,21 @@ def get_verified_subscribers() -> list[dict]:
     return res.data or []
 
 
-def get_user_watchlist_vessel_ids(user_id: str) -> list[str]:
-    """Get vessel IDs from watchlist for a user."""
+def get_user_watchlist_vessel_ids(user_id: str) -> dict[str, dict[str, bool]]:
+    """Get watchlist entries keyed by vessel_id with notification flags."""
     res = (
         supabase.table("watchlist")
-        .select("vessel_id")
+        .select("vessel_id, notify_price_change, notify_status_change")
         .eq("user_id", user_id)
         .execute()
     )
-    return [row["vessel_id"] for row in (res.data or [])]
+    return {
+        row["vessel_id"]: {
+            "notify_price_change": row.get("notify_price_change", True),
+            "notify_status_change": row.get("notify_status_change", True),
+        }
+        for row in (res.data or [])
+    }
 
 
 def save_notification_history(

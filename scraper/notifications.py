@@ -26,6 +26,13 @@ resend.api_key = os.environ.get("RESEND_API_KEY", "")
 
 FROM_ADDRESS = "onboarding@resend.dev"
 
+# Maps change kind to the per-vessel watchlist flag that controls it
+KIND_TO_WATCHLIST_FLAG = {
+    "price_changed": "notify_price_change",
+    "removed": "notify_status_change",
+    "sold": "notify_status_change",
+}
+
 
 def _get_active_subscribers() -> list[str]:
     """Fetch all active subscriber email addresses."""
@@ -198,15 +205,26 @@ def send_summary_email(stats: dict, changes: list[dict]) -> None:
 
 
 def filter_changes_for_user(subscriber: dict, all_changes: list[dict]) -> list[dict]:
-    """Filter changes to only vessels in user's watchlist, respecting preferences."""
-    watchlist_ids = get_user_watchlist_vessel_ids(subscriber["user_id"])
-    if not watchlist_ids:
+    """Filter changes to only vessels in user's watchlist, respecting preferences.
+
+    Three filter layers:
+    1. Vessel must be on user's watchlist
+    2. Change kind must be allowed by global preferences
+    3. Per-vessel notification flag must be enabled for that change kind
+    """
+    watchlist = get_user_watchlist_vessel_ids(subscriber["user_id"])
+    if not watchlist:
         return []
 
     prefs = subscriber.get("preferences") or {}
     allowed_types = prefs.get("types", ["new", "price_change", "removed"])
 
-    type_map = {"inserted": "new", "price_changed": "price_change", "removed": "removed"}
+    type_map = {
+        "inserted": "new",
+        "price_changed": "price_change",
+        "removed": "removed",
+        "sold": "removed",
+    }
 
     filtered = []
     for change in all_changes:
@@ -214,8 +232,14 @@ def filter_changes_for_user(subscriber: dict, all_changes: list[dict]) -> list[d
         kind = change.get("kind", "")
         pref_type = type_map.get(kind, kind)
 
-        if vessel_id in watchlist_ids and pref_type in allowed_types:
-            filtered.append(change)
+        if vessel_id not in watchlist:
+            continue
+        if pref_type not in allowed_types:
+            continue
+        flag_name = KIND_TO_WATCHLIST_FLAG.get(kind)
+        if flag_name and not watchlist[vessel_id].get(flag_name, True):
+            continue
+        filtered.append(change)
 
     return filtered
 
@@ -224,7 +248,7 @@ def build_personalized_subject(user_changes: list[dict]) -> str:
     """Dynamic subject line based on change types."""
     new_count = sum(1 for c in user_changes if c["kind"] == "inserted")
     price_count = sum(1 for c in user_changes if c["kind"] == "price_changed")
-    removed_count = sum(1 for c in user_changes if c["kind"] == "removed")
+    removed_count = sum(1 for c in user_changes if c["kind"] in ("removed", "sold"))
 
     parts = []
     if price_count:
@@ -245,7 +269,7 @@ def build_personalized_email(subscriber: dict, user_changes: list[dict]) -> str:
 
     price_changes = [c for c in user_changes if c["kind"] == "price_changed"]
     new_vessels = [c for c in user_changes if c["kind"] == "inserted"]
-    removed_vessels = [c for c in user_changes if c["kind"] == "removed"]
+    removed_vessels = [c for c in user_changes if c["kind"] in ("removed", "sold")]
 
     sections = ""
 
@@ -571,12 +595,17 @@ def send_digest(frequency: str) -> None:
         seen_vessel_ids = set()
 
         # Watchlist matches
-        watchlist_ids = get_user_watchlist_vessel_ids(sub["user_id"])
+        watchlist = get_user_watchlist_vessel_ids(sub["user_id"])
         for change in recent_changes:
             vid = change.get("vessel", {}).get("id")
-            if vid in watchlist_ids and vid not in seen_vessel_ids:
-                user_matches.append(change)
-                seen_vessel_ids.add(vid)
+            if vid not in watchlist or vid in seen_vessel_ids:
+                continue
+            kind = change.get("kind", "")
+            flag_name = KIND_TO_WATCHLIST_FLAG.get(kind)
+            if flag_name and not watchlist[vid].get(flag_name, True):
+                continue
+            user_matches.append(change)
+            seen_vessel_ids.add(vid)
 
         # Saved search matches
         searches = get_user_saved_searches(sub["user_id"], frequency=frequency)

@@ -40,7 +40,10 @@ def _make_subscriber(**overrides):
 
 
 class TestFilterChangesForUser:
-    @patch("notifications.get_user_watchlist_vessel_ids", return_value=["v1", "v2"])
+    @patch("notifications.get_user_watchlist_vessel_ids", return_value={
+        "v1": {"notify_price_change": True, "notify_status_change": True},
+        "v2": {"notify_price_change": True, "notify_status_change": True},
+    })
     def test_watchlist_only(self, mock_wl):
         """Only vessels on the user's watchlist are returned."""
         changes = [
@@ -53,7 +56,10 @@ class TestFilterChangesForUser:
         ids = {c["vessel"]["id"] for c in result}
         assert ids == {"v1", "v2"}
 
-    @patch("notifications.get_user_watchlist_vessel_ids", return_value=["v1", "v2"])
+    @patch("notifications.get_user_watchlist_vessel_ids", return_value={
+        "v1": {"notify_price_change": True, "notify_status_change": True},
+        "v2": {"notify_price_change": True, "notify_status_change": True},
+    })
     def test_respects_preferences(self, mock_wl):
         """Preference types filter restricts which change kinds are included."""
         changes = [
@@ -66,12 +72,68 @@ class TestFilterChangesForUser:
         assert len(result) == 1
         assert result[0]["kind"] == "price_changed"
 
-    @patch("notifications.get_user_watchlist_vessel_ids", return_value=[])
+    @patch("notifications.get_user_watchlist_vessel_ids", return_value={})
     def test_empty_watchlist(self, mock_wl):
         """Empty watchlist means no changes returned."""
         changes = [_make_change(vessel_id="v1")]
         result = filter_changes_for_user(_make_subscriber(), changes)
         assert result == []
+
+    @patch("notifications.get_user_watchlist_vessel_ids", return_value={
+        "v1": {"notify_price_change": False, "notify_status_change": True},
+        "v2": {"notify_price_change": True, "notify_status_change": True},
+    })
+    def test_per_vessel_price_flag_false_blocks_price_change(self, mock_wl):
+        """notify_price_change=False blocks price_changed for that vessel."""
+        changes = [
+            _make_change(kind="price_changed", vessel_id="v1"),
+            _make_change(kind="price_changed", vessel_id="v2"),
+        ]
+        result = filter_changes_for_user(_make_subscriber(), changes)
+        assert len(result) == 1
+        assert result[0]["vessel"]["id"] == "v2"
+
+    @patch("notifications.get_user_watchlist_vessel_ids", return_value={
+        "v1": {"notify_price_change": True, "notify_status_change": False},
+    })
+    def test_per_vessel_status_flag_false_blocks_removed(self, mock_wl):
+        """notify_status_change=False blocks removed events for that vessel."""
+        changes = [_make_change(kind="removed", vessel_id="v1")]
+        result = filter_changes_for_user(_make_subscriber(), changes)
+        assert result == []
+
+    @patch("notifications.get_user_watchlist_vessel_ids", return_value={
+        "v1": {"notify_price_change": True, "notify_status_change": False},
+    })
+    def test_per_vessel_status_flag_false_blocks_sold(self, mock_wl):
+        """notify_status_change=False blocks sold events for that vessel."""
+        changes = [_make_change(kind="sold", vessel_id="v1")]
+        result = filter_changes_for_user(_make_subscriber(), changes)
+        assert result == []
+
+    @patch("notifications.get_user_watchlist_vessel_ids", return_value={
+        "v1": {"notify_price_change": False, "notify_status_change": False},
+    })
+    def test_both_flags_false_blocks_all_except_inserted(self, mock_wl):
+        """Both flags False blocks price_changed and removed, but inserted passes."""
+        changes = [
+            _make_change(kind="inserted", vessel_id="v1"),
+            _make_change(kind="price_changed", vessel_id="v1"),
+            _make_change(kind="removed", vessel_id="v1"),
+        ]
+        result = filter_changes_for_user(_make_subscriber(), changes)
+        assert len(result) == 1
+        assert result[0]["kind"] == "inserted"
+
+    @patch("notifications.get_user_watchlist_vessel_ids", return_value={
+        "v1": {"notify_price_change": True, "notify_status_change": True},
+    })
+    def test_sold_kind_passes_with_removed_pref(self, mock_wl):
+        """sold change passes when notify_status_change=True and removed in prefs."""
+        changes = [_make_change(kind="sold", vessel_id="v1")]
+        result = filter_changes_for_user(_make_subscriber(), changes)
+        assert len(result) == 1
+        assert result[0]["kind"] == "sold"
 
 
 class TestBuildVerificationHtml:
