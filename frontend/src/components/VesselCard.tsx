@@ -6,7 +6,6 @@ import Link from "next/link";
 import { Vessel, PriceHistory } from "@/lib/supabase";
 import { sourceLabel, sourceColor } from "@/lib/sources";
 import { MiniSparkline } from "./PriceHistoryChart";
-import WatchlistButton from "./WatchlistButton";
 import FavoriteButton from "./FavoriteButton";
 import type { User } from "@supabase/supabase-js";
 
@@ -182,7 +181,6 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
           </div>
           <div className="flex items-center gap-1">
             <FavoriteButton vesselId={vessel.id} user={user} />
-            <WatchlistButton vesselId={vessel.id} user={user} />
             {!user && (
               <button
                 type="button"
