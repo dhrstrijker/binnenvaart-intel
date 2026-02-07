@@ -4,16 +4,18 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useSubscription } from "@/lib/useSubscription";
-import { Vessel } from "@/lib/supabase";
+import { Vessel, WatchlistEntry } from "@/lib/supabase";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import VesselCard from "@/components/VesselCard";
+import WatchlistButton from "@/components/WatchlistButton";
 
 export default function FavorietenPage() {
   const router = useRouter();
   const { user, isPremium, isLoading } = useSubscription();
   const [vessels, setVessels] = useState<Vessel[]>([]);
   const [loadingVessels, setLoadingVessels] = useState(true);
+  const [watchlistMap, setWatchlistMap] = useState<Record<string, WatchlistEntry>>({});
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -44,6 +46,21 @@ export default function FavorietenPage() {
         .in("id", vesselIds);
 
       setVessels(vesselData ?? []);
+
+      const { data: watchlistData } = await supabase
+        .from("watchlist")
+        .select("*")
+        .eq("user_id", user!.id)
+        .in("vessel_id", vesselIds);
+
+      if (watchlistData) {
+        const map: Record<string, WatchlistEntry> = {};
+        for (const w of watchlistData) {
+          map[w.vessel_id] = w as WatchlistEntry;
+        }
+        setWatchlistMap(map);
+      }
+
       setLoadingVessels(false);
     }
 
@@ -89,9 +106,53 @@ export default function FavorietenPage() {
           </div>
         ) : (
           <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {vessels.map((v) => (
-              <VesselCard key={v.id} vessel={v} isPremium={isPremium} user={user} />
-            ))}
+            {vessels.map((v) => {
+              const watched = !!watchlistMap[v.id];
+              return (
+                <div key={v.id}>
+                  <VesselCard vessel={v} isPremium={isPremium} user={user} />
+                  <div className="flex items-center justify-between rounded-b-xl bg-white px-3 py-2 ring-1 ring-gray-100 -mt-1">
+                    <div className="flex items-center gap-1.5">
+                      {watched ? (
+                        <svg className="h-4 w-4 text-amber-500" viewBox="0 0 24 24" fill="currentColor">
+                          <path fillRule="evenodd" d="M5.25 9a6.75 6.75 0 0113.5 0v.75c0 2.123.8 4.057 2.118 5.52a.75.75 0 01-.297 1.206c-1.544.57-3.16.99-4.831 1.243a3.75 3.75 0 11-7.48 0 24.585 24.585 0 01-4.831-1.244.75.75 0 01-.298-1.205A8.217 8.217 0 005.25 9.75V9zm4.502 8.9a2.25 2.25 0 004.496 0 25.057 25.057 0 01-4.496 0z" clipRule="evenodd" />
+                        </svg>
+                      ) : (
+                        <svg className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+                        </svg>
+                      )}
+                      <span className={`text-xs font-medium ${watched ? "text-amber-600" : "text-slate-400"}`}>
+                        {watched ? "Meldingen aan" : "Geen meldingen"}
+                      </span>
+                    </div>
+                    <WatchlistButton
+                      vesselId={v.id}
+                      user={user}
+                      className="flex h-7 w-7 items-center justify-center rounded-md text-slate-400 transition-colors hover:text-amber-500 disabled:opacity-50"
+                      onToggle={(vesselId, isWatched) => {
+                        setWatchlistMap((prev) => {
+                          const next = { ...prev };
+                          if (isWatched) {
+                            next[vesselId] = {
+                              id: "",
+                              user_id: user!.id,
+                              vessel_id: vesselId,
+                              added_at: new Date().toISOString(),
+                              notify_price_change: true,
+                              notify_status_change: true,
+                            };
+                          } else {
+                            delete next[vesselId];
+                          }
+                          return next;
+                        });
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

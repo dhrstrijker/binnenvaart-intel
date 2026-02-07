@@ -44,6 +44,15 @@ export interface Favorite {
   added_at: string;
 }
 
+export interface WatchlistEntry {
+  id: string;
+  user_id: string;
+  vessel_id: string;
+  added_at: string;
+  notify_price_change: boolean;
+  notify_status_change: boolean;
+}
+
 export interface ActivityLogEntry {
   id: string;
   vessel_id: string;

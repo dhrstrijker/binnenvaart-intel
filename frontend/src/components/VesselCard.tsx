@@ -7,6 +7,7 @@ import { Vessel, PriceHistory } from "@/lib/supabase";
 import { sourceLabel, sourceColor } from "@/lib/sources";
 import { MiniSparkline } from "./PriceHistoryChart";
 import FavoriteButton from "./FavoriteButton";
+import WatchlistButton from "./WatchlistButton";
 import type { User } from "@supabase/supabase-js";
 
 function formatPrice(price: number | null): string {
@@ -186,23 +187,7 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
           </div>
           <div className="flex items-center gap-1">
             <FavoriteButton vesselId={vessel.id} user={user} />
-            {!user && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  window.location.href = "/signup";
-                }}
-                className="text-xs font-medium text-amber-600 hover:text-amber-700 transition-colors flex items-center gap-1 cursor-pointer"
-                title="Maak een account voor prijsmeldingen"
-              >
-                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
-                </svg>
-                Prijsmelding
-              </button>
-            )}
+            <WatchlistButton vesselId={vessel.id} user={user} />
             <span className="flex items-center gap-1 text-xs font-medium text-cyan-600 opacity-0 transition-opacity group-hover:opacity-100">
               Details
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

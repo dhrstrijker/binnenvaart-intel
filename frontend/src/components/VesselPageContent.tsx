@@ -10,6 +10,7 @@ import PremiumGate from "./PremiumGate";
 import VesselCard from "./VesselCard";
 import MarineTrafficMap from "./MarineTrafficMap";
 import FavoriteButton from "./FavoriteButton";
+import WatchlistButton from "./WatchlistButton";
 import { useSubscription } from "@/lib/useSubscription";
 
 interface VesselPageContentProps {
@@ -153,6 +154,11 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
             vesselId={vessel.id}
             user={user}
             className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/90 text-slate-500 shadow-sm backdrop-blur-sm transition-colors hover:text-red-500 disabled:opacity-50"
+          />
+          <WatchlistButton
+            vesselId={vessel.id}
+            user={user}
+            className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/90 text-slate-500 shadow-sm backdrop-blur-sm transition-colors hover:text-amber-500 disabled:opacity-50"
           />
           <div className="relative">
             <button
