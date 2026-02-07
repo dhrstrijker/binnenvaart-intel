@@ -6,9 +6,9 @@ interface NavisioLogoProps {
 }
 
 const sizeConfig = {
-  sm: { text: "text-xl", wave: "w-20", gap: "gap-0.5" },
-  md: { text: "text-2xl", wave: "w-28", gap: "gap-1" },
-  lg: { text: "text-4xl", wave: "w-40", gap: "gap-1.5" },
+  sm: { text: "text-xl", gap: "gap-0.5", height: "h-[6px]" },
+  md: { text: "text-2xl", gap: "gap-1", height: "h-[8px]" },
+  lg: { text: "text-4xl", gap: "gap-1.5", height: "h-[10px]" },
 };
 
 export default function NavisioLogo({
@@ -19,7 +19,7 @@ export default function NavisioLogo({
   const textColor = variant === "light" ? "text-white" : "text-slate-900";
 
   return (
-    <div className={`flex flex-col ${config.gap}`}>
+    <div className={`inline-flex flex-col ${config.gap} self-start`}>
       <span
         className={`${config.text} font-bold tracking-[-0.03em] ${textColor}`}
         style={{ fontFamily: "Inter, sans-serif" }}
@@ -27,15 +27,16 @@ export default function NavisioLogo({
         NAVISIO
       </span>
       <svg
-        className={config.wave}
-        viewBox="0 0 400 20"
+        className={`w-full ${config.height}`}
+        viewBox="0 0 120 10"
+        preserveAspectRatio="none"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M 0 10 Q 50 5 100 10 T 200 10 T 300 10 T 400 10"
+          d="M 0 5 Q 15 1 30 5 T 60 5 T 90 5 T 120 5"
           stroke="#06B6D4"
-          strokeWidth="3"
+          strokeWidth="4"
           fill="none"
           strokeLinecap="round"
         />
