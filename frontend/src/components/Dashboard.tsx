@@ -283,6 +283,7 @@ export default function Dashboard() {
               vessel={vessel}
               priceHistory={priceHistoryMap[vessel.id] ?? []}
               isPremium={isPremium}
+              user={user}
               onOpenDetail={handleOpenDetail}
             />
           ))}

@@ -300,3 +300,43 @@ def _source_entry(v: dict) -> dict:
         "url": v.get("url") or "",
         "vessel_id": v["id"],
     }
+
+
+def get_verified_subscribers() -> list[dict]:
+    """Fetch subscribers where verified_at IS NOT NULL and active = TRUE."""
+    res = (
+        supabase.table("notification_subscribers")
+        .select("id, user_id, email, preferences, unsubscribe_token")
+        .eq("active", True)
+        .not_.is_("verified_at", "null")
+        .execute()
+    )
+    return res.data or []
+
+
+def get_user_watchlist_vessel_ids(user_id: str) -> list[str]:
+    """Get vessel IDs from watchlist for a user."""
+    res = (
+        supabase.table("watchlist")
+        .select("vessel_id")
+        .eq("user_id", user_id)
+        .execute()
+    )
+    return [row["vessel_id"] for row in (res.data or [])]
+
+
+def save_notification_history(
+    user_id: str,
+    vessel_ids: list,
+    notification_type: str,
+    message_id: str | None = None,
+) -> None:
+    """Insert a record into notification_history."""
+    supabase.table("notification_history").insert(
+        {
+            "user_id": user_id,
+            "vessel_ids": vessel_ids,
+            "notification_type": notification_type,
+            "resend_message_id": message_id,
+        }
+    ).execute()

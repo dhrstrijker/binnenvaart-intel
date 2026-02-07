@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useSubscription } from "@/lib/useSubscription";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import NotificationSettings from "@/components/NotificationSettings";
 
 export default function AccountPage() {
   const router = useRouter();
@@ -113,6 +114,11 @@ export default function AccountPage() {
               </a>
             </div>
           )}
+        </div>
+
+        {/* Notification settings */}
+        <div className="mt-6">
+          <NotificationSettings user={user} />
         </div>
 
         {/* Sign out */}

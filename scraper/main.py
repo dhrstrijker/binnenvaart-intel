@@ -7,7 +7,7 @@ import scrape_pcshipbrokers
 import scrape_gtsschepen
 import scrape_gsk
 from db import clear_changes, get_changes, mark_removed, run_dedup
-from notifications import send_summary_email
+from notifications import send_personalized_notifications
 
 logging.basicConfig(
     level=logging.INFO,
@@ -81,7 +81,7 @@ def main():
     }
     changes = get_changes()
     logger.info("Changes detected: %d", len(changes))
-    send_summary_email(combined_stats, changes)
+    send_personalized_notifications(combined_stats, changes)
 
 
 if __name__ == "__main__":

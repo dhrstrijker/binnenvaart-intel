@@ -5,6 +5,8 @@ import Image from "next/image";
 import { Vessel, PriceHistory } from "@/lib/supabase";
 import { sourceLabel, sourceColor } from "@/lib/sources";
 import { MiniSparkline } from "./PriceHistoryChart";
+import WatchlistButton from "./WatchlistButton";
+import type { User } from "@supabase/supabase-js";
 
 function formatPrice(price: number | null): string {
   if (price === null) return "Prijs op aanvraag";
@@ -37,10 +39,11 @@ interface VesselCardProps {
   vessel: Vessel;
   priceHistory?: PriceHistory[];
   isPremium?: boolean;
+  user?: User | null;
   onOpenDetail?: (vessel: Vessel) => void;
 }
 
-export default function VesselCard({ vessel, priceHistory = [], isPremium = false, onOpenDetail }: VesselCardProps) {
+export default function VesselCard({ vessel, priceHistory = [], isPremium = false, user = null, onOpenDetail }: VesselCardProps) {
   const [imgError, setImgError] = React.useState(false);
   const trend = getPriceTrend(priceHistory);
 
@@ -186,12 +189,15 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
             )}
             {isPremium && <MiniSparkline history={priceHistory} />}
           </div>
-          <span className="flex items-center gap-1 text-xs font-medium text-cyan-600 opacity-0 transition-opacity group-hover:opacity-100">
-            Details
-            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
-          </span>
+          <div className="flex items-center gap-1">
+            <WatchlistButton vesselId={vessel.id} user={user} />
+            <span className="flex items-center gap-1 text-xs font-medium text-cyan-600 opacity-0 transition-opacity group-hover:opacity-100">
+              Details
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </span>
+          </div>
         </div>
       </div>
     </a>

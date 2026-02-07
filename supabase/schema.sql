@@ -58,10 +58,16 @@ CREATE POLICY "Premium users can read price history"
 CREATE TABLE notification_subscribers (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   email TEXT NOT NULL UNIQUE,
-  user_id UUID REFERENCES auth.users,
+  user_id UUID REFERENCES auth.users(id),
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  active BOOLEAN DEFAULT TRUE
+  active BOOLEAN DEFAULT TRUE,
+  verified_at TIMESTAMPTZ,
+  verification_token TEXT UNIQUE,
+  unsubscribe_token TEXT UNIQUE,
+  preferences JSONB DEFAULT '{"frequency": "immediate", "types": ["new", "price_change", "removed"]}'::jsonb
 );
+
+CREATE INDEX idx_notification_subscribers_user ON notification_subscribers(user_id);
 
 ALTER TABLE notification_subscribers ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow anonymous read access" ON notification_subscribers FOR SELECT USING (true);
@@ -149,3 +155,35 @@ AS $$
     AND current_period_end > NOW()
   );
 $$;
+
+-- Watchlist for tracking specific vessels
+CREATE TABLE watchlist (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) NOT NULL,
+  vessel_id UUID REFERENCES vessels(id) NOT NULL,
+  added_at TIMESTAMPTZ DEFAULT NOW(),
+  notify_price_change BOOLEAN DEFAULT TRUE,
+  notify_status_change BOOLEAN DEFAULT TRUE,
+  UNIQUE(user_id, vessel_id)
+);
+
+CREATE INDEX idx_watchlist_user ON watchlist(user_id);
+CREATE INDEX idx_watchlist_vessel ON watchlist(vessel_id);
+
+ALTER TABLE watchlist ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can manage own watchlist"
+  ON watchlist FOR ALL TO authenticated
+  USING ((SELECT auth.uid()) = user_id);
+
+-- Notification history for tracking sent notifications
+CREATE TABLE notification_history (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) NOT NULL,
+  vessel_ids UUID[] NOT NULL,
+  notification_type TEXT NOT NULL,
+  sent_at TIMESTAMPTZ DEFAULT NOW(),
+  resend_message_id TEXT
+);
+
+CREATE INDEX idx_notification_history_user ON notification_history(user_id);
+CREATE INDEX idx_notification_history_sent_at ON notification_history(sent_at);

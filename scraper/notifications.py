@@ -11,7 +11,12 @@ from datetime import datetime, timezone
 import resend
 from dotenv import load_dotenv
 
-from db import supabase
+from db import (
+    supabase,
+    get_verified_subscribers,
+    get_user_watchlist_vessel_ids,
+    save_notification_history,
+)
 
 load_dotenv()
 
@@ -190,3 +195,246 @@ def send_summary_email(stats: dict, changes: list[dict]) -> None:
             logger.info("E-mail verstuurd naar %s", email)
         except Exception:
             logger.exception("Fout bij verzenden naar %s", email)
+
+
+def filter_changes_for_user(subscriber: dict, all_changes: list[dict]) -> list[dict]:
+    """Filter changes to only vessels in user's watchlist, respecting preferences."""
+    watchlist_ids = get_user_watchlist_vessel_ids(subscriber["user_id"])
+    if not watchlist_ids:
+        return []
+
+    prefs = subscriber.get("preferences") or {}
+    allowed_types = prefs.get("types", ["new", "price_change", "removed"])
+
+    type_map = {"inserted": "new", "price_changed": "price_change", "removed": "removed"}
+
+    filtered = []
+    for change in all_changes:
+        vessel_id = change.get("vessel", {}).get("id")
+        kind = change.get("kind", "")
+        pref_type = type_map.get(kind, kind)
+
+        if vessel_id in watchlist_ids and pref_type in allowed_types:
+            filtered.append(change)
+
+    return filtered
+
+
+def build_personalized_subject(user_changes: list[dict]) -> str:
+    """Dynamic subject line based on change types."""
+    new_count = sum(1 for c in user_changes if c["kind"] == "inserted")
+    price_count = sum(1 for c in user_changes if c["kind"] == "price_changed")
+    removed_count = sum(1 for c in user_changes if c["kind"] == "removed")
+
+    parts = []
+    if price_count:
+        parts.append(f"{price_count} prijswijziging{'en' if price_count != 1 else ''}")
+    if new_count:
+        parts.append(f"{new_count} nieuw{'e' if new_count != 1 else ''} {'schepen' if new_count != 1 else 'schip'}")
+    if removed_count:
+        parts.append(f"{removed_count} verkocht")
+
+    summary = ", ".join(parts) if parts else "Wijzigingen"
+    return f"Navisio: {summary} in uw watchlist"
+
+
+def build_personalized_email(subscriber: dict, user_changes: list[dict]) -> str:
+    """Build personalized HTML email showing only watchlist changes."""
+    now = datetime.now(timezone.utc).strftime("%d-%m-%Y %H:%M UTC")
+    unsubscribe_token = subscriber.get("unsubscribe_token", "")
+
+    price_changes = [c for c in user_changes if c["kind"] == "price_changed"]
+    new_vessels = [c for c in user_changes if c["kind"] == "inserted"]
+    removed_vessels = [c for c in user_changes if c["kind"] == "removed"]
+
+    sections = ""
+
+    if price_changes:
+        rows = "\n".join(_build_vessel_row(c) for c in price_changes)
+        sections += f"""
+        <div style="margin-bottom:16px;">
+          <h3 style="margin:0 0 8px;color:#d97706;font-size:14px;text-transform:uppercase;">
+            Prijswijzigingen ({len(price_changes)})
+          </h3>
+          <table style="width:100%;border-collapse:collapse;">{rows}</table>
+        </div>"""
+
+    if new_vessels:
+        rows = "\n".join(_build_vessel_row(c) for c in new_vessels)
+        sections += f"""
+        <div style="margin-bottom:16px;">
+          <h3 style="margin:0 0 8px;color:#059669;font-size:14px;text-transform:uppercase;">
+            Nieuwe schepen ({len(new_vessels)})
+          </h3>
+          <table style="width:100%;border-collapse:collapse;">{rows}</table>
+        </div>"""
+
+    if removed_vessels:
+        rows = "\n".join(_build_vessel_row(c) for c in removed_vessels)
+        sections += f"""
+        <div style="margin-bottom:16px;">
+          <h3 style="margin:0 0 8px;color:#ef4444;font-size:14px;text-transform:uppercase;">
+            Verkocht / Verwijderd ({len(removed_vessels)})
+          </h3>
+          <table style="width:100%;border-collapse:collapse;">{rows}</table>
+        </div>"""
+
+    return f"""
+<!DOCTYPE html>
+<html lang="nl">
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <div style="max-width:600px;margin:0 auto;padding:20px;">
+    <!-- Header -->
+    <div style="background:#0f172a;border-radius:12px 12px 0 0;padding:24px;text-align:center;">
+      <h1 style="margin:0;color:#ffffff;font-size:22px;letter-spacing:-0.03em;">NAVISIO</h1>
+      <p style="margin:4px 0 0;color:#06b6d4;font-size:13px;">Watchlist Wijzigingen</p>
+    </div>
+
+    <!-- Content -->
+    <div style="background:#ffffff;padding:20px 24px;">
+      <p style="margin:0 0 16px;color:#475569;font-size:14px;">
+        Er zijn {len(user_changes)} wijziging{"en" if len(user_changes) != 1 else ""} gedetecteerd
+        in uw watchlist op {now}.
+      </p>
+      {sections}
+    </div>
+
+    <!-- Footer -->
+    <div style="background:#f8fafc;border-radius:0 0 12px 12px;padding:16px 24px;text-align:center;border-top:1px solid #e2e8f0;">
+      <p style="margin:0;color:#94a3b8;font-size:11px;">
+        U ontvangt dit bericht omdat u watchlist-meldingen heeft ingeschakeld.
+        <br><a href="https://navisio.nl/api/unsubscribe?token={unsubscribe_token}"
+          style="color:#06b6d4;text-decoration:underline;">Uitschrijven</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>"""
+
+
+def build_verification_html(verification_url: str) -> str:
+    """HTML email for double opt-in verification."""
+    return f"""
+<!DOCTYPE html>
+<html lang="nl">
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <div style="max-width:600px;margin:0 auto;padding:20px;">
+    <!-- Header -->
+    <div style="background:#0f172a;border-radius:12px 12px 0 0;padding:24px;text-align:center;">
+      <h1 style="margin:0;color:#ffffff;font-size:22px;letter-spacing:-0.03em;">NAVISIO</h1>
+      <p style="margin:4px 0 0;color:#06b6d4;font-size:13px;">Scheepsmarkt Intelligence</p>
+    </div>
+
+    <!-- Content -->
+    <div style="background:#ffffff;padding:32px 24px;text-align:center;">
+      <h2 style="margin:0 0 12px;color:#0f172a;font-size:20px;">Bevestig uw e-mailadres</h2>
+      <p style="margin:0 0 24px;color:#475569;font-size:14px;line-height:1.6;">
+        Klik op de onderstaande knop om uw e-mailadres te bevestigen
+        en meldingen te activeren.
+      </p>
+      <a href="{verification_url}"
+         style="display:inline-block;background:#06b6d4;color:#ffffff;
+                font-weight:600;font-size:15px;padding:12px 32px;
+                border-radius:8px;text-decoration:none;">
+        E-mailadres bevestigen
+      </a>
+      <p style="margin:24px 0 0;color:#94a3b8;font-size:12px;">
+        Deze link is 24 uur geldig. Heeft u zich niet aangemeld?
+        Dan kunt u deze e-mail negeren.
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <div style="background:#f8fafc;border-radius:0 0 12px 12px;padding:16px 24px;text-align:center;border-top:1px solid #e2e8f0;">
+      <p style="margin:0;color:#94a3b8;font-size:11px;">
+        &copy; Navisio &mdash; Scheepsmarkt Intelligence
+      </p>
+    </div>
+  </div>
+</body>
+</html>"""
+
+
+def send_verification_email(email: str, verification_token: str) -> None:
+    """Send double opt-in verification email."""
+    if not resend.api_key:
+        logger.warning("RESEND_API_KEY niet ingesteld, verificatie-e-mail overgeslagen.")
+        return
+
+    verification_url = f"https://navisio.nl/api/verify-email?token={verification_token}"
+    try:
+        resend.Emails.send(
+            {
+                "from": FROM_ADDRESS,
+                "to": email,
+                "subject": "Bevestig uw e-mailadres voor Navisio meldingen",
+                "html": build_verification_html(verification_url),
+            }
+        )
+        logger.info("Verificatie-e-mail verstuurd naar %s", email)
+    except Exception:
+        logger.exception("Fout bij verzenden verificatie naar %s", email)
+
+
+def send_personalized_notifications(stats: dict, changes: list[dict]) -> None:
+    """Send personalized notifications to verified subscribers with watchlists.
+
+    Subscribers with a user_id get personalized emails filtered to their
+    watchlist. Legacy subscribers (no user_id) receive the generic summary.
+    """
+    if not changes:
+        logger.info("Geen wijzigingen, geen e-mails verstuurd.")
+        return
+
+    if not resend.api_key:
+        logger.warning("RESEND_API_KEY niet ingesteld, overgeslagen.")
+        return
+
+    subscribers = get_verified_subscribers()
+    if not subscribers:
+        logger.info("Geen geverifieerde abonnees gevonden.")
+        return
+
+    personalized_subs = [s for s in subscribers if s.get("user_id")]
+    legacy_subs = [s for s in subscribers if not s.get("user_id")]
+
+    # Personalized emails for subscribers with user accounts
+    for sub in personalized_subs:
+        user_changes = filter_changes_for_user(sub, changes)
+        if not user_changes:
+            continue
+
+        html = build_personalized_email(sub, user_changes)
+        subject = build_personalized_subject(user_changes)
+
+        try:
+            result = resend.Emails.send(
+                {
+                    "from": FROM_ADDRESS,
+                    "to": sub["email"],
+                    "subject": subject,
+                    "html": html,
+                    "headers": {
+                        "List-Unsubscribe": f"<https://navisio.nl/api/unsubscribe?token={sub['unsubscribe_token']}>"
+                    },
+                }
+            )
+            message_id = result.get("id") if isinstance(result, dict) else None
+            save_notification_history(
+                sub["user_id"],
+                [c["vessel"]["id"] for c in user_changes if "vessel" in c],
+                "watchlist",
+                message_id,
+            )
+            logger.info("Gepersonaliseerde e-mail verstuurd naar %s", sub["email"])
+        except Exception:
+            logger.exception("Fout bij verzenden naar %s", sub["email"])
+
+    # Legacy generic email for subscribers without user accounts
+    if legacy_subs and changes:
+        logger.info(
+            "%d legacy abonnees krijgen generieke samenvatting.", len(legacy_subs)
+        )
+        send_summary_email(stats, changes)
