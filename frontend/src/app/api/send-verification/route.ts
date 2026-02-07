@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 function escapeHtml(str: string): string {
   return str
@@ -64,7 +66,7 @@ export async function POST(request: NextRequest) {
         : "https://navisio.nl");
     const verificationUrl = `${siteUrl}/api/verify-email?token=${encodeURIComponent(verificationToken)}`;
 
-    await resend.emails.send({
+    await getResend().emails.send({
       from: "Navisio <notifications@navisio.nl>",
       to: email,
       subject: "Bevestig uw e-mailadres voor Navisio meldingen",
