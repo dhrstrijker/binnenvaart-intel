@@ -39,7 +39,7 @@ export default function Dashboard() {
   const [visibleCount, setVisibleCount] = useState(24);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const { user, isPremium, isLoading: subLoading } = useSubscription();
-  const { entries: activityEntries, loading: activityLoading } = useActivityLog(user ? 20 : 4);
+  const { entries: activityEntries, loading: activityLoading } = useActivityLog(3);
 
   useEffect(() => {
     async function fetchData() {
