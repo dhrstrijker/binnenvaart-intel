@@ -71,7 +71,9 @@ export default function Header() {
   return (
     <header className="bg-slate-950 shadow-lg">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
-        <NavisioLogo size="md" variant="light" />
+        <Link href="/">
+          <NavisioLogo size="md" variant="light" />
+        </Link>
 
         {/* Desktop: Navigation + Auth */}
         <div className="hidden items-center gap-4 md:flex">
