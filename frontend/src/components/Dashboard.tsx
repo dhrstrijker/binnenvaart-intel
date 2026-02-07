@@ -167,7 +167,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
-    if (!sentinel) return;
+    if (!sentinel || loading || filtered.length === 0) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -180,7 +180,7 @@ export default function Dashboard() {
 
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [loadMore]);
+  }, [loadMore, loading, filtered.length]);
 
   const visibleVessels = filtered.slice(0, visibleCount);
   const hasMore = visibleCount < filtered.length;
