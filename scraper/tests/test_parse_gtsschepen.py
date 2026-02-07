@@ -103,10 +103,19 @@ class TestParseCard:
         assert result["width_m"] == 8.21
         assert result["price"] == 395000.0
 
-    def test_sold_vessel_returns_none(self):
+    def test_sold_vessel_has_is_sold_true(self):
         html = self._make_card_html(label="Verkocht")
         card = BeautifulSoup(html, "html.parser").select_one(".grid-item")
-        assert parse_card(card) is None
+        result = parse_card(card)
+        assert result is not None
+        assert result["is_sold"] is True
+        assert result["name"] == "Test Ship"
+
+    def test_active_vessel_has_is_sold_false(self):
+        html = self._make_card_html()
+        card = BeautifulSoup(html, "html.parser").select_one(".grid-item")
+        result = parse_card(card)
+        assert result["is_sold"] is False
 
     def test_nieuw_label_still_parsed(self):
         html = self._make_card_html(label="Nieuw")

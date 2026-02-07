@@ -88,10 +88,9 @@ def parse_card(card) -> dict | None:
 
     Returns None for sold vessels.
     """
-    # Check status label — skip sold vessels
+    # Check status label for sold vessels
     label_el = card.select_one(".item-label")
-    if label_el and "verkocht" in label_el.get_text(strip=True).lower():
-        return None
+    is_sold = bool(label_el and "verkocht" in label_el.get_text(strip=True).lower())
 
     # Name and URL
     name_link = card.select_one("h3 a")
@@ -172,6 +171,7 @@ def parse_card(card) -> dict | None:
         "price": price,
         "url": detail_url,
         "image_url": image_url,
+        "is_sold": is_sold,
     }
 
 
@@ -250,7 +250,7 @@ def scrape() -> dict:
         for card in cards:
             vessel = parse_card(card)
             if vessel is None:
-                continue  # Sold vessel, skip
+                continue  # Missing name/link, skip
 
             # Fetch detail page for raw_details and image_urls
             if vessel["url"]:
