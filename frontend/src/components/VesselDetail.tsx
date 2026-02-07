@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Vessel, PriceHistory } from "@/lib/supabase";
 import { sourceLabel } from "@/lib/sources";
 import PriceHistoryChart from "./PriceHistoryChart";
+import PremiumGate from "./PremiumGate";
 
 interface VesselDetailProps {
   vessel: Vessel;
@@ -185,6 +186,13 @@ export default function VesselDetail({ vessel, history, isPremium = false, onClo
                   </tbody>
                 </table>
               </div>
+            </div>
+          )}
+
+          {/* Premium upsell for non-premium users */}
+          {!isPremium && (
+            <div className="mt-6">
+              <PremiumGate isPremium={false}><></></PremiumGate>
             </div>
           )}
 

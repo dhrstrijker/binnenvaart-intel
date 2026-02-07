@@ -6,7 +6,6 @@ import { useSubscription } from "@/lib/useSubscription";
 import VesselCard from "./VesselCard";
 import VesselDetail from "./VesselDetail";
 import Filters, { FilterState } from "./Filters";
-import PremiumGate from "./PremiumGate";
 
 const INITIAL_FILTERS: FilterState = {
   search: "",
