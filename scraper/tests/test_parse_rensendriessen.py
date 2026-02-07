@@ -103,3 +103,19 @@ class TestParseVessel:
         ship["id"] = 9999
         result = parse_vessel(ship)
         assert result["source_id"] == "9999"
+
+    def test_is_sold_true(self):
+        result = parse_vessel(self._make_ship(is_sold=True))
+        assert result["is_sold"] is True
+
+    def test_is_sold_false(self):
+        result = parse_vessel(self._make_ship(is_sold=False))
+        assert result["is_sold"] is False
+
+    def test_is_sold_truthy_string(self):
+        result = parse_vessel(self._make_ship(is_sold="true"))
+        assert result["is_sold"] is True
+
+    def test_is_sold_absent(self):
+        result = parse_vessel(self._make_ship())
+        assert result["is_sold"] is False

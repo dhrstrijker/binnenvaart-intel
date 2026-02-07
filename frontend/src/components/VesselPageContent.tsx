@@ -97,10 +97,18 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
   return (
     <article>
       {/* Sold banner */}
+      {vessel.status === "sold" && (
+        <div className="mb-4 rounded-xl bg-amber-50 px-4 py-3 ring-1 ring-amber-200">
+          <p className="text-sm font-semibold text-amber-800">
+            Dit schip is verkocht.
+          </p>
+        </div>
+      )}
+      {/* Removed banner */}
       {vessel.status === "removed" && (
         <div className="mb-4 rounded-xl bg-red-50 px-4 py-3 ring-1 ring-red-200">
           <p className="text-sm font-semibold text-red-800">
-            Dit schip is verkocht of niet meer beschikbaar.
+            Dit schip is niet meer beschikbaar.
           </p>
         </div>
       )}

@@ -104,7 +104,7 @@ export default function Dashboard() {
     let result = [...vessels];
 
     if (!filters.showRemoved) {
-      result = result.filter((v) => v.status !== "removed");
+      result = result.filter((v) => v.status !== "removed" && v.status !== "sold");
     }
 
     if (filters.search) {
@@ -242,13 +242,17 @@ export default function Dashboard() {
                     ? "bg-emerald-500"
                     : entry.event_type === "price_changed"
                       ? "bg-amber-500"
-                      : "bg-red-500";
+                      : entry.event_type === "sold"
+                        ? "bg-amber-600"
+                        : "bg-red-500";
                 const label =
                   entry.event_type === "inserted"
                     ? "Nieuw"
                     : entry.event_type === "price_changed"
                       ? "Prijswijziging"
-                      : "Verwijderd";
+                      : entry.event_type === "sold"
+                        ? "Verkocht"
+                        : "Verwijderd";
                 return (
                   <div
                     key={entry.id}

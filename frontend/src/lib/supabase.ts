@@ -47,7 +47,7 @@ export interface Favorite {
 export interface ActivityLogEntry {
   id: string;
   vessel_id: string;
-  event_type: "inserted" | "price_changed" | "removed";
+  event_type: "inserted" | "price_changed" | "removed" | "sold";
   vessel_name: string;
   vessel_source: string;
   old_price: number | null;

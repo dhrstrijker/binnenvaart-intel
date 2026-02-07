@@ -87,6 +87,7 @@ def parse_vessel(ship: dict) -> dict:
         "image_url": image_url,
         "raw_details": raw_details,
         "image_urls": image_urls or None,
+        "is_sold": bool(ship.get("is_sold")),
     }
 
 
