@@ -425,7 +425,7 @@ export default function Dashboard() {
       {/* Vessel grid */}
       {!loading && filtered.length > 0 && (
         <>
-          <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+          <div id="vessel-results" className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
             {visibleVessels.map((vessel) => (
               <VesselCard
                 key={vessel.id}
