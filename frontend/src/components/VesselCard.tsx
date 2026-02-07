@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Vessel, PriceHistory } from "@/lib/supabase";
 import { sourceLabel, sourceColor } from "@/lib/sources";
 import { MiniSparkline } from "./PriceHistoryChart";
@@ -40,26 +41,15 @@ interface VesselCardProps {
   priceHistory?: PriceHistory[];
   isPremium?: boolean;
   user?: User | null;
-  onOpenDetail?: (vessel: Vessel) => void;
 }
 
-export default function VesselCard({ vessel, priceHistory = [], isPremium = false, user = null, onOpenDetail }: VesselCardProps) {
+export default function VesselCard({ vessel, priceHistory = [], isPremium = false, user = null }: VesselCardProps) {
   const [imgError, setImgError] = React.useState(false);
   const trend = getPriceTrend(priceHistory);
 
-  function handleClick(e: React.MouseEvent) {
-    if (onOpenDetail) {
-      e.preventDefault();
-      onOpenDetail(vessel);
-    }
-  }
-
   return (
-    <a
-      href={vessel.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={handleClick}
+    <Link
+      href={`/schepen/${vessel.id}`}
       className={`group block overflow-hidden rounded-xl bg-white shadow-md ring-1 ring-gray-100 transition-all duration-200 hover:shadow-xl hover:ring-cyan-200 hover:-translate-y-0.5 cursor-pointer${vessel.status === "removed" ? " opacity-60" : ""}`}
     >
       {/* Image */}
@@ -128,9 +118,9 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
 
       {/* Content */}
       <div className="p-4">
-        <h3 className="truncate text-lg font-bold text-slate-900 group-hover:text-cyan-700 transition-colors">
+        <h2 className="truncate text-lg font-bold text-slate-900 group-hover:text-cyan-700 transition-colors">
           {vessel.name}
-        </h3>
+        </h2>
 
         {/* Specs row */}
         <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-500">
@@ -192,13 +182,9 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
           <div className="flex items-center gap-1">
             <WatchlistButton vesselId={vessel.id} user={user} />
             {!user && (
-              <a
+              <Link
                 href="/signup"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  window.location.href = "/signup";
-                }}
+                onClick={(e) => e.stopPropagation()}
                 className="text-xs font-medium text-amber-600 hover:text-amber-700 transition-colors flex items-center gap-1"
                 title="Maak een account voor prijsmeldingen"
               >
@@ -206,7 +192,7 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
                   <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
                 </svg>
                 Prijsmelding
-              </a>
+              </Link>
             )}
             <span className="flex items-center gap-1 text-xs font-medium text-cyan-600 opacity-0 transition-opacity group-hover:opacity-100">
               Details
@@ -217,6 +203,6 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
           </div>
         </div>
       </div>
-    </a>
+    </Link>
   );
 }

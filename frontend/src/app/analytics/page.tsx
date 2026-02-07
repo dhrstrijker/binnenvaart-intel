@@ -70,10 +70,10 @@ export default function AnalyticsPage() {
       <Header />
 
       {/* Content */}
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
         {/* Page title */}
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-slate-900">Marktanalyse</h2>
+          <h1 className="text-2xl font-bold text-slate-900">Marktanalyse</h1>
           <p className="text-sm text-slate-500">
             Marktinzichten voor scheepseigenaren en kopers
           </p>
@@ -137,7 +137,7 @@ export default function AnalyticsPage() {
             </PremiumGate>
           </div>
         )}
-      </div>
+      </main>
 
       <Footer />
     </div>

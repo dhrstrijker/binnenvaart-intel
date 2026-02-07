@@ -33,6 +33,7 @@ export default function Filters({
     <div className="rounded-xl bg-white p-4 shadow-md ring-1 ring-gray-100">
       {/* Search bar */}
       <div className="relative">
+        <label htmlFor="vessel-search" className="sr-only">Zoek op naam</label>
         <svg
           className="absolute left-3 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-slate-400"
           fill="none"
@@ -47,6 +48,7 @@ export default function Filters({
           />
         </svg>
         <input
+          id="vessel-search"
           type="text"
           placeholder="Zoek op naam..."
           value={filters.search}
@@ -58,62 +60,82 @@ export default function Filters({
       {/* Filter row */}
       <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
         {/* Type */}
-        <select
-          value={filters.type}
-          onChange={(e) => update({ type: e.target.value })}
-          className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 outline-none transition-colors focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-        >
-          <option value="">Alle types</option>
-          {availableTypes.map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
+        <div>
+          <label htmlFor="filter-type" className="sr-only">Filter op type</label>
+          <select
+            id="filter-type"
+            value={filters.type}
+            onChange={(e) => update({ type: e.target.value })}
+            className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 outline-none transition-colors focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
+          >
+            <option value="">Alle types</option>
+            {availableTypes.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+        </div>
 
         {/* Source */}
-        <select
-          value={filters.source}
-          onChange={(e) => update({ source: e.target.value })}
-          className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 outline-none transition-colors focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-        >
-          <option value="">Alle bronnen</option>
-          <option value="rensendriessen">Rensen & Driessen</option>
-          <option value="galle">Galle Makelaars</option>
-          <option value="pcshipbrokers">PC Shipbrokers</option>
-          <option value="gtsschepen">GTS Schepen</option>
-          <option value="gsk">GSK Brokers</option>
-        </select>
+        <div>
+          <label htmlFor="filter-source" className="sr-only">Filter op bron</label>
+          <select
+            id="filter-source"
+            value={filters.source}
+            onChange={(e) => update({ source: e.target.value })}
+            className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 outline-none transition-colors focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
+          >
+            <option value="">Alle bronnen</option>
+            <option value="rensendriessen">Rensen & Driessen</option>
+            <option value="galle">Galle Makelaars</option>
+            <option value="pcshipbrokers">PC Shipbrokers</option>
+            <option value="gtsschepen">GTS Schepen</option>
+            <option value="gsk">GSK Brokers</option>
+          </select>
+        </div>
 
         {/* Min price */}
-        <input
-          type="number"
-          placeholder="Min prijs"
-          value={filters.minPrice}
-          onChange={(e) => update({ minPrice: e.target.value })}
-          className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 placeholder-slate-400 outline-none transition-colors focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-        />
+        <div>
+          <label htmlFor="filter-min-price" className="sr-only">Minimale prijs</label>
+          <input
+            id="filter-min-price"
+            type="number"
+            placeholder="Min prijs"
+            value={filters.minPrice}
+            onChange={(e) => update({ minPrice: e.target.value })}
+            className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 placeholder-slate-400 outline-none transition-colors focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
+          />
+        </div>
 
         {/* Max price */}
-        <input
-          type="number"
-          placeholder="Max prijs"
-          value={filters.maxPrice}
-          onChange={(e) => update({ maxPrice: e.target.value })}
-          className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 placeholder-slate-400 outline-none transition-colors focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-        />
+        <div>
+          <label htmlFor="filter-max-price" className="sr-only">Maximale prijs</label>
+          <input
+            id="filter-max-price"
+            type="number"
+            placeholder="Max prijs"
+            value={filters.maxPrice}
+            onChange={(e) => update({ maxPrice: e.target.value })}
+            className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 placeholder-slate-400 outline-none transition-colors focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
+          />
+        </div>
 
         {/* Sort */}
-        <select
-          value={filters.sort}
-          onChange={(e) => update({ sort: e.target.value })}
-          className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 outline-none transition-colors focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-        >
-          <option value="newest">Nieuwste eerst</option>
-          <option value="price_asc">Prijs (laag - hoog)</option>
-          <option value="price_desc">Prijs (hoog - laag)</option>
-          <option value="name">Naam (A-Z)</option>
-        </select>
+        <div>
+          <label htmlFor="filter-sort" className="sr-only">Sorteren</label>
+          <select
+            id="filter-sort"
+            value={filters.sort}
+            onChange={(e) => update({ sort: e.target.value })}
+            className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 outline-none transition-colors focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
+          >
+            <option value="newest">Nieuwste eerst</option>
+            <option value="price_asc">Prijs (laag - hoog)</option>
+            <option value="price_desc">Prijs (hoog - laag)</option>
+            <option value="name">Naam (A-Z)</option>
+          </select>
+        </div>
       </div>
 
       {/* Status toggle + Result count */}

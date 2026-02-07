@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { getSupabase, Vessel, PriceHistory } from "@/lib/supabase";
 import { useSubscription } from "@/lib/useSubscription";
 import { useActivityLog } from "@/lib/useActivityLog";
 import { SOURCE_CONFIG } from "@/lib/sources";
 import VesselCard from "./VesselCard";
-import VesselDetail from "./VesselDetail";
 import Filters, { FilterState } from "./Filters";
 
 const INITIAL_FILTERS: FilterState = {
@@ -37,17 +36,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterState>(INITIAL_FILTERS);
-  const [selectedVessel, setSelectedVessel] = useState<Vessel | null>(null);
   const { user, isPremium, isLoading: subLoading } = useSubscription();
   const { entries: activityEntries, loading: activityLoading } = useActivityLog(user ? 20 : 4);
-
-  const handleOpenDetail = useCallback((vessel: Vessel) => {
-    setSelectedVessel(vessel);
-  }, []);
-
-  const handleCloseDetail = useCallback(() => {
-    setSelectedVessel(null);
-  }, []);
 
   useEffect(() => {
     async function fetchData() {
@@ -192,6 +182,7 @@ export default function Dashboard() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+      <h1 className="sr-only">Binnenvaartschepen te koop</h1>
       {/* Broker sources */}
       <div className="mb-6 flex flex-wrap items-center gap-2">
         <span className="text-xs font-medium text-slate-400 uppercase tracking-wide mr-1">Bronnen</span>
@@ -209,9 +200,9 @@ export default function Dashboard() {
       {!activityLoading && activityEntries.length > 0 && (
         <div className="mb-6 rounded-xl bg-white shadow-md ring-1 ring-gray-100 overflow-hidden">
           <div className="p-4">
-            <h3 className="text-sm font-semibold text-slate-700 mb-3">
+            <h2 className="text-sm font-semibold text-slate-700 mb-3">
               Recente marktactiviteit
-            </h3>
+            </h2>
             <div className="flex flex-col gap-2">
               {activityEntries.map((entry) => {
                 const timeAgo = formatTimeAgo(new Date(entry.recorded_at));
@@ -343,38 +334,11 @@ export default function Dashboard() {
               priceHistory={priceHistoryMap[vessel.id] ?? []}
               isPremium={isPremium}
               user={user}
-              onOpenDetail={handleOpenDetail}
             />
           ))}
         </div>
       )}
 
-      {/* Vessel detail modal */}
-      {selectedVessel && (
-        <VesselDetail
-          vessel={selectedVessel}
-          history={(() => {
-            const ids = [selectedVessel.id];
-            if (selectedVessel.linked_sources) {
-              for (const ls of selectedVessel.linked_sources) {
-                if (ls.vessel_id !== selectedVessel.id) {
-                  ids.push(ls.vessel_id);
-                }
-              }
-            }
-            const combined: PriceHistory[] = [];
-            for (const vid of ids) {
-              const entries = priceHistoryMap[vid];
-              if (entries) combined.push(...entries);
-            }
-            return combined.sort((a, b) =>
-              new Date(a.recorded_at).getTime() - new Date(b.recorded_at).getTime()
-            );
-          })()}
-          isPremium={isPremium}
-          onClose={handleCloseDetail}
-        />
-      )}
     </div>
   );
 }
