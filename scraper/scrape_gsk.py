@@ -63,7 +63,7 @@ TYPE_MAP = {
     "TONS_1000_1499": "Motorvrachtschip",
     "TONS_1500": "Motorvrachtschip",
     "PUSH_BARGE": "Duwbak",
-    "PUSH_BOAT": "Duwboot",
+    "PUSH_BOAT": "Duw/Sleepboot",
     "TANKERS_9005_9995": "Tankschip",
     "YAUGHT": "Jacht",
     "HOUSEBOAT": "Woonschip",

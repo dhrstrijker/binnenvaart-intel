@@ -42,7 +42,7 @@ class TestMapType:
         assert map_type("PUSH_BARGE") == "Duwbak"
 
     def test_push_boat(self):
-        assert map_type("PUSH_BOAT") == "Duwboot"
+        assert map_type("PUSH_BOAT") == "Duw/Sleepboot"
 
     def test_tonnage_variants_all_motorvrachtschip(self):
         for t in ("TONS_250_399", "TONS_400_499", "TONS_500_749",

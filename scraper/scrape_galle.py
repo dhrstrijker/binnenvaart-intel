@@ -11,12 +11,6 @@ logger = logging.getLogger(__name__)
 
 URL = "https://gallemakelaars.nl/scheepsaanbod"
 
-# Known vessel types on Galle (used for validation)
-KNOWN_TYPES = {
-    "duwbak", "duwboot", "motorbeunschip",
-    "motortankschip", "motorvrachtschip", "koppelverband",
-}
-
 
 def _fetch_with_retry(method, url, retries=3, **kwargs):
     """Fetch a URL with exponential-backoff retries on network errors."""

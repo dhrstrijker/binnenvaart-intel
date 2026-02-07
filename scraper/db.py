@@ -16,17 +16,39 @@ supabase = create_client(_url, _key)
 # Canonical type mapping: raw variations → single canonical name.
 # Keys are lowercase for case-insensitive matching.
 TYPE_MAP: dict[str, str] = {
+    # Motorvrachtschip (Motor cargo vessel)
+    "motorvrachtschip": "Motorvrachtschip",
+    "dry cargo vessel": "Motorvrachtschip",
+    # Tankschip (Tanker)
     "tanker": "Tankschip",
     "motortankschip": "Tankschip",
+    "tankschip": "Tankschip",
+    "motor tanker": "Tankschip",
+    # Duw/Sleepboot (Push/tug boat)
     "sleepboot": "Duw/Sleepboot",
     "duwboot": "Duw/Sleepboot",
+    "duw/sleepboot": "Duw/Sleepboot",
+    "pusher": "Duw/Sleepboot",
+    # Duwbak (Push barge)
     "duwbak": "Duwbak",
+    "pushbarge": "Duwbak",
+    "push barge": "Duwbak",
+    # Koppelverband (Coupled combination)
     "koppelverband": "Koppelverband",
+    "push combination": "Koppelverband",
+    # Beunschip (Hopper barge)
     "beunschip": "Beunschip",
+    "motorbeunschip": "Beunschip",
+    # Other canonical types
     "jacht": "Jacht",
     "woonschip": "Woonschip",
     "passagiersschip": "Passagiersschip",
     "nieuwbouw": "Nieuwbouw",
+    "kraanschip": "Kraanschip",
+    "ponton": "Ponton",
+    "overige": "Overige",
+    "accomodatieschepen": "Accomodatieschip",
+    "accomodatieschip": "Accomodatieschip",
 }
 
 
