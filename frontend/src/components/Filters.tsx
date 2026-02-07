@@ -78,6 +78,7 @@ interface FiltersProps {
   vesselCount: number;
   user?: User | null;
   onSaveAsSearch?: (filters: FilterState) => void;
+  onAuthPrompt?: () => void;
 }
 
 export default function Filters({
@@ -87,6 +88,7 @@ export default function Filters({
   vesselCount,
   user,
   onSaveAsSearch,
+  onAuthPrompt,
 }: FiltersProps) {
   const [advancedOpen, setAdvancedOpen] = useState(false);
 
@@ -268,9 +270,15 @@ export default function Filters({
 
         {/* Right: Save search + Filters toggle */}
         <div className="flex items-center gap-2">
-          {user && onSaveAsSearch && (filters.type || filters.source || filters.minPrice || filters.maxPrice || filters.search || filters.minLength || filters.maxLength || filters.minTonnage || filters.maxTonnage || filters.minBuildYear || filters.maxBuildYear) && (
+          {(filters.type || filters.source || filters.minPrice || filters.maxPrice || filters.search || filters.minLength || filters.maxLength || filters.minTonnage || filters.maxTonnage || filters.minBuildYear || filters.maxBuildYear) && (
             <button
-              onClick={() => onSaveAsSearch(filters)}
+              onClick={() => {
+                if (user && onSaveAsSearch) {
+                  onSaveAsSearch(filters);
+                } else if (onAuthPrompt) {
+                  onAuthPrompt();
+                }
+              }}
               className="flex items-center gap-1.5 rounded-lg border border-cyan-200 bg-cyan-50 px-2.5 py-1.5 text-xs font-medium text-cyan-700 transition hover:bg-cyan-100"
             >
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

@@ -386,6 +386,7 @@ export default function Dashboard() {
           vesselCount={filtered.length}
           user={user}
           onSaveAsSearch={handleSaveAsSearch}
+          onAuthPrompt={() => openAuthModal()}
         />
       </div>
 
