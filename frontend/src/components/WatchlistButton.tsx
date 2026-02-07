@@ -31,7 +31,13 @@ export default function WatchlistButton({ vesselId, user }: WatchlistButtonProps
     async (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      if (!user || loading) return;
+
+      if (!user) {
+        window.location.href = "/signup";
+        return;
+      }
+
+      if (loading) return;
 
       const prev = inWatchlist;
       setInWatchlist(!prev);
@@ -60,14 +66,12 @@ export default function WatchlistButton({ vesselId, user }: WatchlistButtonProps
     [user, vesselId, inWatchlist, loading]
   );
 
-  if (!user) return null;
-
   return (
     <button
       onClick={toggle}
       disabled={loading}
       className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:text-red-500 disabled:opacity-50"
-      title={inWatchlist ? "Verwijderen uit watchlist" : "Toevoegen aan watchlist"}
+      title={!user ? "Maak een account om te volgen" : inWatchlist ? "Verwijderen uit watchlist" : "Toevoegen aan watchlist"}
     >
       {inWatchlist ? (
         <svg className="h-5 w-5 text-red-500" viewBox="0 0 24 24" fill="currentColor">

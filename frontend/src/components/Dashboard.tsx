@@ -29,6 +29,18 @@ function formatAvgPrice(vessels: Vessel[]): string {
   }).format(avg);
 }
 
+function formatTimeAgo(date: Date): string {
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 60) return `${diffMins}m`;
+  if (diffHours < 24) return `${diffHours}u`;
+  return `${diffDays}d`;
+}
+
 export default function Dashboard() {
   const [vessels, setVessels] = useState<Vessel[]>([]);
   const [priceHistoryMap, setPriceHistoryMap] = useState<Record<string, PriceHistory[]>>({});
@@ -165,6 +177,40 @@ export default function Dashboard() {
     [vessels]
   );
 
+  const recentActivity = useMemo(() => {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    const newThisWeek = vessels.filter((v) => {
+      return (
+        new Date(v.first_seen_at) > sevenDaysAgo && v.status !== "removed"
+      );
+    });
+
+    const recentlySold = vessels.filter((v) => v.status === "removed");
+
+    const activityItems = [
+      ...newThisWeek.slice(0, 2).map((v) => ({
+        type: "new" as const,
+        vessel: v,
+        timestamp: new Date(v.first_seen_at),
+      })),
+      ...recentlySold.slice(0, 2).map((v) => ({
+        type: "sold" as const,
+        vessel: v,
+        timestamp: new Date(v.updated_at),
+      })),
+    ]
+      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+      .slice(0, 4);
+
+    return {
+      newCount: newThisWeek.length,
+      soldCount: recentlySold.length,
+      items: activityItems,
+    };
+  }, [vessels]);
+
   if (error) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
@@ -232,6 +278,94 @@ export default function Dashboard() {
           }
         />
       </div>
+
+      {/* Recent Market Activity */}
+      {!loading && recentActivity.items.length > 0 && (
+        <div className="mb-6 rounded-xl bg-white shadow-md ring-1 ring-gray-100 overflow-hidden">
+          <div className="relative p-4">
+            {/* Content that gets blurred for anonymous users */}
+            <div className={!user ? "blur-sm select-none pointer-events-none" : ""}>
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                {/* Left: Summary stats */}
+                <div className="flex items-center gap-4">
+                  <h3 className="text-sm font-semibold text-slate-700">
+                    Recente marktactiviteit
+                  </h3>
+                  <div className="flex items-center gap-3 text-xs">
+                    {recentActivity.newCount > 0 && (
+                      <span className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 font-medium text-emerald-700">
+                        <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 8 8">
+                          <circle cx="4" cy="4" r="3" />
+                        </svg>
+                        {recentActivity.newCount} nieuwe schepen
+                      </span>
+                    )}
+                    {recentActivity.soldCount > 0 && (
+                      <span className="flex items-center gap-1.5 rounded-full bg-red-50 px-2.5 py-1 font-medium text-red-700">
+                        <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 8 8">
+                          <circle cx="4" cy="4" r="3" />
+                        </svg>
+                        {recentActivity.soldCount} verkocht
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Right: Activity feed */}
+                <div className="flex flex-col gap-2 sm:max-w-md">
+                  {recentActivity.items.map((item, idx) => {
+                    const timeAgo = formatTimeAgo(item.timestamp);
+                    const isNew = item.type === "new";
+                    return (
+                      <div
+                        key={`${item.vessel.id}-${idx}`}
+                        className="flex items-center gap-2 text-xs"
+                      >
+                        <div
+                          className={`h-2 w-2 rounded-full ${
+                            isNew ? "bg-emerald-500" : "bg-red-500"
+                          }`}
+                        />
+                        <span className="truncate font-medium text-slate-700">
+                          {item.vessel.name}
+                        </span>
+                        {item.vessel.price && (
+                          <span className="text-slate-500">
+                            {new Intl.NumberFormat("nl-NL", {
+                              style: "currency",
+                              currency: "EUR",
+                              minimumFractionDigits: 0,
+                              maximumFractionDigits: 0,
+                            }).format(item.vessel.price)}
+                          </span>
+                        )}
+                        <span className="ml-auto text-slate-400">{timeAgo}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Overlay for anonymous users */}
+            {!user && (
+              <div className="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-[1px]">
+                <div className="text-center px-4">
+                  <p className="text-sm font-semibold text-slate-800">
+                    Maak een gratis account om marktactiviteit te zien
+                  </p>
+                  <a
+                    href="/signup"
+                    className="mt-2 inline-block rounded-lg bg-cyan-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg hover:bg-cyan-500 transition"
+                  >
+                    Gratis account aanmaken
+                  </a>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Filters */}
       <Filters
