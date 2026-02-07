@@ -10,6 +10,7 @@ import { useAuthNudge } from "@/lib/useAuthNudge";
 import { useAuthModal } from "@/lib/AuthModalContext";
 import { SOURCE_CONFIG } from "@/lib/sources";
 import VesselCard from "./VesselCard";
+import AuthNudgeToast from "./AuthNudgeToast";
 import Filters, { FilterState } from "./Filters";
 
 const INITIAL_FILTERS: FilterState = {
@@ -376,33 +377,6 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Auth nudge for anonymous users with 3+ local favorites */}
-      {!user && shouldShowNudge && (
-        <div className="mb-6 flex items-center gap-3 rounded-xl bg-cyan-50 px-4 py-3 ring-1 ring-cyan-200">
-          <svg className="h-5 w-5 shrink-0 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-          </svg>
-          <p className="flex-1 text-sm text-cyan-800">
-            Maak een account aan om je favorieten op te slaan en meldingen te ontvangen.
-          </p>
-          <button
-            onClick={() => openAuthModal()}
-            className="shrink-0 rounded-lg bg-cyan-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-cyan-700"
-          >
-            Account aanmaken
-          </button>
-          <button
-            onClick={dismissNudge}
-            className="shrink-0 text-cyan-400 hover:text-cyan-600"
-            title="Sluiten"
-          >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-      )}
-
       {/* Filters */}
       <Filters
         filters={filters}
@@ -473,6 +447,10 @@ export default function Dashboard() {
         </>
       )}
 
+      {/* Auth nudge toast for anonymous users with 3+ local favorites */}
+      {!user && shouldShowNudge && (
+        <AuthNudgeToast onDismiss={dismissNudge} />
+      )}
     </div>
   );
 }
