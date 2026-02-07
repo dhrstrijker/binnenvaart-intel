@@ -208,3 +208,25 @@ CREATE POLICY "Users can manage own saved searches"
   ON saved_searches FOR ALL TO authenticated
   USING ((SELECT auth.uid()) = user_id)
   WITH CHECK ((SELECT auth.uid()) = user_id);
+
+-- Email delivery events tracked via Resend webhooks (for notification analytics)
+CREATE TABLE notification_events (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  notification_history_id UUID REFERENCES notification_history(id) ON DELETE CASCADE,
+  resend_message_id TEXT,
+  event_type TEXT NOT NULL CHECK (event_type IN ('delivered', 'opened', 'clicked', 'bounced', 'complained')),
+  occurred_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_notification_events_type ON notification_events(event_type);
+CREATE INDEX idx_notification_events_message ON notification_events(resend_message_id);
+CREATE INDEX idx_notification_events_occurred ON notification_events(occurred_at);
+
+ALTER TABLE notification_events ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Authenticated users can read own events"
+  ON notification_events FOR SELECT TO authenticated
+  USING (
+    notification_history_id IN (
+      SELECT id FROM notification_history WHERE user_id = (SELECT auth.uid())
+    )
+  );

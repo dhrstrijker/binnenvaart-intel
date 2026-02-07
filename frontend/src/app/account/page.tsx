@@ -124,7 +124,7 @@ export default function AccountPage() {
 
         {/* Saved searches */}
         <div className="mt-6">
-          <SavedSearchManager user={user} />
+          <SavedSearchManager user={user} isPremium={isPremium} />
         </div>
 
         {/* Sign out */}

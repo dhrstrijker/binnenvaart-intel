@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
+import PremiumGate from "@/components/PremiumGate";
 
 interface SavedSearchFilters {
   type?: string;
@@ -22,6 +23,7 @@ interface SavedSearch {
 
 interface SavedSearchManagerProps {
   user: User;
+  isPremium: boolean;
 }
 
 const sourceLabels: Record<string, string> = {
@@ -48,7 +50,9 @@ const COMMON_TYPES = [
   "Overig",
 ];
 
-export default function SavedSearchManager({ user }: SavedSearchManagerProps) {
+const MAX_FREE_SEARCHES = 2;
+
+export default function SavedSearchManager({ user, isPremium }: SavedSearchManagerProps) {
   const [searches, setSearches] = useState<SavedSearch[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -143,6 +147,8 @@ export default function SavedSearchManager({ user }: SavedSearchManagerProps) {
     );
   }
 
+  const canAddSearch = isPremium || searches.length < MAX_FREE_SEARCHES;
+
   return (
     <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
       <div className="flex items-center justify-between">
@@ -156,12 +162,18 @@ export default function SavedSearchManager({ user }: SavedSearchManagerProps) {
               : `${searches.length} ${searches.length === 1 ? "zoekopdracht" : "zoekopdrachten"} actief`}
           </p>
         </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="rounded-lg bg-cyan-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-700"
-        >
-          {showForm ? "Annuleren" : "+ Nieuwe zoekopdracht"}
-        </button>
+        {canAddSearch ? (
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="rounded-lg bg-cyan-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-700"
+          >
+            {showForm ? "Annuleren" : "+ Nieuwe zoekopdracht"}
+          </button>
+        ) : (
+          <PremiumGate isPremium={isPremium}>
+            <span className="text-sm text-slate-500">Upgrade naar Pro voor onbeperkte zoekopdrachten</span>
+          </PremiumGate>
+        )}
       </div>
 
       {/* Creation form */}
