@@ -1,48 +1,37 @@
 import { Vessel } from "@/lib/supabase";
+import { predictPrice } from "@/lib/vesselPricing";
 
 export interface DealScore {
   label: string;
   color: string;
-  percentile: number;
+  pctDiff: number;
 }
 
 export function computeDealScores(vessels: Vessel[]): Map<string, DealScore> {
   const scores = new Map<string, DealScore>();
 
-  // Group vessels by type
-  const byType = new Map<string, Vessel[]>();
   for (const v of vessels) {
-    if (v.price == null || !v.type) continue;
-    const group = byType.get(v.type);
-    if (group) group.push(v);
-    else byType.set(v.type, [v]);
-  }
+    if (v.price == null) continue;
 
-  for (const [, group] of byType) {
-    // Only score types with 10+ priced vessels
-    if (group.length < 10) continue;
+    const predicted = predictPrice(v);
+    if (predicted == null || predicted <= 0) continue;
 
-    // Sort by price ascending
-    const sorted = [...group].sort((a, b) => a.price! - b.price!);
+    const pctDiff = ((predicted - v.price) / predicted) * 100;
+    let label: string;
+    let color: string;
 
-    for (let i = 0; i < sorted.length; i++) {
-      const percentile = (i / (sorted.length - 1)) * 100;
-      let label: string;
-      let color: string;
-
-      if (percentile < 40) {
-        label = "Scherp geprijsd";
-        color = "bg-emerald-100 text-emerald-800";
-      } else if (percentile <= 60) {
-        label = "Marktconform";
-        color = "bg-slate-100 text-slate-600";
-      } else {
-        label = "Boven marktgemiddelde";
-        color = "bg-amber-100 text-amber-800";
-      }
-
-      scores.set(sorted[i].id, { label, color, percentile });
+    if (pctDiff > 15) {
+      label = "Scherp geprijsd";
+      color = "bg-emerald-100 text-emerald-800";
+    } else if (pctDiff >= -15) {
+      label = "Marktconform";
+      color = "bg-slate-100 text-slate-600";
+    } else {
+      label = "Boven marktgemiddelde";
+      color = "bg-amber-100 text-amber-800";
     }
+
+    scores.set(v.id, { label, color, pctDiff: Math.round(pctDiff) });
   }
 
   return scores;

@@ -11,7 +11,12 @@ import FavoriteButton from "./FavoriteButton";
 import WatchlistButton from "./WatchlistButton";
 import BrokerCard from "./BrokerCard";
 import ImageGallery from "./ImageGallery";
+import PriceExplanation from "./PriceExplanation";
+import ConditionSignals from "./ConditionSignals";
+import DealScoreBadge from "./DealScoreBadge";
 import { useSubscription } from "@/lib/useSubscription";
+import { predictPrice, computeDaysOnMarket, formatDaysOnMarket } from "@/lib/vesselPricing";
+import { computeDealScores } from "@/lib/dealScore";
 
 interface VesselPageContentProps {
   vessel: Vessel;
@@ -204,14 +209,47 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
               {sourceLabel(vessel.source)} &middot; Eerste keer gezien{" "}
               {formatDate(vessel.first_seen_at)}
             </p>
+            {(() => {
+              const scores = computeDealScores([vessel]);
+              const score = scores.get(vessel.id);
+              const days = computeDaysOnMarket(vessel.first_seen_at);
+              const daysLabel = formatDaysOnMarket(days);
+              const isActive = vessel.status !== "removed" && vessel.status !== "sold";
+              if (!score && !isActive) return null;
+              return (
+                <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                  {score && <DealScoreBadge score={score} />}
+                  {isActive && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-slate-50 px-2 py-0.5 text-xs text-slate-500 ring-1 ring-slate-200">
+                      <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {daysLabel}
+                    </span>
+                  )}
+                </div>
+              );
+            })()}
           </div>
 
           {/* Price block */}
           <div className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
             <p className="text-xs font-medium text-slate-500">Vraagprijs</p>
-            <p className="text-3xl font-extrabold text-slate-900">
-              {formatPrice(vessel.price)}
-            </p>
+            {vessel.price !== null ? (
+              <p className="text-3xl font-extrabold text-slate-900">
+                {formatPrice(vessel.price)}
+              </p>
+            ) : (() => {
+              const est = predictPrice(vessel);
+              return est ? (
+                <p className="text-3xl font-extrabold text-slate-400 italic" title="Geschatte marktwaarde">
+                  ~{formatPrice(est)}
+                  <span className="ml-1.5 text-sm font-medium not-italic">geschat</span>
+                </p>
+              ) : (
+                <p className="text-3xl font-extrabold text-slate-900">Prijs op aanvraag</p>
+              );
+            })()}
             {isPremium && priceChange !== null && priceChange !== 0 && priceChangePercent !== null && (
               <p
                 className={`mt-1 text-xs font-semibold ${
@@ -259,6 +297,12 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
 
           {/* BrokerCard */}
           <BrokerCard vessel={vessel} />
+
+          {/* Price explanation */}
+          <PriceExplanation vessel={vessel} />
+
+          {/* Condition signals */}
+          <ConditionSignals vessel={vessel} />
 
         </div>
       </div>

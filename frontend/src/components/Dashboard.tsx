@@ -12,6 +12,7 @@ import SkeletonCard from "./SkeletonCard";
 import AuthNudgeToast from "./AuthNudgeToast";
 import Filters, { FilterState } from "./Filters";
 import { computeDealScores } from "@/lib/dealScore";
+import { predictPrice } from "@/lib/vesselPricing";
 
 const INITIAL_FILTERS: FilterState = {
   search: "",
@@ -259,6 +260,17 @@ export default function Dashboard() {
 
   const dealScores = useMemo(() => computeDealScores(vessels), [vessels]);
 
+  const estimatedPrices = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const v of vessels) {
+      if (v.price === null) {
+        const pred = predictPrice(v);
+        if (pred !== null && pred > 0) map.set(v.id, pred);
+      }
+    }
+    return map;
+  }, [vessels]);
+
   // Reset visible count when filters change
   useEffect(() => {
     setVisibleCount(24);
@@ -431,6 +443,7 @@ export default function Dashboard() {
                 user={user}
                 freeTierTrend={freeTierTrends[vessel.id] ?? null}
                 dealScore={dealScores.get(vessel.id)}
+                estimatedPrice={estimatedPrices.get(vessel.id) ?? null}
               />
             ))}
           </div>

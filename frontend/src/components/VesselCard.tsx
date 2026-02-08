@@ -11,6 +11,7 @@ import WatchlistButton from "./WatchlistButton";
 import type { User } from "@supabase/supabase-js";
 import { DealScore } from "@/lib/dealScore";
 import DealScoreBadge from "./DealScoreBadge";
+import { computeDaysOnMarket, formatDaysOnMarket } from "@/lib/vesselPricing";
 
 function formatPrice(price: number | null): string {
   if (price === null) return "Prijs op aanvraag";
@@ -46,9 +47,10 @@ interface VesselCardProps {
   user?: User | null;
   freeTierTrend?: 'up' | 'down' | null;
   dealScore?: DealScore;
+  estimatedPrice?: number | null;
 }
 
-export default function VesselCard({ vessel, priceHistory = [], isPremium = false, user = null, freeTierTrend = null, dealScore }: VesselCardProps) {
+export default function VesselCard({ vessel, priceHistory = [], isPremium = false, user = null, freeTierTrend = null, dealScore, estimatedPrice }: VesselCardProps) {
   const [imgError, setImgError] = React.useState(false);
   const trend = getPriceTrend(priceHistory);
   const effectiveTrend = trend ?? freeTierTrend ?? null;
@@ -158,18 +160,41 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
           )}
         </div>
 
-        {dealScore && (
-          <div className="mt-2">
-            <DealScoreBadge score={dealScore} />
+        {(dealScore || (vessel.status !== "removed" && vessel.status !== "sold")) && (
+          <div className="mt-2 flex flex-wrap items-center gap-1.5">
+            {dealScore && <DealScoreBadge score={dealScore} />}
+            {vessel.status !== "removed" && vessel.status !== "sold" && (() => {
+              const days = computeDaysOnMarket(vessel.first_seen_at);
+              const label = formatDaysOnMarket(days);
+              return (
+                <span className="inline-flex items-center gap-1 rounded-full bg-slate-50 px-2 py-0.5 text-xs text-slate-500 ring-1 ring-slate-200">
+                  <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {label}
+                </span>
+              );
+            })()}
           </div>
         )}
 
         {/* Price + trend indicator */}
         <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
           <div className="flex items-center gap-2">
-            <span className="text-xl font-extrabold text-slate-900">
-              {formatPrice(vessel.price)}
-            </span>
+            {vessel.price !== null ? (
+              <span className="text-xl font-extrabold text-slate-900">
+                {formatPrice(vessel.price)}
+              </span>
+            ) : estimatedPrice ? (
+              <span className="text-xl font-extrabold text-slate-400 italic" title="Geschatte marktwaarde">
+                ~{formatPrice(estimatedPrice)}
+                <span className="ml-1 text-xs font-medium not-italic">geschat</span>
+              </span>
+            ) : (
+              <span className="text-xl font-extrabold text-slate-900">
+                Prijs op aanvraag
+              </span>
+            )}
             {effectiveTrend === "down" && (
               <span className="flex items-center gap-0.5 text-xs font-semibold text-emerald-600" title="Prijs gedaald">
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
