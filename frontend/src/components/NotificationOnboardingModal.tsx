@@ -37,6 +37,7 @@ export default function NotificationOnboardingModal({
   const [email, setEmail] = useState("");
   const [emailLoading, setEmailLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const [alreadySubscribed, setAlreadySubscribed] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [googleError, setGoogleError] = useState<string | null>(null);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -191,7 +192,11 @@ export default function NotificationOnboardingModal({
         return;
       }
 
-      setEmailSent(true);
+      if (data.already_subscribed) {
+        setAlreadySubscribed(true);
+      } else {
+        setEmailSent(true);
+      }
       setEmailLoading(false);
     } catch {
       setEmailError("Er ging iets mis. Probeer het opnieuw.");
@@ -276,6 +281,35 @@ export default function NotificationOnboardingModal({
               <span className="ml-3 text-sm text-slate-600">
                 Bezig met inloggen...
               </span>
+            </div>
+          ) : alreadySubscribed ? (
+            /* Already subscribed state */
+            <div className="text-center py-4">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-cyan-100">
+                <svg
+                  className="h-6 w-6 text-cyan-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <p className="mt-4 text-sm text-slate-600">
+                <strong className="text-slate-900">{email}</strong> ontvangt al
+                meldingen. Log in om dit schip aan je volglijst toe te voegen.
+              </p>
+              <button
+                onClick={onClose}
+                className="mt-5 rounded-lg bg-cyan-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-cyan-700"
+              >
+                Sluiten
+              </button>
             </div>
           ) : emailSent ? (
             /* Email success state */
