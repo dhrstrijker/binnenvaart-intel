@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useContext, createContext } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 const STORAGE_KEY = "navisio_favorites";
@@ -23,7 +23,18 @@ function writeStorage(ids: string[]) {
   }
 }
 
-export function useLocalFavorites() {
+interface LocalFavoritesContextValue {
+  localFavorites: string[];
+  addLocal: (vesselId: string) => void;
+  removeLocal: (vesselId: string) => void;
+  isLocalFav: (vesselId: string) => boolean;
+  clearLocal: () => void;
+  migrateToSupabase: (supabase: SupabaseClient, userId: string) => Promise<void>;
+}
+
+const LocalFavoritesContext = createContext<LocalFavoritesContextValue | null>(null);
+
+export function LocalFavoritesProvider({ children }: { children: React.ReactNode }) {
   const [localFavorites, setLocalFavorites] = useState<string[]>([]);
 
   useEffect(() => {
@@ -82,5 +93,17 @@ export function useLocalFavorites() {
     [clearLocal]
   );
 
-  return { localFavorites, addLocal, removeLocal, isLocalFav, clearLocal, migrateToSupabase };
+  return (
+    <LocalFavoritesContext.Provider value={{ localFavorites, addLocal, removeLocal, isLocalFav, clearLocal, migrateToSupabase }}>
+      {children}
+    </LocalFavoritesContext.Provider>
+  );
+}
+
+export function useLocalFavorites() {
+  const ctx = useContext(LocalFavoritesContext);
+  if (!ctx) {
+    throw new Error("useLocalFavorites must be used within a LocalFavoritesProvider");
+  }
+  return ctx;
 }

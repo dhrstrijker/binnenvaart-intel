@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { AuthModalProvider } from "@/lib/AuthModalContext";
+import { LocalFavoritesProvider } from "@/lib/useLocalFavorites";
 import "./globals.css";
 
 const inter = Inter({
@@ -45,7 +46,9 @@ export default function RootLayout({
   return (
     <html lang="nl">
       <body className={`${inter.variable} font-sans antialiased`}>
-        <AuthModalProvider>{children}</AuthModalProvider>
+        <LocalFavoritesProvider>
+          <AuthModalProvider>{children}</AuthModalProvider>
+        </LocalFavoritesProvider>
       </body>
     </html>
   );
