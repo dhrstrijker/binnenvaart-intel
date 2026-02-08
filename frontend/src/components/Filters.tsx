@@ -32,17 +32,27 @@ const LENGTH_PRESETS: Preset[] = [
   { label: "Onder 40m", min: "", max: "40" },
   { label: "40 – 60m", min: "40", max: "60" },
   { label: "60 – 80m", min: "60", max: "80" },
-  { label: "80 – 110m", min: "80", max: "110" },
-  { label: "110m+", min: "110", max: "" },
+  { label: "80 – 100m", min: "80", max: "100" },
+  { label: "100 – 120m", min: "100", max: "120" },
+  { label: "120m+", min: "120", max: "" },
 ];
 
 const PRICE_PRESETS: Preset[] = [
   { label: "Alle prijzen", min: "", max: "" },
-  { label: "Tot \u20AC100.000", min: "", max: "100000" },
-  { label: "\u20AC100k – \u20AC250k", min: "100000", max: "250000" },
-  { label: "\u20AC250k – \u20AC500k", min: "250000", max: "500000" },
-  { label: "\u20AC500k – \u20AC1M", min: "500000", max: "1000000" },
-  { label: "\u20AC1M+", min: "1000000", max: "" },
+  { label: "Tot €100k", min: "", max: "100000" },
+  { label: "Tot €200k", min: "", max: "200000" },
+  { label: "Tot €300k", min: "", max: "300000" },
+  { label: "Tot €500k", min: "", max: "500000" },
+  { label: "Tot €700k", min: "", max: "700000" },
+  { label: "Tot €1M", min: "", max: "1000000" },
+  { label: "Tot €1,5M", min: "", max: "1500000" },
+  { label: "Tot €2M", min: "", max: "2000000" },
+  { label: "Tot €2,5M", min: "", max: "2500000" },
+  { label: "Tot €3M", min: "", max: "3000000" },
+  { label: "Tot €5M", min: "", max: "5000000" },
+  { label: "Tot €7M", min: "", max: "7000000" },
+  { label: "Tot €10M", min: "", max: "10000000" },
+  { label: "€10M+", min: "10000000", max: "" },
 ];
 
 const TONNAGE_PRESETS: Preset[] = [
