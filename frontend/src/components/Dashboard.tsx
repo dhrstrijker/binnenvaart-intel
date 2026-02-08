@@ -27,14 +27,38 @@ const INITIAL_FILTERS: FilterState = {
   showRemoved: false,
 };
 
+/** Read filter state from URL search params (client-side only) */
+function getInitialFilters(): FilterState {
+  if (typeof window === "undefined") return INITIAL_FILTERS;
+  const p = new URLSearchParams(window.location.search);
+  // Only override defaults when a param is actually present
+  if (p.toString() === "") return INITIAL_FILTERS;
+  return {
+    search: p.get("search") ?? "",
+    type: p.get("type") ?? "",
+    source: p.get("source") ?? "",
+    minPrice: p.get("minPrice") ?? "",
+    maxPrice: p.get("maxPrice") ?? "",
+    minLength: p.get("minLength") ?? "",
+    maxLength: p.get("maxLength") ?? "",
+    minTonnage: p.get("minTonnage") ?? "",
+    maxTonnage: p.get("maxTonnage") ?? "",
+    minBuildYear: p.get("minBuildYear") ?? "",
+    maxBuildYear: p.get("maxBuildYear") ?? "",
+    sort: p.get("sort") ?? "newest",
+    showRemoved: p.get("showRemoved") === "true",
+  };
+}
+
 export default function Dashboard() {
   const [vessels, setVessels] = useState<Vessel[]>([]);
   const [priceHistoryMap, setPriceHistoryMap] = useState<Record<string, PriceHistory[]>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState<FilterState>(INITIAL_FILTERS);
+  const [filters, setFilters] = useState<FilterState>(getInitialFilters);
   const [visibleCount, setVisibleCount] = useState(24);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const scrollTargetRef = useRef<string | null>(null);
   const router = useRouter();
   const { user, isPremium, isLoading: subLoading } = useSubscription();
   const { localFavorites } = useLocalFavorites();
@@ -92,6 +116,33 @@ export default function Dashboard() {
       fetchData();
     }
   }, [user, isPremium, subLoading]);
+
+  // Sync filters to URL for persistence across navigation
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (filters.search) params.set("search", filters.search);
+    if (filters.type) params.set("type", filters.type);
+    if (filters.source) params.set("source", filters.source);
+    if (filters.minPrice) params.set("minPrice", filters.minPrice);
+    if (filters.maxPrice) params.set("maxPrice", filters.maxPrice);
+    if (filters.minLength) params.set("minLength", filters.minLength);
+    if (filters.maxLength) params.set("maxLength", filters.maxLength);
+    if (filters.minTonnage) params.set("minTonnage", filters.minTonnage);
+    if (filters.maxTonnage) params.set("maxTonnage", filters.maxTonnage);
+    if (filters.minBuildYear) params.set("minBuildYear", filters.minBuildYear);
+    if (filters.maxBuildYear) params.set("maxBuildYear", filters.maxBuildYear);
+    if (filters.sort && filters.sort !== "newest") params.set("sort", filters.sort);
+    if (filters.showRemoved) params.set("showRemoved", "true");
+    const qs = params.toString();
+    const url = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
+    window.history.replaceState(null, "", url);
+  }, [filters]);
+
+  // Capture scroll target on mount
+  useEffect(() => {
+    scrollTargetRef.current = sessionStorage.getItem("scrollToVessel");
+    sessionStorage.removeItem("scrollToVessel");
+  }, []);
 
   const availableTypes = useMemo(() => {
     const types = new Set(vessels.map((v) => v.type).filter(Boolean));
@@ -187,6 +238,31 @@ export default function Dashboard() {
   useEffect(() => {
     setVisibleCount(24);
   }, [filters]);
+
+  // Scroll to vessel after data loads
+  useEffect(() => {
+    const target = scrollTargetRef.current;
+    if (!target || loading) return;
+
+    const idx = filtered.findIndex((v) => v.id === target);
+    if (idx === -1) {
+      scrollTargetRef.current = null;
+      return;
+    }
+
+    if (idx >= visibleCount) {
+      setVisibleCount(idx + 1);
+      return;
+    }
+
+    scrollTargetRef.current = null;
+    requestAnimationFrame(() => {
+      const el = document.getElementById(`vessel-${target}`);
+      if (el) {
+        el.scrollIntoView({ behavior: "instant", block: "center" });
+      }
+    });
+  }, [loading, filtered, visibleCount]);
 
   // IntersectionObserver to load more vessels on scroll
   const loadMore = useCallback(() => {

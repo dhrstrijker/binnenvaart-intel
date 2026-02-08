@@ -50,7 +50,9 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
 
   return (
     <Link
+      id={`vessel-${vessel.id}`}
       href={`/schepen/${vessel.id}`}
+      onClick={() => sessionStorage.setItem("scrollToVessel", vessel.id)}
       className={`group block overflow-hidden rounded-xl bg-white shadow-md ring-1 ring-gray-100 transition-all duration-200 hover:shadow-xl hover:ring-cyan-200 hover:-translate-y-0.5 cursor-pointer${vessel.status === "removed" || vessel.status === "sold" ? " opacity-60" : ""}`}
     >
       {/* Image */}
