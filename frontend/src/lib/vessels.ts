@@ -24,6 +24,29 @@ export async function getAllVesselIds(): Promise<{ id: string; updated_at: strin
   return data;
 }
 
+function dimensionDistance(ref: Vessel, candidate: Vessel): number {
+  let sum = 0;
+  let dimensions = 0;
+
+  if (ref.length_m && candidate.length_m) {
+    sum += ((candidate.length_m - ref.length_m) / ref.length_m) ** 2;
+    dimensions++;
+  }
+  if (ref.width_m && candidate.width_m) {
+    sum += ((candidate.width_m - ref.width_m) / ref.width_m) ** 2;
+    dimensions++;
+  }
+  if (ref.tonnage && candidate.tonnage) {
+    sum += ((candidate.tonnage - ref.tonnage) / ref.tonnage) ** 2;
+    dimensions++;
+  }
+
+  // No comparable dimensions — push to the end
+  if (dimensions === 0) return Infinity;
+
+  return Math.sqrt(sum / dimensions);
+}
+
 export async function getSimilarVessels(vessel: Vessel, limit = 6): Promise<Vessel[]> {
   const supabase = await createClient();
 
@@ -42,14 +65,13 @@ export async function getSimilarVessels(vessel: Vessel, limit = 6): Promise<Vess
 
   if (error || !data) return [];
 
-  // Sort by price proximity
-  if (vessel.price !== null) {
-    data.sort((a, b) => {
-      const diffA = a.price !== null ? Math.abs(a.price - vessel.price!) : Infinity;
-      const diffB = b.price !== null ? Math.abs(b.price - vessel.price!) : Infinity;
-      return diffA - diffB;
-    });
-  }
+  // Sort by dimension proximity (length, width, tonnage)
+  // Normalize each dimension by the vessel's own value to weight them equally
+  data.sort((a, b) => {
+    const distA = dimensionDistance(vessel, a);
+    const distB = dimensionDistance(vessel, b);
+    return distA - distB;
+  });
 
   return data.slice(0, limit);
 }
