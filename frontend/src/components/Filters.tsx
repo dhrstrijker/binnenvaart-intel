@@ -245,9 +245,9 @@ export default function Filters({
       </div>
 
       {/* ═══ Zone B: Secondary Row ═══ */}
-      <div className="flex items-center justify-between gap-3 px-1">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-1">
         {/* Left: Sort + result count */}
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 items-center gap-2">
           <div className="relative">
             <label htmlFor="filter-sort" className="sr-only">Sorteren</label>
             <select
@@ -284,7 +284,8 @@ export default function Filters({
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
-              Zoekopdracht opslaan
+              <span className="hidden sm:inline">Zoekopdracht opslaan</span>
+              <span className="sm:hidden">Opslaan</span>
             </button>
           )}
 
