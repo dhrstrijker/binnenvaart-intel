@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { Vessel, PriceHistory, getSupabase } from "@/lib/supabase";
 import { sourceLabel, sourceColor, safeUrl } from "@/lib/sources";
 import PriceHistoryChart from "./PriceHistoryChart";
@@ -331,15 +330,19 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
 
       {/* Back link */}
       <div className="mt-8 border-t border-slate-200 pt-6">
-        <Link
+        <a
           href="/"
+          onClick={(e) => {
+            e.preventDefault();
+            window.history.back();
+          }}
           className="inline-flex items-center gap-1.5 text-sm font-medium text-cyan-600 hover:text-cyan-800 transition-colors"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
           Terug naar overzicht
-        </Link>
+        </a>
       </div>
 
       {/* Similar vessels */}
