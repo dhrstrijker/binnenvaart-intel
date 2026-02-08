@@ -1,12 +1,42 @@
 import { Vessel } from "@/lib/supabase";
 
-interface Coefficients {
+export interface Coefficients {
   length: number;
   tonnage: number;
   build_year: number;
   intercept: number;
   r2: number;
   label: string;
+}
+
+// Types where the linear model fails catastrophically (MAPE > 90%)
+const UNSUPPORTED_TYPES = new Set([
+  "Duw/Sleepboot",
+  "Woonschip",
+  "Kraanschip",
+  "Accomodatieschip",
+  "Ponton",
+  "Overige",
+  "Passagiersschip",
+]);
+
+export type SuppressionReason = "unsupported_type" | "too_old" | "too_small";
+
+/** Returns a reason string if prediction should be suppressed, null if OK */
+export function shouldSuppressPrediction(vessel: Vessel): SuppressionReason | null {
+  if (vessel.type && UNSUPPORTED_TYPES.has(vessel.type)) return "unsupported_type";
+  if (vessel.build_year != null && vessel.build_year < 1950) return "too_old";
+  if (vessel.length_m != null && vessel.length_m < 40) return "too_small";
+  return null;
+}
+
+export type ConfidenceLevel = "high" | "medium" | "low";
+
+export function getConfidenceLevel(vessel: Vessel): ConfidenceLevel {
+  const coeff = getCoefficients(vessel.type);
+  if (coeff.r2 >= 0.8) return "high";
+  if (coeff.r2 >= 0.5) return "medium";
+  return "low";
 }
 
 // Retrained coefficients from model competition (2026-02-08)
@@ -49,12 +79,13 @@ export const TYPE_COEFFICIENTS: Record<string, Coefficients> = {
 const MIN_PRICE = 10_000;
 const MAX_PRICE = 15_000_000;
 
-function getCoefficients(type: string | null | undefined): Coefficients {
+export function getCoefficients(type: string | null | undefined): Coefficients {
   if (type && TYPE_COEFFICIENTS[type]) return TYPE_COEFFICIENTS[type];
   return TYPE_COEFFICIENTS._fallback;
 }
 
 export function predictPrice(vessel: Vessel): number | null {
+  if (shouldSuppressPrediction(vessel)) return null;
   if (vessel.length_m == null || vessel.build_year == null) return null;
 
   const coeff = getCoefficients(vessel.type);
@@ -100,6 +131,7 @@ export interface PriceExplanationData {
 }
 
 export function explainPrice(vessel: Vessel): PriceExplanationData | null {
+  if (shouldSuppressPrediction(vessel)) return null;
   if (vessel.length_m == null || vessel.build_year == null) return null;
 
   const coeff = getCoefficients(vessel.type);

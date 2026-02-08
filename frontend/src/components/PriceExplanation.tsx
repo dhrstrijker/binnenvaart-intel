@@ -1,5 +1,5 @@
 import { Vessel } from "@/lib/supabase";
-import { explainPrice, predictPriceRange } from "@/lib/vesselPricing";
+import { explainPrice, predictPriceRange, shouldSuppressPrediction, SuppressionReason } from "@/lib/vesselPricing";
 import Link from "next/link";
 
 interface PriceExplanationProps {
@@ -15,7 +15,34 @@ function formatEur(n: number): string {
   }).format(n);
 }
 
+const SUPPRESSION_MESSAGES: Record<SuppressionReason, string> = {
+  unsupported_type: "Geen prijsschatting beschikbaar voor dit scheepstype",
+  too_old: "Geen betrouwbare schatting mogelijk voor schepen van vóór 1950",
+  too_small: "Geen betrouwbare schatting mogelijk voor schepen onder 40 meter",
+};
+
 export default function PriceExplanation({ vessel }: PriceExplanationProps) {
+  const suppressionReason = shouldSuppressPrediction(vessel);
+
+  if (suppressionReason) {
+    return (
+      <div className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-slate-900">Marktwaarde-analyse</h2>
+          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500">
+            Niet beschikbaar
+          </span>
+        </div>
+        <div className="mt-3 rounded-lg bg-slate-50 px-3 py-2.5">
+          <p className="text-sm text-slate-500">{SUPPRESSION_MESSAGES[suppressionReason]}</p>
+        </div>
+        <p className="mt-3 text-xs text-slate-400">
+          Het prijsmodel werkt het beste voor vrachtschepen en tankschepen van 40m+ gebouwd na 1950.
+        </p>
+      </div>
+    );
+  }
+
   const data = explainPrice(vessel);
   const range = predictPriceRange(vessel);
   if (!data || !range) return null;

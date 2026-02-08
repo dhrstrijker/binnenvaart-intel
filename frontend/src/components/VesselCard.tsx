@@ -11,7 +11,7 @@ import WatchlistButton from "./WatchlistButton";
 import type { User } from "@supabase/supabase-js";
 import { DealScore } from "@/lib/dealScore";
 import DealScoreBadge from "./DealScoreBadge";
-import { computeDaysOnMarket, formatDaysOnMarket, PriceRange } from "@/lib/vesselPricing";
+import { computeDaysOnMarket, formatDaysOnMarket, PriceRange, getConfidenceLevel } from "@/lib/vesselPricing";
 
 function formatPrice(price: number | null): string {
   if (price === null) return "Prijs op aanvraag";
@@ -163,6 +163,11 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
         {(dealScore || (vessel.status !== "removed" && vessel.status !== "sold")) && (
           <div className="mt-2 flex flex-wrap items-center gap-1.5">
             {dealScore && <DealScoreBadge score={dealScore} />}
+            {dealScore && getConfidenceLevel(vessel) === "low" && (
+              <span className="inline-flex items-center rounded-full bg-slate-50 px-2 py-0.5 text-xs text-slate-400 ring-1 ring-slate-200" title="Indicatieve schatting">
+                ~indicatief
+              </span>
+            )}
             {vessel.status !== "removed" && vessel.status !== "sold" && (() => {
               const days = computeDaysOnMarket(vessel.first_seen_at);
               const label = formatDaysOnMarket(days);

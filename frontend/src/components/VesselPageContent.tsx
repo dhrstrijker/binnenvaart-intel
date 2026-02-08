@@ -13,8 +13,9 @@ import BrokerCard from "./BrokerCard";
 import ImageGallery from "./ImageGallery";
 import DealScoreBadge from "./DealScoreBadge";
 import { useSubscription } from "@/lib/useSubscription";
-import { predictPriceRange, computeDaysOnMarket, formatDaysOnMarket } from "@/lib/vesselPricing";
+import { predictPriceRange, computeDaysOnMarket, formatDaysOnMarket, shouldSuppressPrediction, getConfidenceLevel } from "@/lib/vesselPricing";
 import { computeDealScores } from "@/lib/dealScore";
+import PriceExplanation from "./PriceExplanation";
 
 interface VesselPageContentProps {
   vessel: Vessel;
@@ -276,13 +277,14 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
               </p>
             )}
 
-            {/* Price range bar */}
-            {vessel.price !== null && (() => {
+            {/* Price range bar — hidden for suppressed vessels */}
+            {vessel.price !== null && !shouldSuppressPrediction(vessel) && (() => {
               const range = predictPriceRange(vessel);
               if (!range) return null;
               const pct = Math.max(0, Math.min(100, ((vessel.price - range.low) / (range.high - range.low)) * 100));
               const scores = computeDealScores([vessel]);
               const score = scores.get(vessel.id);
+              const confidence = getConfidenceLevel(vessel);
               return (
                 <div className="mt-3 border-t border-slate-100 pt-3">
                   <div className="flex items-center justify-between text-xs text-slate-400">
@@ -301,10 +303,16 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
                       {score.label}
                     </p>
                   )}
+                  {confidence === "low" && (
+                    <p className="mt-1 text-xs text-slate-400">Indicatieve schatting — beperkte data voor dit type</p>
+                  )}
                 </div>
               );
             })()}
           </div>
+
+          {/* Price explanation / suppression message */}
+          <PriceExplanation vessel={vessel} />
 
           {/* Specs table */}
           {specRows.length > 0 && (
