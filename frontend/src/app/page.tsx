@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Dashboard from "@/components/Dashboard";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 export const metadata: Metadata = {
   title: "Binnenvaartschepen te koop - Dashboard",
@@ -18,7 +19,9 @@ export default function Home() {
       <Header />
 
       <main>
-        <Dashboard />
+        <ErrorBoundary>
+          <Dashboard />
+        </ErrorBoundary>
       </main>
 
       <Footer />

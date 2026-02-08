@@ -1,30 +1,15 @@
 import logging
 import re
-import time
 
 import requests
 
 from db import upsert_vessel
+from http_utils import fetch_with_retry as _fetch_with_retry
 
 logger = logging.getLogger(__name__)
 
 API_URL = "https://api.rensendriessen.com/api/public/ships/brokers/list/filter/"
 MAX_PAGES = 50
-
-
-def _fetch_with_retry(method, url, retries=3, **kwargs):
-    """Fetch a URL with exponential-backoff retries on network errors."""
-    for attempt in range(1, retries + 1):
-        try:
-            resp = method(url, timeout=30, **kwargs)
-            resp.raise_for_status()
-            return resp
-        except requests.RequestException as e:
-            if attempt == retries:
-                raise
-            wait = 2 ** (attempt - 1)
-            logger.warning("Attempt %d failed: %s. Retrying in %ds...", attempt, e, wait)
-            time.sleep(wait)
 
 
 def parse_dimension(value):

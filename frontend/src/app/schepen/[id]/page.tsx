@@ -6,6 +6,7 @@ import { sourceLabel } from "@/lib/sources";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import VesselPageContent from "@/components/VesselPageContent";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import Link from "next/link";
 
 interface PageProps {
@@ -124,7 +125,9 @@ export default async function VesselPage({ params }: PageProps) {
           </ol>
         </nav>
 
-        <VesselPageContent vessel={vessel} similarVessels={similarVessels} />
+        <ErrorBoundary>
+          <VesselPageContent vessel={vessel} similarVessels={similarVessels} />
+        </ErrorBoundary>
       </main>
 
       <Footer />

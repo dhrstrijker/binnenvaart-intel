@@ -1,13 +1,6 @@
 import { Vessel } from "@/lib/supabase";
 import { sourceLabel, sourceColor, safeUrl } from "@/lib/sources";
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("nl-NL", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-}
+import { formatDate } from "@/lib/formatting";
 
 interface BrokerCardProps {
   vessel: Vessel;

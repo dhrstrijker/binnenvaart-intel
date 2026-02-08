@@ -10,6 +10,7 @@ import {
   COMMON_TYPES,
 } from "@/lib/savedSearchTypes";
 import type { User } from "@supabase/supabase-js";
+import { formatPrice } from "@/lib/formatting";
 
 interface VesselPreview {
   id: string;
@@ -117,15 +118,6 @@ export default function SearchTaskForm({
     onSave();
   }
 
-  function formatPrice(price: number | null): string {
-    if (price === null) return "Prijs op aanvraag";
-    return new Intl.NumberFormat("nl-NL", {
-      style: "currency",
-      currency: "EUR",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(price);
-  }
 
   return (
     <div className="rounded-xl bg-white shadow-md ring-1 ring-gray-100 p-5">

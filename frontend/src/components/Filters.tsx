@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import type { User } from "@supabase/supabase-js";
+import { formatPriceShort } from "@/lib/formatting";
 
 export interface FilterState {
   search: string;
@@ -77,19 +78,6 @@ function customRangeLabel(min: string, max: string, unit: string, formatter?: (v
   if (hasMin) return `${fmt(Number(min))}+`;
   if (hasMax) return `Tot ${fmt(Number(max))}`;
   return "Aangepast"; // fallback, shouldn't happen
-}
-
-function formatPriceShort(value: number): string {
-  if (value >= 1_000_000) {
-    const millions = value / 1_000_000;
-    // Use comma as decimal separator for Dutch locale
-    const formatted = millions % 1 === 0 ? `${millions}` : `${millions.toFixed(1).replace(".", ",")}`;
-    return `€${formatted}M`;
-  }
-  if (value >= 1_000) {
-    return `€${Math.round(value / 1_000)}k`;
-  }
-  return `€${value}`;
 }
 
 /* ── Chevron SVG (shared) ─────────────────────────────────── */

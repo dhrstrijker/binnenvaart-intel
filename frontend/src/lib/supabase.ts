@@ -1,11 +1,8 @@
-import { createClient } from "./supabase/client";
+/** Columns selected for vessel list views (Dashboard, similar vessels, etc.) */
+export const VESSEL_LIST_COLUMNS = "id, name, type, length_m, width_m, tonnage, build_year, price, url, image_url, source, source_id, scraped_at, first_seen_at, updated_at, status, canonical_vessel_id, linked_sources, predicted_price, prediction_confidence, prediction_range_low, prediction_range_high";
 
-/**
- * @deprecated Use createClient() from "@/lib/supabase/client" directly
- */
-export function getSupabase() {
-  return createClient();
-}
+/** Columns selected for vessel detail views (includes raw_details, image_urls, condition_signals) */
+export const VESSEL_DETAIL_COLUMNS = `${VESSEL_LIST_COLUMNS}, raw_details, image_urls, condition_signals`;
 
 export interface Vessel {
   id: string;

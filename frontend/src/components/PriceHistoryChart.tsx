@@ -2,6 +2,7 @@
 
 import React from "react";
 import { PriceHistory } from "@/lib/supabase";
+import { formatPrice as formatEur, formatDateShort as formatDate } from "@/lib/formatting";
 
 interface PriceHistoryChartProps {
   history: PriceHistory[];
@@ -9,22 +10,6 @@ interface PriceHistoryChartProps {
   height?: number;
   showDots?: boolean;
   showLabels?: boolean;
-}
-
-function formatEur(price: number): string {
-  return new Intl.NumberFormat("nl-NL", {
-    style: "currency",
-    currency: "EUR",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(price);
-}
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("nl-NL", {
-    day: "numeric",
-    month: "short",
-  });
 }
 
 export default function PriceHistoryChart({

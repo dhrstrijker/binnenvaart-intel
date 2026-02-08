@@ -12,16 +12,7 @@ import type { User } from "@supabase/supabase-js";
 import { DealScore } from "@/lib/dealScore";
 import DealScoreBadge from "./DealScoreBadge";
 import { computeDaysOnMarket, formatDaysOnMarket, PriceRange, getConfidenceLevel } from "@/lib/vesselPricing";
-
-function formatPrice(price: number | null): string {
-  if (price === null) return "Prijs op aanvraag";
-  return new Intl.NumberFormat("nl-NL", {
-    style: "currency",
-    currency: "EUR",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(price);
-}
+import { formatPrice } from "@/lib/formatting";
 
 function isNew(firstSeenAt: string): boolean {
   const sevenDaysAgo = new Date();

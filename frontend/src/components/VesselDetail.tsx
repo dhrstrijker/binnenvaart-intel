@@ -6,30 +6,13 @@ import { Vessel, PriceHistory } from "@/lib/supabase";
 import { sourceLabel, safeUrl } from "@/lib/sources";
 import PriceHistoryChart from "./PriceHistoryChart";
 import PremiumGate from "./PremiumGate";
+import { formatPrice, formatDate } from "@/lib/formatting";
 
 interface VesselDetailProps {
   vessel: Vessel;
   history: PriceHistory[];
   isPremium?: boolean;
   onClose: () => void;
-}
-
-function formatPrice(price: number | null): string {
-  if (price === null) return "Prijs op aanvraag";
-  return new Intl.NumberFormat("nl-NL", {
-    style: "currency",
-    currency: "EUR",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(price);
-}
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("nl-NL", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
 }
 
 export default function VesselDetail({ vessel, history, isPremium = false, onClose }: VesselDetailProps) {

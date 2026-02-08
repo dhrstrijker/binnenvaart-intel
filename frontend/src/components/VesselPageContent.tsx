@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Vessel, PriceHistory, getSupabase } from "@/lib/supabase";
+import { Vessel, PriceHistory } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
 import { sourceLabel } from "@/lib/sources";
 import PriceHistoryChart from "./PriceHistoryChart";
 import PremiumGate from "./PremiumGate";
@@ -15,28 +16,11 @@ import DealScoreBadge from "./DealScoreBadge";
 import { useSubscription } from "@/lib/useSubscription";
 import { predictPriceRange, computeDaysOnMarket, formatDaysOnMarket, shouldSuppressPrediction, getConfidenceLevel } from "@/lib/vesselPricing";
 import { computeDealScores } from "@/lib/dealScore";
+import { formatPrice, formatDate } from "@/lib/formatting";
 
 interface VesselPageContentProps {
   vessel: Vessel;
   similarVessels: Vessel[];
-}
-
-function formatPrice(price: number | null): string {
-  if (price === null) return "Prijs op aanvraag";
-  return new Intl.NumberFormat("nl-NL", {
-    style: "currency",
-    currency: "EUR",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(price);
-}
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("nl-NL", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
 }
 
 export default function VesselPageContent({ vessel, similarVessels }: VesselPageContentProps) {
@@ -49,7 +33,7 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
     if (subLoading || !user || !isPremium) return;
 
     async function fetchHistory() {
-      const supabase = getSupabase();
+      const supabase = createClient();
       const ids = [vessel.id];
       if (vessel.linked_sources) {
         for (const ls of vessel.linked_sources) {
@@ -76,7 +60,7 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
     if (subLoading || isPremium) return;
 
     async function fetchFreeTrend() {
-      const supabase = getSupabase();
+      const supabase = createClient();
       const { data } = await supabase
         .from("activity_log")
         .select("old_price, new_price")

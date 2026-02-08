@@ -1,9 +1,9 @@
 import logging
-import time
 
 import requests
 
 from db import upsert_vessel
+from http_utils import fetch_with_retry as _fetch_with_retry_base
 
 logger = logging.getLogger(__name__)
 
@@ -91,17 +91,7 @@ TYPE_MAP = {
 
 def _fetch_with_retry(url, json_body, retries=3):
     """POST a GraphQL request with exponential-backoff retries."""
-    for attempt in range(1, retries + 1):
-        try:
-            resp = requests.post(url, json=json_body, timeout=30)
-            resp.raise_for_status()
-            return resp
-        except requests.RequestException as e:
-            if attempt == retries:
-                raise
-            wait = 2 ** (attempt - 1)
-            logger.warning("Attempt %d failed: %s. Retrying in %ds...", attempt, e, wait)
-            time.sleep(wait)
+    return _fetch_with_retry_base(requests.post, url, retries=retries, json=json_body)
 
 
 def map_type(raw_type: str | None) -> str | None:
