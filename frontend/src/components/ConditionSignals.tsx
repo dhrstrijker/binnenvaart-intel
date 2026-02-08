@@ -25,6 +25,27 @@ function getNestedValue(obj: Record<string, unknown>, path: string): string | nu
     }
   }
   if (current == null) return null;
+  if (typeof current === "string") return current;
+  if (typeof current === "number" || typeof current === "boolean") return String(current);
+  if (Array.isArray(current)) {
+    const texts = current.map((item) => {
+      if (item == null) return null;
+      if (typeof item !== "object") return String(item);
+      const o = item as Record<string, unknown>;
+      const name = o.name ?? o.title ?? o.type ?? o.description;
+      if (name) return String(name);
+      const strs = Object.values(o).filter((v) => typeof v === "string");
+      return strs.length > 0 ? strs.join(", ") : null;
+    }).filter(Boolean);
+    return texts.length > 0 ? texts.join("; ") : null;
+  }
+  if (typeof current === "object") {
+    const o = current as Record<string, unknown>;
+    const name = o.name ?? o.title ?? o.type ?? o.description;
+    if (name) return String(name);
+    const strs = Object.values(o).filter((v) => typeof v === "string");
+    return strs.length > 0 ? strs.join(", ") : null;
+  }
   return String(current);
 }
 

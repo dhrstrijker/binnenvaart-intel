@@ -94,7 +94,7 @@ export function explainPrice(vessel: Vessel): PriceExplanationData | null {
     {
       label: "Bouwjaar",
       rawValue: `${vessel.build_year} (${age}j)`,
-      contribution: Math.round(coeff.build_year * vessel.build_year),
+      contribution: Math.round(coeff.build_year * (vessel.build_year - new Date().getFullYear())),
     },
   ];
 
