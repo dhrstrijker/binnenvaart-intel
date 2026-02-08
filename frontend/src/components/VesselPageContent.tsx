@@ -158,7 +158,7 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
       {/* Main 2-column grid — starts immediately, no hero */}
       <div className="lg:grid lg:grid-cols-[1fr,360px] lg:gap-8">
         {/* Left: Image gallery */}
-        <ImageGallery imageUrl={vessel.image_url} imageUrls={vessel.image_urls} />
+        <ImageGallery imageUrl={vessel.image_url} />
 
         {/* Right: Info panel */}
         <div className="mt-6 lg:mt-0 lg:sticky lg:top-6 lg:self-start space-y-5">
