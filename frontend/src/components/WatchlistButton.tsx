@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { createClient } from "@/lib/supabase/client";
 import NotificationOnboardingModal from "@/components/NotificationOnboardingModal";
 import type { User } from "@supabase/supabase-js";
@@ -103,17 +104,19 @@ export default function WatchlistButton({ vesselId, user, className, onToggle }:
           </svg>
         )}
       </button>
-      {showOnboarding && (
-        <NotificationOnboardingModal
-          vesselId={vesselId}
-          onSuccess={() => {
-            setIsWatched(true);
-            setShowOnboarding(false);
-            onToggle?.(vesselId, true);
-          }}
-          onClose={() => setShowOnboarding(false)}
-        />
-      )}
+      {showOnboarding &&
+        createPortal(
+          <NotificationOnboardingModal
+            vesselId={vesselId}
+            onSuccess={() => {
+              setIsWatched(true);
+              setShowOnboarding(false);
+              onToggle?.(vesselId, true);
+            }}
+            onClose={() => setShowOnboarding(false)}
+          />,
+          document.body
+        )}
     </>
   );
 }
