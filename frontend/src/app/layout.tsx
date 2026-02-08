@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { AuthModalProvider } from "@/lib/AuthModalContext";
+import { NotificationModalProvider } from "@/lib/NotificationModalContext";
 import { LocalFavoritesProvider } from "@/lib/useLocalFavorites";
 import "./globals.css";
 
@@ -47,7 +48,9 @@ export default function RootLayout({
     <html lang="nl">
       <body className={`${inter.variable} font-sans antialiased`}>
         <LocalFavoritesProvider>
-          <AuthModalProvider>{children}</AuthModalProvider>
+          <AuthModalProvider>
+            <NotificationModalProvider>{children}</NotificationModalProvider>
+          </AuthModalProvider>
         </LocalFavoritesProvider>
       </body>
     </html>

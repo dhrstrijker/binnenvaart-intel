@@ -222,7 +222,7 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
             )}
             {isPremium && <MiniSparkline history={priceHistory} />}
           </div>
-          <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center gap-1">
             <FavoriteButton vesselId={vessel.id} user={user} />
             <WatchlistButton vesselId={vessel.id} user={user} />
             <span className="flex items-center gap-1 text-xs font-medium text-cyan-600 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
