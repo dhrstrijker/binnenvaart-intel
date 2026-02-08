@@ -5,9 +5,10 @@ import Image from "next/image";
 
 interface ImageGalleryProps {
   imageUrl: string | null;
+  children?: React.ReactNode;
 }
 
-export default function ImageGallery({ imageUrl }: ImageGalleryProps) {
+export default function ImageGallery({ imageUrl, children }: ImageGalleryProps) {
   const [imgError, setImgError] = useState(false);
 
   return (
@@ -38,6 +39,13 @@ export default function ImageGallery({ imageUrl }: ImageGalleryProps) {
                 d="M3 17h1l1-5h14l1 5h1M5 17l-2 4h18l-2-4M7 7h10l2 5H5l2-5zM9 7V5a1 1 0 011-1h4a1 1 0 011 1v2"
               />
             </svg>
+          </div>
+        )}
+
+        {/* Overlay slot (action buttons) */}
+        {children && (
+          <div className="absolute top-3 right-3 flex gap-2">
+            {children}
           </div>
         )}
       </div>

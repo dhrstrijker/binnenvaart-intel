@@ -157,8 +157,36 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
 
       {/* Main 2-column grid — starts immediately, no hero */}
       <div className="lg:grid lg:grid-cols-[1fr_360px] lg:gap-8">
-        {/* Left: Image gallery */}
-        <ImageGallery imageUrl={vessel.image_url} />
+        {/* Left: Image gallery with action buttons overlay */}
+        <ImageGallery imageUrl={vessel.image_url}>
+          <FavoriteButton
+            vesselId={vessel.id}
+            user={user}
+            className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/90 text-slate-500 shadow-sm backdrop-blur-sm transition-colors hover:text-red-500 disabled:opacity-50"
+          />
+          <WatchlistButton
+            vesselId={vessel.id}
+            user={user}
+            className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/90 text-slate-500 shadow-sm backdrop-blur-sm transition-colors hover:text-amber-500 disabled:opacity-50"
+          />
+          <div className="relative">
+            <button
+              type="button"
+              onClick={handleShare}
+              className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/90 text-slate-500 shadow-sm backdrop-blur-sm transition-colors hover:text-cyan-600"
+              title="Deel dit schip"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+              </svg>
+            </button>
+            {shareOpen && (
+              <span className="absolute -bottom-8 right-0 whitespace-nowrap rounded-md bg-slate-900 px-2 py-1 text-xs font-medium text-white">
+                Link gekopieerd!
+              </span>
+            )}
+          </div>
+        </ImageGallery>
 
         {/* Right: Info panel */}
         <div className="mt-6 lg:mt-0 lg:sticky lg:top-6 lg:self-start space-y-5">
@@ -232,36 +260,6 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
           {/* BrokerCard */}
           <BrokerCard vessel={vessel} />
 
-          {/* Action buttons */}
-          <div className="flex gap-2">
-            <FavoriteButton
-              vesselId={vessel.id}
-              user={user}
-              className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-500 shadow-sm ring-1 ring-slate-100 transition-colors hover:text-red-500 disabled:opacity-50"
-            />
-            <WatchlistButton
-              vesselId={vessel.id}
-              user={user}
-              className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-500 shadow-sm ring-1 ring-slate-100 transition-colors hover:text-amber-500 disabled:opacity-50"
-            />
-            <div className="relative">
-              <button
-                type="button"
-                onClick={handleShare}
-                className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-500 shadow-sm ring-1 ring-slate-100 transition-colors hover:text-cyan-600"
-                title="Deel dit schip"
-              >
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                </svg>
-              </button>
-              {shareOpen && (
-                <span className="absolute -bottom-8 right-0 whitespace-nowrap rounded-md bg-slate-900 px-2 py-1 text-xs font-medium text-white">
-                  Link gekopieerd!
-                </span>
-              )}
-            </div>
-          </div>
         </div>
       </div>
 
