@@ -10,12 +10,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1.0,
     },
     {
-      url: "https://navisio.nl/analytics",
-      lastModified: new Date(),
-      changeFrequency: "daily",
-      priority: 0.7,
-    },
-    {
       url: "https://navisio.nl/pricing",
       lastModified: new Date(),
       changeFrequency: "monthly",
