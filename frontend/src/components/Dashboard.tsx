@@ -78,7 +78,7 @@ export default function Dashboard() {
         // Always fetch vessels
         const vesselsRes = await supabase
           .from("vessels")
-          .select("id, name, type, length_m, width_m, tonnage, build_year, price, url, image_url, source, source_id, scraped_at, first_seen_at, updated_at, status, canonical_vessel_id, linked_sources")
+          .select("id, name, type, length_m, width_m, tonnage, build_year, price, url, image_url, source, source_id, scraped_at, first_seen_at, updated_at, status, canonical_vessel_id, linked_sources, predicted_price, prediction_confidence, prediction_range_low, prediction_range_high")
           .order("scraped_at", { ascending: false });
 
         if (vesselsRes.error) {

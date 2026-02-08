@@ -1,5 +1,5 @@
 import { Vessel } from "@/lib/supabase";
-import { explainPrice, predictPriceRange, shouldSuppressPrediction, SuppressionReason } from "@/lib/vesselPricing";
+import { explainPrice, predictPriceRange, shouldSuppressPrediction } from "@/lib/vesselPricing";
 import Link from "next/link";
 
 interface PriceExplanationProps {
@@ -15,12 +15,6 @@ function formatEur(n: number): string {
   }).format(n);
 }
 
-const SUPPRESSION_MESSAGES: Record<SuppressionReason, string> = {
-  unsupported_type: "Geen prijsschatting beschikbaar voor dit scheepstype",
-  too_old: "Geen betrouwbare schatting mogelijk voor schepen van vóór 1950",
-  too_small: "Geen betrouwbare schatting mogelijk voor schepen onder 40 meter",
-};
-
 export default function PriceExplanation({ vessel }: PriceExplanationProps) {
   const suppressionReason = shouldSuppressPrediction(vessel);
 
@@ -34,11 +28,8 @@ export default function PriceExplanation({ vessel }: PriceExplanationProps) {
           </span>
         </div>
         <div className="mt-3 rounded-lg bg-slate-50 px-3 py-2.5">
-          <p className="text-sm text-slate-500">{SUPPRESSION_MESSAGES[suppressionReason]}</p>
+          <p className="text-sm text-slate-500">Geen prijsschatting beschikbaar voor dit schip</p>
         </div>
-        <p className="mt-3 text-xs text-slate-400">
-          Het prijsmodel werkt het beste voor vrachtschepen en tankschepen van 40m+ gebouwd na 1950.
-        </p>
       </div>
     );
   }
@@ -47,14 +38,14 @@ export default function PriceExplanation({ vessel }: PriceExplanationProps) {
   const range = predictPriceRange(vessel);
   if (!data || !range) return null;
 
-  const { factors, coefficients, pctDiff } = data;
+  const { confidence, positiveFactors, negativeFactors, pctDiff } = data;
 
   let confidenceLabel: string;
   let confidenceColor: string;
-  if (coefficients.r2 >= 0.8) {
+  if (confidence === "high") {
     confidenceLabel = "Hoge betrouwbaarheid";
     confidenceColor = "bg-emerald-100 text-emerald-800";
-  } else if (coefficients.r2 >= 0.5) {
+  } else if (confidence === "medium") {
     confidenceLabel = "Gemiddelde betrouwbaarheid";
     confidenceColor = "bg-amber-100 text-amber-800";
   } else {
@@ -89,27 +80,28 @@ export default function PriceExplanation({ vessel }: PriceExplanationProps) {
         )}
       </div>
 
-      {/* Factor breakdown */}
-      <div className="mt-3">
-        <p className="text-xs font-medium text-slate-500">Prijsbepalende factoren</p>
-        <ul className="mt-1.5 space-y-1">
-          {factors.map((f) => (
-            <li key={f.label} className="flex items-center justify-between text-sm">
-              <span className="text-slate-600">
-                <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-cyan-400" />
-                {f.label} ({f.rawValue})
+      {/* Value factors */}
+      {(positiveFactors.length > 0 || negativeFactors.length > 0) && (
+        <div className="mt-3">
+          <p className="text-xs font-medium text-slate-500">Waardebepalende factoren</p>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {positiveFactors.map((f) => (
+              <span key={f} className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-emerald-200">
+                {f}
               </span>
-              <span className={`font-medium ${f.contribution >= 0 ? "text-slate-900" : "text-red-500"}`}>
-                {f.contribution >= 0 ? "+" : ""}{formatEur(f.contribution)}
+            ))}
+            {negativeFactors.map((f) => (
+              <span key={f} className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-amber-200">
+                {f}
               </span>
-            </li>
-          ))}
-        </ul>
-      </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Disclaimer */}
       <p className="mt-3 text-xs text-slate-400">
-        Indicatie op basis van vergelijkbare {coefficients.label.toLowerCase()}. Geen taxatie.
+        Indicatie op basis van vergelijkbare schepen. Geen taxatie.
       </p>
 
       {/* Premium CTA */}

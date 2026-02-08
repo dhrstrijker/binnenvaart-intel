@@ -10,7 +10,7 @@ export function buildSavedSearchQuery(filters: SavedSearchFilters) {
   const supabase = createClient();
   let query = supabase
     .from("vessels")
-    .select("id, name, type, length_m, width_m, tonnage, build_year, price, url, image_url, source, status, canonical_vessel_id", { count: "exact" })
+    .select("id, name, type, length_m, width_m, tonnage, build_year, price, url, image_url, source, status, canonical_vessel_id, predicted_price, prediction_confidence, prediction_range_low, prediction_range_high", { count: "exact" })
     .is("canonical_vessel_id", null)
     .not("status", "in", '("removed","sold")');
 

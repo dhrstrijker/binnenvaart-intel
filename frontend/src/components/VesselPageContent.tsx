@@ -305,6 +305,27 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
                   {confidence === "low" && (
                     <p className="mt-1 text-xs text-slate-400">Indicatieve schatting — beperkte data voor dit type</p>
                   )}
+                  {/* Condition signal pills */}
+                  {vessel.condition_signals && (() => {
+                    const signals = vessel.condition_signals as Record<string, unknown>;
+                    const pos = (signals.value_factors_positive as string[] | undefined) ?? [];
+                    const neg = (signals.value_factors_negative as string[] | undefined) ?? [];
+                    if (pos.length === 0 && neg.length === 0) return null;
+                    return (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {pos.map((f) => (
+                          <span key={f} className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-emerald-200">
+                            {f}
+                          </span>
+                        ))}
+                        {neg.map((f) => (
+                          <span key={f} className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-amber-200">
+                            {f}
+                          </span>
+                        ))}
+                      </div>
+                    );
+                  })()}
                 </div>
               );
             })()}

@@ -8,7 +8,7 @@ import scrape_pcshipbrokers
 import scrape_gtsschepen
 import scrape_gsk
 import alerting
-from db import clear_changes, get_changes, mark_removed, run_dedup
+from db import clear_changes, get_changes, mark_removed, run_dedup, supabase
 from notifications import send_personalized_notifications, send_digest
 
 logging.basicConfig(
@@ -96,6 +96,36 @@ def main():
         )
     except Exception:
         logger.exception("Deduplication failed")
+
+    # Run condition extraction + price prediction (non-fatal)
+    try:
+        from haiku_extract import run_extraction
+        from price_model import predict_all
+
+        all_vessels = supabase.table("vessels").select(
+            "id, name, type, length_m, width_m, tonnage, build_year, price, source, "
+            "raw_details, condition_signals_hash, condition_signals"
+        ).eq("status", "active").execute().data or []
+        logger.info("Running condition extraction on %d active vessels...", len(all_vessels))
+        extraction_result = run_extraction(all_vessels)
+        logger.info(
+            "Extraction: %d extracted, %d skipped, %d errors",
+            extraction_result["extracted"], extraction_result["skipped"], extraction_result["errors"],
+        )
+
+        # Re-fetch to get updated condition_signals for prediction
+        all_vessels = supabase.table("vessels").select(
+            "id, name, type, length_m, width_m, tonnage, build_year, price, source, "
+            "condition_signals"
+        ).eq("status", "active").execute().data or []
+        logger.info("Running price predictions on %d active vessels...", len(all_vessels))
+        prediction_result = predict_all(all_vessels)
+        logger.info(
+            "Predictions: %d predicted, %d suppressed, %d errors",
+            prediction_result["predicted"], prediction_result["suppressed"], prediction_result["errors"],
+        )
+    except Exception:
+        logger.exception("Condition extraction / price prediction failed (non-fatal)")
 
     combined_stats = {
         "total": total,

@@ -28,6 +28,11 @@ export interface Vessel {
   image_urls?: Array<{ original?: string; thumbnail?: string; sorting_no?: number } | string> | null;
   canonical_vessel_id?: string | null;
   linked_sources?: Array<{ source: string; price: number | null; url: string; vessel_id: string }> | null;
+  predicted_price?: number | null;
+  prediction_confidence?: "high" | "medium" | "low" | null;
+  prediction_range_low?: number | null;
+  prediction_range_high?: number | null;
+  condition_signals?: Record<string, unknown> | null;
 }
 
 export interface PriceHistory {

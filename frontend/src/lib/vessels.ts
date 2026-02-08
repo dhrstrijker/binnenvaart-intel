@@ -5,7 +5,7 @@ export async function getVesselById(id: string): Promise<Vessel | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("vessels")
-    .select("id, name, type, length_m, width_m, tonnage, build_year, price, url, image_url, source, source_id, scraped_at, first_seen_at, updated_at, status, canonical_vessel_id, linked_sources, raw_details, image_urls")
+    .select("id, name, type, length_m, width_m, tonnage, build_year, price, url, image_url, source, source_id, scraped_at, first_seen_at, updated_at, status, canonical_vessel_id, linked_sources, raw_details, image_urls, predicted_price, prediction_confidence, prediction_range_low, prediction_range_high, condition_signals")
     .eq("id", id)
     .maybeSingle();
 
@@ -52,7 +52,7 @@ export async function getSimilarVessels(vessel: Vessel, limit = 6): Promise<Vess
 
   let query = supabase
     .from("vessels")
-    .select("id, name, type, length_m, width_m, tonnage, build_year, price, url, image_url, source, source_id, scraped_at, first_seen_at, updated_at, status, canonical_vessel_id, linked_sources")
+    .select("id, name, type, length_m, width_m, tonnage, build_year, price, url, image_url, source, source_id, scraped_at, first_seen_at, updated_at, status, canonical_vessel_id, linked_sources, predicted_price, prediction_confidence, prediction_range_low, prediction_range_high")
     .is("canonical_vessel_id", null)
     .neq("id", vessel.id)
     .neq("status", "removed");
