@@ -116,7 +116,7 @@ def mark_removed(source: str, run_start: str) -> int:
     if count > 0:
         logger.info("Marked %d %s vessels as removed", count, source)
         for row in resp.data:
-            _changes.append({"kind": "removed", "vessel": row})
+            _changes.append({"kind": "removed", "vessel": row, "old_price": row.get("price"), "new_price": None})
             _log_activity(
                 vessel_id=row["id"],
                 event_type="removed",
@@ -191,7 +191,7 @@ def upsert_vessel(vessel: dict) -> str:
                 ).execute()
 
             event = "sold" if is_sold else "inserted"
-            _changes.append({"kind": event, "vessel": vessel})
+            _changes.append({"kind": event, "vessel": vessel, "old_price": None, "new_price": vessel.get("price")})
             _log_activity(
                 vessel_id=vessel_id,
                 event_type=event,
@@ -248,7 +248,7 @@ def upsert_vessel(vessel: dict) -> str:
             )
 
             if became_sold:
-                _changes.append({"kind": "sold", "vessel": vessel})
+                _changes.append({"kind": "sold", "vessel": vessel, "old_price": old_price, "new_price": new_price})
                 _log_activity(
                     vessel_id=vessel_id,
                     event_type="sold",
@@ -266,7 +266,7 @@ def upsert_vessel(vessel: dict) -> str:
         ).execute()
 
         if became_sold:
-            _changes.append({"kind": "sold", "vessel": vessel})
+            _changes.append({"kind": "sold", "vessel": vessel, "old_price": old_price, "new_price": new_price})
             _log_activity(
                 vessel_id=vessel_id,
                 event_type="sold",
@@ -540,6 +540,7 @@ def get_changes_since(cutoff_iso: str) -> list[dict]:
         changes.append({
             "kind": "price_changed",
             "vessel": vessel,
+            "old_price": None,
             "new_price": entry["price"],
             "recorded_at": entry["recorded_at"],
         })
@@ -549,16 +550,13 @@ def get_changes_since(cutoff_iso: str) -> list[dict]:
         vessel = vessel_map.get(entry.get("vessel_id"))
         if not vessel:
             continue
-        change: dict = {
+        changes.append({
             "kind": entry["event_type"],
             "vessel": vessel,
+            "old_price": entry.get("old_price"),
+            "new_price": entry.get("new_price"),
             "recorded_at": entry["recorded_at"],
-        }
-        if entry.get("new_price") is not None:
-            change["new_price"] = entry["new_price"]
-        if entry.get("old_price") is not None:
-            change["old_price"] = entry["old_price"]
-        changes.append(change)
+        })
 
     # 6. Sort combined list by recorded_at
     changes.sort(key=lambda c: c.get("recorded_at", ""))

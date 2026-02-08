@@ -18,17 +18,49 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  const { data, error } = await getAdminClient()
+  const admin = getAdminClient();
+
+  // Look up the subscriber by token (unverified only)
+  const { data: subscriber } = await admin
     .from("notification_subscribers")
-    .update({ verified_at: new Date().toISOString() })
+    .select("id, updated_at")
     .eq("verification_token", token)
     .is("verified_at", null)
+    .maybeSingle();
+
+  if (!subscriber) {
+    return new NextResponse(htmlPage("Ongeldige of verlopen verificatielink."), {
+      status: 400,
+      headers: { "Content-Type": "text/html; charset=utf-8" },
+    });
+  }
+
+  // Enforce 24-hour token expiration
+  if (subscriber.updated_at) {
+    const tokenAge = Date.now() - new Date(subscriber.updated_at).getTime();
+    const twentyFourHours = 24 * 60 * 60 * 1000;
+    if (tokenAge > twentyFourHours) {
+      return new NextResponse(
+        htmlPage("Deze verificatielink is verlopen. Vraag een nieuwe aan."),
+        {
+          status: 400,
+          headers: { "Content-Type": "text/html; charset=utf-8" },
+        }
+      );
+    }
+  }
+
+  // Mark as verified
+  const { data, error } = await admin
+    .from("notification_subscribers")
+    .update({ verified_at: new Date().toISOString() })
+    .eq("id", subscriber.id)
     .select("id")
     .maybeSingle();
 
   if (error || !data) {
-    return new NextResponse(htmlPage("Ongeldige of verlopen verificatielink."), {
-      status: 400,
+    return new NextResponse(htmlPage("Er ging iets mis bij het verifiëren."), {
+      status: 500,
       headers: { "Content-Type": "text/html; charset=utf-8" },
     });
   }

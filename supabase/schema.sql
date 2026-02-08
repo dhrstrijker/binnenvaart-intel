@@ -64,7 +64,8 @@ CREATE TABLE notification_subscribers (
   verified_at TIMESTAMPTZ,
   verification_token TEXT UNIQUE,
   unsubscribe_token TEXT UNIQUE,
-  preferences JSONB DEFAULT '{"frequency": "immediate", "types": ["new", "price_change", "removed"]}'::jsonb
+  preferences JSONB DEFAULT '{"frequency": "immediate", "types": ["new", "price_change", "removed"]}'::jsonb,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE INDEX idx_notification_subscribers_user ON notification_subscribers(user_id);

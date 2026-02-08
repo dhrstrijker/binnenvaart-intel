@@ -53,7 +53,7 @@ def main():
             stats = module.scrape()
         except Exception as e:
             logger.exception("%s scraper failed", name)
-            alerting.alert_scraper_failure(name, str(e))
+            alerting.alert_scraper_failure(name, str(e), source_key=source_key)
             stats = _empty_stats()
 
         logger.info(
@@ -65,7 +65,7 @@ def main():
         # Circuit breaker: decide whether mark_removed() is safe to call
         if stats["total"] == 0:
             logger.warning("⚠ %s returned 0 vessels — skipping mark_removed", name)
-            alerting.alert_zero_vessels(name, alerting.get_historical_avg(source_key))
+            alerting.alert_zero_vessels(name, alerting.get_historical_avg(source_key), source_key=source_key)
             alerting.log_scraper_run(source_key, 0, "error")
         elif not alerting.should_allow_mark_removed(source_key, stats["total"]):
             historical_avg = alerting.get_historical_avg(source_key)
@@ -73,7 +73,7 @@ def main():
                 "🛑 %s returned %d vessels (expected ~%d) — mark_removed BLOCKED!",
                 name, stats["total"], historical_avg,
             )
-            alerting.alert_vessel_count_drop(name, stats["total"], historical_avg)
+            alerting.alert_vessel_count_drop(name, stats["total"], historical_avg, source_key=source_key)
             alerting.log_scraper_run(source_key, stats["total"], "blocked")
         else:
             # Safe: count is within normal range

@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 resend.api_key = os.environ.get("RESEND_API_KEY", "")
 ALERT_EMAIL = os.environ.get("ALERT_EMAIL", "")
-FROM_ADDRESS = "onboarding@resend.dev"
+FROM_ADDRESS = os.environ.get("FROM_ADDRESS", "Navisio <notifications@navisio.nl>")
 
 # Threshold: if vessel count drops below this fraction of the
 # historical average, block mark_removed().
@@ -174,7 +174,7 @@ def send_email_alert(subject: str, body: str) -> None:
         logger.exception("Failed to send alert email: %s", subject)
 
 
-def alert_scraper_failure(scraper_name: str, error_msg: str) -> None:
+def alert_scraper_failure(scraper_name: str, error_msg: str, source_key: str | None = None) -> None:
     """Called when a scraper crashes with an exception."""
     subject = f"Scraper crashed: {scraper_name}"
     body = _build_alert_html(
@@ -192,10 +192,10 @@ def alert_scraper_failure(scraper_name: str, error_msg: str) -> None:
         ],
     )
     send_email_alert(subject, body)
-    _log_alert_to_db(scraper_name.lower(), "exception", error_msg, actual_count=0)
+    _log_alert_to_db(source_key or scraper_name.lower(), "exception", error_msg, actual_count=0)
 
 
-def alert_zero_vessels(scraper_name: str, expected_count: int) -> None:
+def alert_zero_vessels(scraper_name: str, expected_count: int, source_key: str | None = None) -> None:
     """Called when a scraper returns 0 vessels."""
     subject = f"Scraper returned 0 vessels: {scraper_name}"
     body = _build_alert_html(
@@ -215,12 +215,12 @@ def alert_zero_vessels(scraper_name: str, expected_count: int) -> None:
         ],
     )
     send_email_alert(subject, body)
-    _log_alert_to_db(scraper_name.lower(), "zero_vessels",
+    _log_alert_to_db(source_key or scraper_name.lower(), "zero_vessels",
                      f"{scraper_name} returned 0 vessels (expected ~{expected_count})",
                      expected_count=expected_count, actual_count=0)
 
 
-def alert_vessel_count_drop(scraper_name: str, current: int, expected: int) -> None:
+def alert_vessel_count_drop(scraper_name: str, current: int, expected: int, source_key: str | None = None) -> None:
     """Called when vessel count drops >50% from baseline (circuit breaker triggered)."""
     subject = f"Circuit breaker triggered: {scraper_name} ({current}/{expected} vessels)"
     body = _build_alert_html(
@@ -240,7 +240,7 @@ def alert_vessel_count_drop(scraper_name: str, current: int, expected: int) -> N
         ],
     )
     send_email_alert(subject, body)
-    _log_alert_to_db(scraper_name.lower(), "count_drop",
+    _log_alert_to_db(source_key or scraper_name.lower(), "count_drop",
                      f"{scraper_name} returned {current} vessels (expected ~{expected}), mark_removed blocked",
                      expected_count=expected, actual_count=current)
 

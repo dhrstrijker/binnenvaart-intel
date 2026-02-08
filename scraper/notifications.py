@@ -277,14 +277,11 @@ def build_personalized_subject(user_changes: list[dict]) -> str:
     return f"Navisio: {summary} in uw watchlist"
 
 
-def build_personalized_email(subscriber: dict, user_changes: list[dict]) -> str:
-    """Build personalized HTML email showing only watchlist changes."""
-    now = datetime.now(timezone.utc).strftime("%d-%m-%Y %H:%M UTC")
-    unsubscribe_token = subscriber.get("unsubscribe_token", "")
-
-    price_changes = [c for c in user_changes if c["kind"] == "price_changed"]
-    new_vessels = [c for c in user_changes if c["kind"] == "inserted"]
-    removed_vessels = [c for c in user_changes if c["kind"] in ("removed", "sold")]
+def _build_change_sections(changes: list[dict]) -> str:
+    """Build grouped HTML sections for price changes, new vessels, and removed vessels."""
+    price_changes = [c for c in changes if c["kind"] == "price_changed"]
+    new_vessels = [c for c in changes if c["kind"] == "inserted"]
+    removed_vessels = [c for c in changes if c["kind"] in ("removed", "sold")]
 
     sections = ""
 
@@ -317,6 +314,15 @@ def build_personalized_email(subscriber: dict, user_changes: list[dict]) -> str:
           </h3>
           <table style="width:100%;border-collapse:collapse;">{rows}</table>
         </div>"""
+
+    return sections
+
+
+def build_personalized_email(subscriber: dict, user_changes: list[dict]) -> str:
+    """Build personalized HTML email showing only watchlist changes."""
+    now = datetime.now(timezone.utc).strftime("%d-%m-%Y %H:%M UTC")
+    unsubscribe_token = subscriber.get("unsubscribe_token", "")
+    sections = _build_change_sections(user_changes)
 
     return f"""
 <!DOCTYPE html>
@@ -541,42 +547,7 @@ def build_digest_email(subscriber: dict, all_matches: list[dict], label: str) ->
     """Build digest HTML email grouping watchlist + saved search results."""
     now = datetime.now(timezone.utc).strftime("%d-%m-%Y %H:%M UTC")
     unsubscribe_token = subscriber.get("unsubscribe_token", "")
-
-    price_changes = [c for c in all_matches if c["kind"] == "price_changed"]
-    new_vessels = [c for c in all_matches if c["kind"] == "inserted"]
-    removed_vessels = [c for c in all_matches if c["kind"] == "removed"]
-
-    sections = ""
-
-    if price_changes:
-        rows = "\n".join(_build_vessel_row(c) for c in price_changes)
-        sections += f"""
-        <div style="margin-bottom:16px;">
-          <h3 style="margin:0 0 8px;color:#d97706;font-size:14px;text-transform:uppercase;">
-            Prijswijzigingen ({len(price_changes)})
-          </h3>
-          <table style="width:100%;border-collapse:collapse;">{rows}</table>
-        </div>"""
-
-    if new_vessels:
-        rows = "\n".join(_build_vessel_row(c) for c in new_vessels)
-        sections += f"""
-        <div style="margin-bottom:16px;">
-          <h3 style="margin:0 0 8px;color:#059669;font-size:14px;text-transform:uppercase;">
-            Nieuwe schepen ({len(new_vessels)})
-          </h3>
-          <table style="width:100%;border-collapse:collapse;">{rows}</table>
-        </div>"""
-
-    if removed_vessels:
-        rows = "\n".join(_build_vessel_row(c) for c in removed_vessels)
-        sections += f"""
-        <div style="margin-bottom:16px;">
-          <h3 style="margin:0 0 8px;color:#ef4444;font-size:14px;text-transform:uppercase;">
-            Verkocht / Verwijderd ({len(removed_vessels)})
-          </h3>
-          <table style="width:100%;border-collapse:collapse;">{rows}</table>
-        </div>"""
+    sections = _build_change_sections(all_matches)
 
     return f"""
 <!DOCTYPE html>
@@ -612,6 +583,43 @@ def build_digest_email(subscriber: dict, all_matches: list[dict], label: str) ->
 </html>"""
 
 
+def _get_watchlist_matches(
+    user_id: str, changes: list[dict], seen_vessel_ids: set[str],
+) -> list[dict]:
+    """Filter changes to vessels on the user's watchlist, respecting per-vessel flags."""
+    watchlist = get_user_watchlist_vessel_ids(user_id)
+    matches = []
+    for change in changes:
+        vid = change.get("vessel", {}).get("id")
+        if vid not in watchlist or vid in seen_vessel_ids:
+            continue
+        kind = change.get("kind", "")
+        flag_name = KIND_TO_WATCHLIST_FLAG.get(kind)
+        if flag_name and not watchlist[vid].get(flag_name, True):
+            continue
+        matches.append(change)
+        seen_vessel_ids.add(vid)
+    return matches
+
+
+def _get_saved_search_matches_deduped(
+    user_id: str, frequency: str, changes: list[dict], seen_vessel_ids: set[str],
+) -> list[dict]:
+    """Filter changes matching saved search criteria, deduplicating against already-seen vessels."""
+    from db import get_user_saved_searches
+
+    searches = get_user_saved_searches(user_id, frequency=frequency)
+    matches = []
+    for search in searches:
+        search_matches = get_saved_search_matches(search, changes)
+        for match in search_matches:
+            vid = match.get("vessel", {}).get("id")
+            if vid not in seen_vessel_ids:
+                matches.append(match)
+                seen_vessel_ids.add(vid)
+    return matches
+
+
 def send_digest(frequency: str) -> None:
     """Send digest emails (daily or weekly) to subscribers with that frequency preference.
 
@@ -621,7 +629,7 @@ def send_digest(frequency: str) -> None:
         logger.warning("RESEND_API_KEY niet ingesteld, digest overgeslagen.")
         return
 
-    from db import get_subscribers_with_frequency, get_user_saved_searches, get_user_watchlist_vessel_ids, get_changes_since, save_notification_history
+    from db import get_subscribers_with_frequency, get_changes_since, save_notification_history
     from datetime import timedelta
 
     cutoff_days = 1 if frequency == "daily" else 7
@@ -638,31 +646,10 @@ def send_digest(frequency: str) -> None:
         return
 
     for sub in subscribers:
-        user_matches = []
-        seen_vessel_ids = set()
-
-        # Watchlist matches
-        watchlist = get_user_watchlist_vessel_ids(sub["user_id"])
-        for change in recent_changes:
-            vid = change.get("vessel", {}).get("id")
-            if vid not in watchlist or vid in seen_vessel_ids:
-                continue
-            kind = change.get("kind", "")
-            flag_name = KIND_TO_WATCHLIST_FLAG.get(kind)
-            if flag_name and not watchlist[vid].get(flag_name, True):
-                continue
-            user_matches.append(change)
-            seen_vessel_ids.add(vid)
-
-        # Saved search matches
-        searches = get_user_saved_searches(sub["user_id"], frequency=frequency)
-        for search in searches:
-            search_matches = get_saved_search_matches(search, recent_changes)
-            for match in search_matches:
-                vid = match.get("vessel", {}).get("id")
-                if vid not in seen_vessel_ids:
-                    user_matches.append(match)
-                    seen_vessel_ids.add(vid)
+        seen_vessel_ids: set[str] = set()
+        watchlist_matches = _get_watchlist_matches(sub["user_id"], recent_changes, seen_vessel_ids)
+        search_matches = _get_saved_search_matches_deduped(sub["user_id"], frequency, recent_changes, seen_vessel_ids)
+        user_matches = watchlist_matches + search_matches
 
         if not user_matches:
             continue

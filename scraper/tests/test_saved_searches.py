@@ -284,7 +284,7 @@ class TestSendDigest(unittest.TestCase):
     @patch("notifications.resend")
     @patch("db.get_subscribers_with_frequency")
     @patch("db.get_changes_since")
-    @patch("db.get_user_watchlist_vessel_ids")
+    @patch("notifications.get_user_watchlist_vessel_ids")
     @patch("db.get_user_saved_searches")
     @patch("db.save_notification_history")
     def test_send_digest_with_watchlist_match(
@@ -337,7 +337,7 @@ class TestSendDigest(unittest.TestCase):
     @patch("notifications.resend")
     @patch("db.get_subscribers_with_frequency")
     @patch("db.get_changes_since")
-    @patch("db.get_user_watchlist_vessel_ids")
+    @patch("notifications.get_user_watchlist_vessel_ids")
     @patch("db.get_user_saved_searches")
     @patch("db.save_notification_history")
     def test_send_digest_with_saved_search_match(
@@ -391,7 +391,7 @@ class TestSendDigest(unittest.TestCase):
     @patch("notifications.resend")
     @patch("db.get_subscribers_with_frequency")
     @patch("db.get_changes_since")
-    @patch("db.get_user_watchlist_vessel_ids")
+    @patch("notifications.get_user_watchlist_vessel_ids")
     @patch("db.get_user_saved_searches")
     @patch("db.save_notification_history")
     def test_send_digest_deduplicates_vessels(
