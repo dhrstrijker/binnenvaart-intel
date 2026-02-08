@@ -74,14 +74,18 @@ def parse_vessel(ship: dict) -> dict:
         if k != "images" and not k.startswith("bin_")
     }
 
-    # Extract max tonnage from draft-specific fields
-    tonnage_fields = [
-        "tonnage_1_50", "tonnage_2_00", "tonnage_2_50",
-        "tonnage_2_60", "tonnage_2_80", "tonnage_3_00m", "tonnage_3_50m",
-        "tonnage_max",
-    ]
-    tonnage_values = [ship.get(f) for f in tonnage_fields if ship.get(f)]
-    tonnage = max(tonnage_values) if tonnage_values else None
+    # Primary: use content_ship_space_capacity (matches website "Max. Tonnage")
+    tonnage = ship.get("content_ship_space_capacity")
+
+    # Fallback: max of depth-specific fields
+    if not tonnage:
+        tonnage_fields = [
+            "tonnage_1_50", "tonnage_2_00", "tonnage_2_50",
+            "tonnage_2_60", "tonnage_2_80", "tonnage_3_00m", "tonnage_3_50m",
+            "tonnage_max",
+        ]
+        tonnage_values = [ship.get(f) for f in tonnage_fields if ship.get(f)]
+        tonnage = max(tonnage_values) if tonnage_values else None
 
     return {
         "source": "rensendriessen",
@@ -93,7 +97,7 @@ def parse_vessel(ship: dict) -> dict:
         "tonnage": tonnage,
         "build_year": ship.get("build_year"),
         "price": price,
-        "url": f"https://rensendriessen.com/aanbod/{ship_id}",
+        "url": f"https://www.rensendriessen.com/brokerage/vessels-for-sale/details?id={ship_id}",
         "image_url": image_url,
         "raw_details": raw_details,
         "image_urls": image_urls or None,

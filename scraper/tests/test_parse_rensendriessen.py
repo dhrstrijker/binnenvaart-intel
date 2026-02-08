@@ -56,7 +56,7 @@ class TestParseVessel:
         assert result["width_m"] == 11.45
         assert result["build_year"] == 2020
         assert result["price"] == 5000000.0
-        assert result["url"] == "https://rensendriessen.com/aanbod/1234"
+        assert result["url"] == "https://www.rensendriessen.com/brokerage/vessels-for-sale/details?id=1234"
         assert result["image_url"] == "https://example.com/img1.jpg"
 
     def test_hidden_price(self):
@@ -119,3 +119,21 @@ class TestParseVessel:
     def test_is_sold_absent(self):
         result = parse_vessel(self._make_ship())
         assert result["is_sold"] is False
+
+    def test_tonnage_uses_content_ship_space_capacity(self):
+        result = parse_vessel(self._make_ship(
+            content_ship_space_capacity=2509,
+            tonnage_3_00m=2414,
+        ))
+        assert result["tonnage"] == 2509
+
+    def test_tonnage_falls_back_to_depth_fields(self):
+        result = parse_vessel(self._make_ship(
+            tonnage_2_50=1800,
+            tonnage_3_00m=2414,
+        ))
+        assert result["tonnage"] == 2414
+
+    def test_tonnage_none_when_no_data(self):
+        result = parse_vessel(self._make_ship())
+        assert result["tonnage"] is None
