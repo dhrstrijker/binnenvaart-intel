@@ -15,7 +15,7 @@ import PriceExplanation from "./PriceExplanation";
 import ConditionSignals from "./ConditionSignals";
 import DealScoreBadge from "./DealScoreBadge";
 import { useSubscription } from "@/lib/useSubscription";
-import { predictPrice, computeDaysOnMarket, formatDaysOnMarket } from "@/lib/vesselPricing";
+import { predictPriceRange, computeDaysOnMarket, formatDaysOnMarket } from "@/lib/vesselPricing";
 import { computeDealScores } from "@/lib/dealScore";
 
 interface VesselPageContentProps {
@@ -240,11 +240,10 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
                 {formatPrice(vessel.price)}
               </p>
             ) : (() => {
-              const est = predictPrice(vessel);
-              return est ? (
-                <p className="text-3xl font-extrabold text-slate-400 italic" title="Geschatte marktwaarde">
-                  ~{formatPrice(est)}
-                  <span className="ml-1.5 text-sm font-medium not-italic">geschat</span>
+              const range = predictPriceRange(vessel);
+              return range ? (
+                <p className="text-2xl font-extrabold text-slate-400 italic" title="Geschatte prijsrange">
+                  {formatPrice(range.low)} – {formatPrice(range.high)}
                 </p>
               ) : (
                 <p className="text-3xl font-extrabold text-slate-900">Prijs op aanvraag</p>

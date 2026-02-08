@@ -12,7 +12,7 @@ import SkeletonCard from "./SkeletonCard";
 import AuthNudgeToast from "./AuthNudgeToast";
 import Filters, { FilterState } from "./Filters";
 import { computeDealScores } from "@/lib/dealScore";
-import { predictPrice } from "@/lib/vesselPricing";
+import { predictPriceRange, PriceRange } from "@/lib/vesselPricing";
 
 const INITIAL_FILTERS: FilterState = {
   search: "",
@@ -260,12 +260,12 @@ export default function Dashboard() {
 
   const dealScores = useMemo(() => computeDealScores(vessels), [vessels]);
 
-  const estimatedPrices = useMemo(() => {
-    const map = new Map<string, number>();
+  const estimatedRanges = useMemo(() => {
+    const map = new Map<string, PriceRange>();
     for (const v of vessels) {
       if (v.price === null) {
-        const pred = predictPrice(v);
-        if (pred !== null && pred > 0) map.set(v.id, pred);
+        const range = predictPriceRange(v);
+        if (range !== null) map.set(v.id, range);
       }
     }
     return map;
@@ -443,7 +443,7 @@ export default function Dashboard() {
                 user={user}
                 freeTierTrend={freeTierTrends[vessel.id] ?? null}
                 dealScore={dealScores.get(vessel.id)}
-                estimatedPrice={estimatedPrices.get(vessel.id) ?? null}
+                estimatedRange={estimatedRanges.get(vessel.id) ?? null}
               />
             ))}
           </div>

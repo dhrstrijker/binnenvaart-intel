@@ -1,5 +1,5 @@
 import { Vessel } from "@/lib/supabase";
-import { explainPrice } from "@/lib/vesselPricing";
+import { explainPrice, predictPriceRange } from "@/lib/vesselPricing";
 import Link from "next/link";
 
 interface PriceExplanationProps {
@@ -17,9 +17,10 @@ function formatEur(n: number): string {
 
 export default function PriceExplanation({ vessel }: PriceExplanationProps) {
   const data = explainPrice(vessel);
-  if (!data) return null;
+  const range = predictPriceRange(vessel);
+  if (!data || !range) return null;
 
-  const { predicted, factors, coefficients, pctDiff } = data;
+  const { factors, coefficients, pctDiff } = data;
 
   let confidenceLabel: string;
   let confidenceColor: string;
@@ -44,24 +45,26 @@ export default function PriceExplanation({ vessel }: PriceExplanationProps) {
         </span>
       </div>
 
-      {/* Predicted price */}
+      {/* Price range */}
       <div className="mt-3 rounded-lg bg-slate-50 px-3 py-2.5">
-        <p className="text-xs text-slate-500">Geschatte marktwaarde</p>
-        <p className="text-2xl font-extrabold text-slate-900">{formatEur(predicted)}</p>
+        <p className="text-xs text-slate-500">Geschatte prijsrange</p>
+        <p className="text-xl font-extrabold text-slate-900">
+          {formatEur(range.low)} – {formatEur(range.high)}
+        </p>
         {pctDiff !== null && vessel.price !== null && (
           <p className={`mt-0.5 text-xs font-semibold ${pctDiff > 0 ? "text-emerald-600" : pctDiff < 0 ? "text-red-500" : "text-slate-500"}`}>
             {pctDiff > 0
-              ? `${Math.round(Math.abs(pctDiff))}% onder de geschatte marktwaarde`
+              ? `Vraagprijs ${Math.round(Math.abs(pctDiff))}% onder marktgemiddelde`
               : pctDiff < 0
-                ? `${Math.round(Math.abs(pctDiff))}% boven de geschatte marktwaarde`
-                : "Gelijk aan de geschatte marktwaarde"}
+                ? `Vraagprijs ${Math.round(Math.abs(pctDiff))}% boven marktgemiddelde`
+                : "Vraagprijs rond marktgemiddelde"}
           </p>
         )}
       </div>
 
       {/* Factor breakdown */}
       <div className="mt-3">
-        <p className="text-xs font-medium text-slate-500">Waarom deze waarde?</p>
+        <p className="text-xs font-medium text-slate-500">Prijsbepalende factoren</p>
         <ul className="mt-1.5 space-y-1">
           {factors.map((f) => (
             <li key={f.label} className="flex items-center justify-between text-sm">
@@ -79,7 +82,7 @@ export default function PriceExplanation({ vessel }: PriceExplanationProps) {
 
       {/* Disclaimer */}
       <p className="mt-3 text-xs text-slate-400">
-        Berekend op basis van {coefficients.label} model ({factors.length} factoren). Schatting, geen taxatie.
+        Indicatie op basis van vergelijkbare {coefficients.label.toLowerCase()}. Geen taxatie.
       </p>
 
       {/* Premium CTA */}

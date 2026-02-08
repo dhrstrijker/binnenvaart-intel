@@ -11,7 +11,7 @@ import WatchlistButton from "./WatchlistButton";
 import type { User } from "@supabase/supabase-js";
 import { DealScore } from "@/lib/dealScore";
 import DealScoreBadge from "./DealScoreBadge";
-import { computeDaysOnMarket, formatDaysOnMarket } from "@/lib/vesselPricing";
+import { computeDaysOnMarket, formatDaysOnMarket, PriceRange } from "@/lib/vesselPricing";
 
 function formatPrice(price: number | null): string {
   if (price === null) return "Prijs op aanvraag";
@@ -47,10 +47,10 @@ interface VesselCardProps {
   user?: User | null;
   freeTierTrend?: 'up' | 'down' | null;
   dealScore?: DealScore;
-  estimatedPrice?: number | null;
+  estimatedRange?: PriceRange | null;
 }
 
-export default function VesselCard({ vessel, priceHistory = [], isPremium = false, user = null, freeTierTrend = null, dealScore, estimatedPrice }: VesselCardProps) {
+export default function VesselCard({ vessel, priceHistory = [], isPremium = false, user = null, freeTierTrend = null, dealScore, estimatedRange }: VesselCardProps) {
   const [imgError, setImgError] = React.useState(false);
   const trend = getPriceTrend(priceHistory);
   const effectiveTrend = trend ?? freeTierTrend ?? null;
@@ -185,10 +185,9 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
               <span className="text-xl font-extrabold text-slate-900">
                 {formatPrice(vessel.price)}
               </span>
-            ) : estimatedPrice ? (
-              <span className="text-xl font-extrabold text-slate-400 italic" title="Geschatte marktwaarde">
-                ~{formatPrice(estimatedPrice)}
-                <span className="ml-1 text-xs font-medium not-italic">geschat</span>
+            ) : estimatedRange ? (
+              <span className="text-lg font-extrabold text-slate-400 italic" title="Geschatte prijsrange">
+                {formatPrice(estimatedRange.low)} – {formatPrice(estimatedRange.high)}
               </span>
             ) : (
               <span className="text-xl font-extrabold text-slate-900">

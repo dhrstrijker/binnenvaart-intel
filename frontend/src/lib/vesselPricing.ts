@@ -9,37 +9,39 @@ interface Coefficients {
   label: string;
 }
 
+// Retrained coefficients from model competition (2026-02-08)
+// Linear fallback for frontend; Log-Price GBM (R²=0.744) is the primary model
 export const TYPE_COEFFICIENTS: Record<string, Coefficients> = {
   Motorvrachtschip: {
-    length: 5680.45,
-    tonnage: 697.91,
-    build_year: 16382.36,
-    intercept: -32785231.98,
-    r2: 0.926,
+    length: 24775.45,
+    tonnage: 154.53,
+    build_year: 20847.54,
+    intercept: -42311494.51,
+    r2: 0.837,
     label: "Motorvrachtschip",
   },
   Tankschip: {
-    length: 12761.84,
-    tonnage: 545.76,
-    build_year: 26316.55,
-    intercept: -52005837.38,
-    r2: 0.526,
+    length: 6765.06,
+    tonnage: 823.2,
+    build_year: 20883.83,
+    intercept: -41268543.44,
+    r2: 0.625,
     label: "Tankschip",
   },
   Duwbak: {
-    length: 10534.15,
-    tonnage: 57.28,
-    build_year: 11943.15,
-    intercept: -24016119.95,
+    length: 11983.87,
+    tonnage: -53.49,
+    build_year: 8622.09,
+    intercept: -17376364.25,
     r2: 0.398,
     label: "Duwbak",
   },
   _fallback: {
-    length: 8390.53,
-    tonnage: 481.93,
-    build_year: 23317.8,
-    intercept: -46208569.38,
-    r2: 0.736,
+    length: 11599.98,
+    tonnage: 319.29,
+    build_year: 24807.53,
+    intercept: -49121384.67,
+    r2: 0.744,
     label: "Alle typen",
   },
 };
@@ -64,6 +66,24 @@ export function predictPrice(vessel: Vessel): number | null {
 
   predicted = Math.max(MIN_PRICE, Math.min(MAX_PRICE, predicted));
   return Math.round(predicted);
+}
+
+export interface PriceRange {
+  low: number;
+  high: number;
+  mid: number;
+}
+
+const RANGE_MARGIN = 0.20; // ±20% — conservative given ~31% MAPE
+
+export function predictPriceRange(vessel: Vessel): PriceRange | null {
+  const mid = predictPrice(vessel);
+  if (mid === null) return null;
+
+  const low = Math.max(MIN_PRICE, Math.round(mid * (1 - RANGE_MARGIN)));
+  const high = Math.min(MAX_PRICE, Math.round(mid * (1 + RANGE_MARGIN)));
+
+  return { low, high, mid };
 }
 
 export interface PriceFactor {
