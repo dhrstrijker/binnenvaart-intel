@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     // Check if already subscribed and verified
     const { data: existing } = await admin
       .from("notification_subscribers")
-      .select("id, verified_at, updated_at")
+      .select("id, verified_at, updated_at, user_id")
       .eq("email", email)
       .maybeSingle();
 
@@ -35,6 +35,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         message: "Dit e-mailadres ontvangt al meldingen.",
         already_subscribed: true,
+        has_account: !!existing.user_id,
       });
     }
 
