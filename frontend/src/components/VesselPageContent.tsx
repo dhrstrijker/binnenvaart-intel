@@ -15,7 +15,6 @@ import DealScoreBadge from "./DealScoreBadge";
 import { useSubscription } from "@/lib/useSubscription";
 import { predictPriceRange, computeDaysOnMarket, formatDaysOnMarket, shouldSuppressPrediction, getConfidenceLevel } from "@/lib/vesselPricing";
 import { computeDealScores } from "@/lib/dealScore";
-import PriceExplanation from "./PriceExplanation";
 
 interface VesselPageContentProps {
   vessel: Vessel;
@@ -310,9 +309,6 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
               );
             })()}
           </div>
-
-          {/* Price explanation / suppression message */}
-          <PriceExplanation vessel={vessel} />
 
           {/* Specs table */}
           {specRows.length > 0 && (
