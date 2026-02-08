@@ -48,11 +48,12 @@ export default function SearchTaskForm({
     existingSearch?.filters ?? {}
   );
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [matchCount, setMatchCount] = useState<number | null>(null);
   const [previews, setPreviews] = useState<VesselPreview[]>([]);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  const isEdit = !!existingSearch;
+  const isEdit = !!existingSearch?.id;
 
   // Merge types: DB types + COMMON_TYPES
   const allTypes = Array.from(new Set([...availableTypes, ...COMMON_TYPES])).sort();
@@ -83,6 +84,7 @@ export default function SearchTaskForm({
   async function handleSubmit() {
     if (!name.trim()) return;
     setSaving(true);
+    setError(null);
 
     const supabase = createClient();
     // Strip empty string values from filters
@@ -91,22 +93,27 @@ export default function SearchTaskForm({
       if (val) (cleanFilters as Record<string, string>)[key] = val;
     }
 
+    let saveError;
     if (isEdit) {
-      await supabase
+      ({ error: saveError } = await supabase
         .from("saved_searches")
         .update({ name: name.trim(), filters: cleanFilters, frequency })
-        .eq("id", existingSearch!.id);
+        .eq("id", existingSearch!.id));
     } else {
-      await supabase.from("saved_searches").insert({
+      ({ error: saveError } = await supabase.from("saved_searches").insert({
         user_id: user.id,
         name: name.trim(),
         filters: cleanFilters,
         frequency,
         active: true,
-      });
+      }));
     }
 
     setSaving(false);
+    if (saveError) {
+      setError("Opslaan mislukt. Probeer het opnieuw.");
+      return;
+    }
     onSave();
   }
 
@@ -322,6 +329,11 @@ export default function SearchTaskForm({
               <option value="weekly">Wekelijks</option>
             </select>
           </div>
+
+          {/* Error message */}
+          {error && (
+            <p className="text-sm text-red-600">{error}</p>
+          )}
 
           {/* Actions */}
           <div className="flex gap-2 pt-2">
