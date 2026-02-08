@@ -1,0 +1,174 @@
+Rich Field Parse Failures (172 total)
+============================================================
+power | pcshipbrokers | Rolf-Moni | raw: 2x van Tiem
+power | pcshipbrokers | Vertrouwen | raw: Kalkman, stuurrooster 600 mm. Bj 1985
+power | pcshipbrokers | Smaragd | raw: van Tiem, stuurrooster
+power | pcshipbrokers | Atiram  | raw: Stuurrooster 360°
+power | pcshipbrokers | Agamemnon | raw: Oudakker, stuurrooster, (ingebouwd '06)
+power | pcshipbrokers | Farmsum | raw: Van Oost, Maasbracht, stuurrooster BJ. 2012
+power | pcshipbrokers | Zwaantje | raw: Van Tiem, stuurrooster
+power | pcshipbrokers | Chrisya | raw: Veth kanaal systeem
+power | pcshipbrokers | Sméagol  | raw: Schottel, Bos Groningen
+power | pcshipbrokers | Meare | raw: Van Wijk
+power | pcshipbrokers | Rumandy | raw: Dries Hamelinck, stuurrooster
+power | pcshipbrokers | Festine Vere | raw: De Gerlien van Tiem, stuurrooster
+power | pcshipbrokers | Festine Vere | raw: MTU, 12V 183 TA
+power | pcshipbrokers | Hayley-Rose | raw: Caterpillar 3406
+power | pcshipbrokers | Hayley-Rose | raw: van Ballegooy stuurrooster, Bj. 1992
+power | pcshipbrokers | Falaise | raw: Van Ballegooy
+power | pcshipbrokers | Orion | raw: Veth-Jet, Bj. 2004
+power | pcshipbrokers | Venezuela | raw: van Tiem stuurrooster
+power | pcshipbrokers | Spido II | raw: Kalkman
+power | pcshipbrokers | Bremare | raw: Van Mill
+power | pcshipbrokers | Rimari | raw: Mitsubishi, 4-kanaals, Bj. 2007 / Mitsubishi, 4-kanaals, Bj. 2007
+power | pcshipbrokers | Crescendo | raw: Van Tiem
+power | pcshipbrokers | Mordicus | raw: Ballegooy, 360 graden
+power | pcshipbrokers | Sélodie | raw: Omega
+power | pcshipbrokers | Carina | raw: Van Wijk stuurrooster
+power | pcshipbrokers | Loukoum | raw: Platliggend schroef Dries Hamelink
+power | pcshipbrokers | Janneke | raw: Van Tiem, stuurrooster
+power | pcshipbrokers | Skyfall | raw: Stuurrooster 360°
+power | pcshipbrokers | Valé | raw: Cummins QSK 19, Bj. 2021
+power | pcshipbrokers | Valé | raw: van Ballegooy
+power | pcshipbrokers | Seceda | raw: Van Ballegooy met hydraulisch 360° draaibaar stuurrooster, Bj. 2002
+power | pcshipbrokers | Mercurius (kraanschip) | raw: Van Wijk, stuurrooster
+power | pcshipbrokers | Horizon | raw: De Gerlien van Tiem, stuurrooster, Bj. 2003
+power | pcshipbrokers | Navigatio | raw: Schottel met verticaal beweegbare as en 360 graden draaibare schroef
+generator_kva | pcshipbrokers | Pergo | raw: Perkins
+power | pcshipbrokers | Asdeta | raw: Caterpillar 3512, Bj. 2008 (CCR2)
+generator_kva | pcshipbrokers | Asdeta | raw: John Deere, Bj. 2019 (CCR2) / Caterpillar C 4,4, Bj. 2008 (CCR2)
+power | pcshipbrokers | Mi Vida | raw: Veth, 4 kanalen systeem, Bj. 1992
+power | pcshipbrokers | Credo | raw: Fabr. van Tiem 360 graden stuurrooster, Bj. 2017
+generator_kva | pcshipbrokers | Johanna Adriana | raw: Yanmar
+power | pcshipbrokers | Debussy | raw: Ballegooy
+power | pcshipbrokers | Via Nova | raw: Kanalen Systeem
+power | pcshipbrokers | Via Nova | raw: Daf 65
+generator_kva | pcshipbrokers | Emma Sophia | raw: Hatz 2M41 / Hatz 3M41
+power | pcshipbrokers | Emma Sophia | raw: Van Tiem 410
+power | pcshipbrokers | Emma Sophia | raw: DAF 1160 (revisie sep '21)
+power | pcshipbrokers | Hermina  | raw: Cummins QSK 50, Bj. 2019
+power | pcshipbrokers | Hermina  | raw: Veth 4 kanaals
+power | pcshipbrokers | Sanitas | raw: Van Wijk platliggende schroef
+generator_kva | pcshipbrokers | Laco | raw: JCB ,448TGWA
+power | pcshipbrokers | Laco | raw: MTH, 295 WS
+power | pcshipbrokers | Kevalia | raw: Van Ballegooy, stuurrooster, Bj. 2007
+power | pcshipbrokers | Imperieux | raw: van Tiem, stuurrooster
+power | pcshipbrokers | Eivissa | raw: Kalkman
+power | pcshipbrokers | Tranquilo | raw: Veth Jeth, 4K1000, Ø 800 mm., Bj. 1988
+power | pcshipbrokers | Flottant | raw: Cummins QSK 19-M, Bj 2019
+power | pcshipbrokers | Flottant | raw: Van Ballegooy, stuurrooster
+power | pcshipbrokers | Merlin | raw: 360° stuurrooster
+power | pcshipbrokers | Saffier | raw: 4 kanalensyteem
+power | pcshipbrokers | Hermina 1  | raw: Van Tiem, Rooster
+power | pcshipbrokers | Kenora | raw: Van Tiem 4 kanalen 1000 mm
+power | pcshipbrokers | Kenora | raw: John Deere type 6 JDXM
+power | pcshipbrokers | Commando | raw: Veth-Jeth K-1000 revisie 2025
+power | pcshipbrokers | Waterweg | raw: caterpillar C18 608 pb, Bj. 2011
+power | gtsschepen | Mission | raw: 465 cm
+power | pcshipbrokers | Quo-Vadis | raw: Bos Steenwijk
+power | pcshipbrokers | Quo-Vadis | raw: DAF 575
+power | pcshipbrokers | Heinrich k | raw: Boterman
+power | gtsschepen | Obelix | raw: 250 cm
+power | pcshipbrokers | Jericho | raw: 2x Van Tiem, Stuurrooster
+power | pcshipbrokers | MRD-Responder | raw: Mercedes
+generator_kva | pcshipbrokers | MRD-Responder | raw: Yanmar
+power | pcshipbrokers | MRD-Responder | raw: bouwjaar 2022 elektrisch
+power | pcshipbrokers | Salutare | raw: van Tiem, Stuurrooster, Bj. 1997
+power | pcshipbrokers | Dythar | raw: Stuurrooster, 90 cm
+power | pcshipbrokers | Avontuur | raw: De Gerlien- Van Tiem, stuurroostersysteem met 360 graden draaibaar stuurrooster en platliggende schroef
+power | pcshipbrokers | Forza | raw: Gerlien van Tiem, 360° stuurrooster, Bj. 2007
+power | pcshipbrokers | Alfa-mea  | raw: Mitsubishi S16r-C2, Bj. 2009 CCR2 (Complete revisie in 2024)
+power | pcshipbrokers | Alfa-mea  | raw: Veth
+power | pcshipbrokers | Con Amore | raw: Van Mill,
+power | pcshipbrokers | Sablo | raw: Veth Jet
+power | pcshipbrokers | Panera | raw: Van Tiem, stuurrooster
+power | pcshipbrokers | Naomi | raw: Kalkman stuurrooster
+power | pcshipbrokers | Saffira | raw: Van Wijk. stuurrooster 360 graden. (2020 gereviseerd.)
+power | pcshipbrokers | Saffira | raw: Daf type WS 268-2 BJ 2018 CCR2
+generator_kva | pcshipbrokers | Integro | raw: 1x Hatz 4L41C Silence pack, Bj.2009 (CCRII) / 2x Hatz 3-cilinder (1x silence pack, Bj. 1998 en 1x Bj. 2013 (CCRII)) voorschip.
+power | pcshipbrokers | Integro | raw: Schottel Oosterwolde
+power | pcshipbrokers | Naxos  | raw: Scania DI 12, Bj. 2000 (revisie 2018 bij 28.000 uur)
+power | pcshipbrokers | Naxos  | raw: Stuurrooster 360°
+power | pcshipbrokers | Naxos  | raw: Daf
+power | pcshipbrokers | Silencio | raw: Van Mill, 360 graden draaibaar stuurrooster
+power | pcshipbrokers | Tormenta | raw: Veth, 4-kanalensysteemtype, Bj.2011
+power | pcshipbrokers | Celeste | raw: Verhaar 4 kanalen, Ø 1.300 , Bj. 2004
+power | pcshipbrokers | Gottardo | raw: De Gerlien van Tiem, stuurrooster, Bj. 2000
+power | pcshipbrokers | Libel | raw: Ballegooy, 360 graden
+power | pcshipbrokers | Libel | raw: Weicha
+power | pcshipbrokers | Sus en zo | raw: Volvo Penta D13, Bj. 2021 (Stage V)
+power | pcshipbrokers | Sus en zo | raw: Kalkman draaibaar stuurrooster 360°
+power | pcshipbrokers | Consensus | raw: Van Ballegooy met hydraulisch 360° draaibaar stuurrooster, Bj. 2024
+power | pcshipbrokers | Gibraltar | raw: Verhaar Omega, 4 kanalensysteem
+power | pcshipbrokers | Porthos | raw: fabr. Verhaar Omega 4-kanalen
+power | pcshipbrokers | Hybrid | raw: Verhaar Omega, 4 kanaalssysteem
+power | pcshipbrokers | Franca | raw: Cummins QSK38, Bj.2015
+power | pcshipbrokers | Franca | raw: Oudeakker (revisie '18)
+power | pcshipbrokers | Amigos | raw: Catterpillar 3508, Bj. 2015
+generator_kva | pcshipbrokers | Poseidon | raw: 2x John Deere, Bj. 2000
+power | pcshipbrokers | Poseidon | raw: Verhaar
+power | pcshipbrokers | Miryana | raw: MTU, 4000, Bj. 2005 (revisie nov '22)
+power | pcshipbrokers | Miryana | raw: Van Ballegooy, Bj. 2006
+power | pcshipbrokers | Miryana | raw: Cummins, Bj. 1994
+power | pcshipbrokers | Majesty | raw: Van wijk kanalen
+power | pcshipbrokers | Dakota | raw: Van Wijk, stuurrooster
+power | pcshipbrokers | Mercur | raw: Verhaar, Omega 4K
+power | pcshipbrokers | Tokaj 4 | raw: Scania DS 1401, Bj. 2005
+generator_kva | pcshipbrokers | Milano 4 | raw: 1x in boegschroefruimte
+power | pcshipbrokers | Milano 4 | raw: Veth, stuurrooster
+power | pcshipbrokers | Esmee | raw: Caterpillar C 32, CCR2, Bj. 2018 (revisie 2024 bij 20.000 uur)
+power | pcshipbrokers | Esmee | raw: Van Ballegooy, stuurrooster
+power | pcshipbrokers | Bornrif | raw: Caterpillar 3516, Bj. 1994 (volledig gereviseerd '19)
+power | pcshipbrokers | Bornrif | raw: Van Tiem, Stuurrooster (rooster van 2024)
+power | pcshipbrokers | Rik | raw: 360° schottel
+power | pcshipbrokers | Serfra | raw: Van Tiem, Stuurrooster
+power | pcshipbrokers | Anna-Maria | raw: Van Wijk stuurrooster
+power | pcshipbrokers | Claudia | raw: Boterman 360° hydraulisch draaibaar stuurrooster
+power | pcshipbrokers | Claudia | raw: Gereviseerde DAF, CCR2, Bj. 2021
+power | pcshipbrokers | Avatar | raw: GSM 360° roteerbaar stuurrooster
+power | pcshipbrokers | Honte | raw: Paccar, MX-13, Bj. 2023
+power | pcshipbrokers | Honte | raw: Bakels
+power | pcshipbrokers | Aquamarin | raw: Verhaar Omega, 3100 ,4 kanalen 360 graden, Bj.1996
+power | pcshipbrokers | Adeline | raw: Veth 4K1000 Ø 1.000 mm, Bj. 2001
+power | pcshipbrokers | Drakar | raw: Ballegooy, 360° stuurrooster, Bj. 2008
+power | pcshipbrokers | Laura | raw: Dwarsschroef buis kanaal 800 mm
+power | pcshipbrokers | Wilina | raw: Houtakker, stuurrooster
+power | pcshipbrokers | Vigilate  | raw: Veth Jet 4K-1200, 4 Kanalen
+power | pcshipbrokers | Res I & Res II | raw: Caterpillar 3508 B, Bj. 2003 (revisie '14)
+power | pcshipbrokers | Res I & Res II | raw: Veth 4-kanaals 1200 mm, Bj. 2016 / Hekschroef van Wijk stuurrooster / 2-kanaals 800 mm
+power | pcshipbrokers | Bausyl | raw: 360° schottel  Bj. 1996
+power | pcshipbrokers | Aspasia | raw: Ballegooy, 4 kanalen, Bj. 2008
+power | pcshipbrokers | Deo Favente | raw: Veth kanalen, type 1200
+power | pcshipbrokers | Duc in Altum | raw: Mitsubishi S12R-C2MPTK, Bj. 2009
+generator_kva | pcshipbrokers | Duc in Altum | raw: Cummins / Cummins
+power | pcshipbrokers | Duc in Altum | raw: 2x Veth
+power | pcshipbrokers | Duc in Altum | raw: 2x Cummins
+power | pcshipbrokers | Subito | raw: Van Wijk 3-kanalen Ø 1.000 mm
+power | pcshipbrokers | Laguz  | raw: Van Wijk, 360° roteerbaar stuurrooster, Bj. 2022
+power | pcshipbrokers | Laguz  | raw: DAF, CCR2, Bj. 2022
+power | pcshipbrokers | Alcor | raw: Van Wijk, Kanalen
+power | pcshipbrokers | Michaelangelo | raw: 2 stuks Verhaar Omega,  type 1100 mm Bj 2008 4-kanaals
+power | pcshipbrokers | Lauwrens Sr | raw: Verhaar stuurrooster, 1 meter, Bj. 2019
+power | gtsschepen | Jericho | raw: 249 cm
+power | gtsschepen | Orchila | raw: 704 cm
+power | pcshipbrokers | RS Alinda | raw: Van Ballegooy
+power | pcshipbrokers | Saga | raw: Ballegooy, 360° stuurrooster, Bj. 2022
+power | pcshipbrokers | Orchila | raw: 2x van Ballegooy stuurrooster 1.200 mm, Bj. 2009
+power | pcshipbrokers | Juliska | raw: De Gerlien - van Tiem, stuurrooster
+power | pcshipbrokers | Jacorni | raw: Kalkman, 360 graden elektrisch draaibaar stuurrooster, Bj. 1993
+power | pcshipbrokers | Cigno Minore | raw: Van Ballegooy
+power | pcshipbrokers | El Viajero  | raw: Caterpillar 3512 dita, Bj. 1997 (revisie 2018 op 57.000 uur)
+power | pcshipbrokers | El Viajero  | raw: Van Wijk Kanalen
+power | pcshipbrokers | El Viajero  | raw: Cummins NT855, Bj. 1988
+power | pcshipbrokers | Aurora | raw: Verhaar Omega, 4 kanalen
+power | pcshipbrokers | Johannes | raw: Fabr. Verhaar Omega 360° stuurrooster, Bj. 2004, Ø 1300mm
+power | pcshipbrokers | Denver | raw: Van Tiem, rooster
+power | pcshipbrokers | Ambitie | raw: Gerlien-Van Tiem, stuurroostersysteem, Bj. 2000
+power | pcshipbrokers | Amistade | raw: Van Wijk Kanalen / Van Tiem rooster, Bj, 2001
+power | pcshipbrokers | Bas Anne | raw: Caterpillar 60M06144, Bj. 1996
+power | pcshipbrokers | Bas Anne | raw: De Gerlien Van Tiem, Stuurrooster
+power | pcshipbrokers | Petite Fleur | raw: Veth, 4 kanalen.
+generator_kva | pcshipbrokers | Spes Nova | raw: lister
+power | pcshipbrokers | Spes Nova | raw: DAF 1160
+power | pcshipbrokers | Risico | raw: Fabr. van Tiem 360 graden stuurrooster, Bj. 2008
+fuel_tank | rensendriessen | Orchila | raw: 76000,00m3 (parsed 76000000.0L from m3, likely data error)

@@ -1,0 +1,757 @@
+id,name,type,source,price,length_m,width_m,tonnage,build_year,engine_hours,engine_power_hp,engine_make,generator_kva,bow_thruster_hp,fuel_tank_liters,num_holds,hull_type,clearance_height_m,cargo_capacity_m3,double_hull,has_bow_thruster,engine_revision_year,certificate_valid,price_per_meter,price_per_ton,vessel_age,days_on_market,is_outlier,canonical_vessel_id
+001e19d9-48ea-48d4-8e3e-06a095c33c37,Vera,Motorvrachtschip,gsk,780000.0,100.05,9.52,1832.0,1974.0,,1000.0,Deutz,102.0,284.0,,1.0,welded,4.45,2200.0,True,True,2021.0,True,7796.1,425.76,52.0,122,False,
+0041f8ea-7f81-4d6f-8a73-ab502a9e42ed,Bobr,Duw/Sleepboot,gsk,150000.0,29.65,7.44,,1983.0,,230.0,2 x WH6A,,,,,,,,,,,True,5059.02,,43.0,122,False,
+004bb67e-23bc-4cbb-aaf6-4a98fd2374d6,Serfra,Motorvrachtschip,gtsschepen,,67.0,8.2,850.0,1947.0,,560.0,Deutz,30.0,220.0,15600.0,2.0,mixed,4.3,1200.0,False,True,2003.0,True,,,79.0,122,False,bc53ae71-f452-4a3f-a9c3-872ea64f28ce
+01189f71-17d0-43a6-aad9-d765bc111808,Le temps,Motorvrachtschip,gsk,390000.0,73.0,8.27,1154.0,1966.0,16000.0,820.0,Caterpillar,,270.0,,,,,,,True,2007.0,False,5342.47,337.95,60.0,122,False,
+01bf2dc8-757e-404c-8f80-dd7b71e74613,Elsa,Motorvrachtschip,gtsschepen,165000.0,54.84,7.08,574.0,1956.0,22300.0,530.0,Scania,,168.0,7500.0,2.0,welded,4.2,875.0,False,True,2017.0,True,3008.75,287.46,70.0,122,False,
+01d910ae-125b-41e4-adc6-3cb4b86bfb15,Sammi,Motorvrachtschip,gtsschepen,299000.0,67.0,8.2,921.0,1959.0,59000.0,811.0,Carterpillar,17.0,350.0,13000.0,1.0,welded,4.25,1400.0,False,True,2009.0,False,4462.69,324.65,67.0,122,False,
+02dedca2-a68d-4b59-b330-5721670ab8c6,Christaro,Motorvrachtschip,gsk,,80.18,8.22,1127.037,1957.0,67260.0,900.0,ABC,28.0,320.0,,2.0,welded,6.0,1750.0,,True,2002.0,True,,,69.0,122,False,
+02ea9d62-a7b1-4a4a-bc0f-e16914846abb,Asturias,Motorvrachtschip,pcshipbrokers,,80.0,8.99,1270.0,1964.0,,,,,,,,,,,,,,,,,62.0,122,False,
+03046587-27b1-4ac0-8f95-dcdce5d630c6,Licorne,Motorvrachtschip,gtsschepen,225000.0,66.84,8.2,913.0,1957.0,44524.0,671.0,Caterpillar,,320.0,,2.0,,,1350.0,,True,,False,3366.25,246.44,69.0,122,False,
+03341510-3b10-4404-8a22-20a55b843517,Rolf-Moni,Motorvrachtschip,pcshipbrokers,2495000.0,105.47,11.42,2646.0,2001.0,122337.0,1800.0,ABC,70.0,405.0,28000.0,,,5.2,,True,True,2019.0,True,23656.02,942.93,25.0,122,False,
+03407b7d-44bb-4d4a-bd05-6d4c4461a907,Vertrouwen,Motorvrachtschip,pcshipbrokers,190000.0,51.95,6.59,615.0,1959.0,56210.0,400.0,Cummins,20.0,140.0,9000.0,,riveted,4.76,725.0,False,True,,True,3657.36,308.94,67.0,24,False,
+036e4421-c0df-4803-bdee-f5d51e6d71ad,Fatal,Motorvrachtschip,pcshipbrokers,1350000.0,86.0,9.5,1661.0,1964.0,,,,,,,,,,,,,,,15697.67,812.76,62.0,122,False,
+049e2048-6dbe-406a-b7c8-02a08fca728c,MRD-Support,Overige,pcshipbrokers,169500.0,38.7,6.55,141.0,1955.0,,149.6,Deutz,,,,,,,,,,,True,4379.84,1202.13,71.0,122,False,
+05219f97-3edd-408e-a32c-c2a3e158f16e,O Salerno,Accomodatieschip,pcshipbrokers,550000.0,39.0,5.0,379.0,1963.0,,360.0,GM,20.0,,4000.0,,welded,3.45,,,,,False,14102.56,1451.19,63.0,122,False,
+05254d89-0b01-4686-b112-dd69cfc9dae3,Shari,Motorvrachtschip,gsk,155000.0,49.84,6.6,500.39,1913.0,,406.0,Caterpillar ,25.0,168.0,,2.0,,4.8,,,True,,,3109.95,309.76,113.0,122,False,
+05cad7be-d69c-4358-bc0c-4dc47b05a8cd,Mi Vida,Motorvrachtschip,rensendriessen,2000000.0,109.0,10.5,1750.0,1992.0,48106.0,,Caterpillar,65.0,,28000.0,,,,,,,,,18348.62,1142.86,34.0,122,False,
+068f5dd1-9b60-48fd-acba-195f2e1ee94a,Makimbo,Motorvrachtschip,gsk,,100.0,10.07,2095.0,1974.0,40000.0,650.0,Volvo ,30.0,430.0,,2.0,,6.6,2900.0,True,True,,True,,,52.0,122,False,
+069728d8-f788-45df-ae5f-710af69e5a2c,Gibraltar,Tankschip,galle,5450000.0,109.96,11.44,2690.139,2020.0,,,,436.0,,,,,4.58,3023.0,,,,,49563.48,2025.92,6.0,2,False,7af0668a-83ad-4ea6-9933-0fd45828fcbb
+07e32890-cd77-431d-8e5c-d4d0faed8428,Sorrento,Motorvrachtschip,gsk,2450000.0,110.0,11.45,2722.0,1999.0,,,,,,,,,,,,,,,22272.73,900.07,27.0,122,False,
+07eafc0e-70a8-4065-9c51-accacca3b59f,Visioen,Tankschip,gsk,,109.9,11.45,3234.99,2005.0,45280.0,1835.0,Caterpillar,140.0,511.0,,,welded,6.66,,,True,2023.0,True,,,21.0,122,False,
+0856a285-cda6-418a-8474-04022719f7db,Saga,Motorvrachtschip,gsk,495000.0,79.82,8.2,1086.0,1961.0,48500.0,862.0,Mitsubishi,35.0,400.0,,2.0,welded,5.55,1600.0,,True,2016.0,True,6201.45,455.8,65.0,122,False,
+0859db6e-7325-4a14-bc56-6c4505efd906,Mercurius,Kraanschip,gtsschepen,,86.0,11.55,2150.0,2005.0,,860.0,Caterpillar,44.0,608.0,,2.0,welded,,,True,True,2021.0,,,,21.0,122,False,4bb99b9c-b0af-422b-83bd-84fe4884c990
+087641b9-3e87-4b6f-9787-8a41fe0264c2,Jogo 3,Motorvrachtschip,gsk,195000.0,67.0,8.2,873.0,1943.0,52000.0,720.0,Deutz,20.0,200.0,,2.0,,4.25,1250.0,,True,,True,2910.45,223.37,83.0,122,False,
+08b88172-0832-4bd8-8754-341919364425,Malayu Cybra,Koppelverband,rensendriessen,3500000.0,109.93,11.48,2138.0,1997.0,,1800.0,Wartsila,60.0,350.0,,,,,,,True,2025.0,,31838.44,1637.04,29.0,122,False,
+08ce1f0c-3174-4954-99f2-c9186d07e8bb,Smaragd,Motorvrachtschip,pcshipbrokers,400000.0,80.0,9.19,1397.0,1930.0,,750.0,Deutz,35.0,400.0,32000.0,,,5.5,2000.0,,True,2012.0,False,5000.0,286.33,96.0,122,False,f851d026-335e-4a62-aa1d-f9ef69a0acf8
+096547ad-d86e-4416-8eff-024066b41a98,Ems Dollard,Motorvrachtschip,gtsschepen,,53.9,7.19,706.0,1963.0,,,,,,,,,,,,,,,,,63.0,122,False,
+09b7280b-d59d-49ff-a51b-df24563c712a,Walrus,Duwbak,gsk,,85.49,12.08,3141.102,1972.0,,,,,,,1.0,,,,True,True,,True,,,54.0,122,False,
+09ba9faa-f329-4fa0-a810-ea021555089c,.,Tankschip,rensendriessen,4500000.0,110.0,11.45,,,,,,,,,,,,,,,,,40909.09,,,115,False,
+09d999c3-397c-4d34-b3aa-54cf67f16689,Itinerant,,gsk,1150000.0,104.85,9.57,2204.0,1981.0,,,,,,,,,,,,,,,10968.05,521.78,45.0,122,False,
+0ab99a1f-b917-4823-9ccb-3317a504f052,Poseidon,Tankschip,gsk,2850000.0,110.0,11.45,2511.0,2000.0,3341.0,1834.0,Caterpillar,,336.0,,,welded,,,,True,2023.0,True,25909.09,1135.01,26.0,122,False,ddcc726b-524c-4b26-99aa-c2ab3a801cb3
+0ad6c8fd-a8b3-4d4b-ba30-f4f689aa1214,Breeze,,gsk,830000.0,79.0,8.2,1303.0,1960.0,,,,,,,,,,,,,,,10506.33,636.99,66.0,122,False,
+0b87861f-a097-4c27-8bcb-8e4b09e6e25f,Atiram ,Motorvrachtschip,pcshipbrokers,585000.0,75.9,8.2,1057.0,1957.0,46300.0,640.0,Cummins,20.0,320.0,1000.0,,riveted,5.2,1470.0,,True,,True,7707.51,553.45,69.0,122,False,
+0be95213-cf78-4247-9bd2-9352f106efd5,Taz,Koppelverband,gsk,2400000.0,110.0,12.54,4432.924,2000.0,,,,,,,,,,,,,,,21818.18,541.4,26.0,122,False,
+0c481b7a-7e65-4588-870e-55110b307635,Agamemnon,Motorvrachtschip,pcshipbrokers,865000.0,84.91,9.52,1657.0,1978.0,,1000.0,Deutz,40.0,400.0,31000.0,,welded,,1800.0,True,True,,True,10187.26,522.03,48.0,122,False,
+0c6dc314-7dcc-413a-97ce-76acb856a09e,ARESE,Motorvrachtschip,rensendriessen,4995000.0,135.0,11.45,,,,,,,,,,,,,,,,,37000.0,,,115,False,1d06644d-1849-420d-99f4-a8e0b550359e
+0d3ba6df-a20c-47a0-98c1-f139be9df0e3,Enja-D,Motorvrachtschip,gtsschepen,650000.0,80.0,8.2,1121.0,1972.0,23000.0,650.0,Volvo Penta,30.0,250.0,16000.0,1.0,welded,4.52,1500.0,,True,,True,8125.0,579.84,54.0,122,False,
+0d4fcded-7fbb-4300-8ec9-866de72deca7,SONORA,Tankschip,rensendriessen,,110.0,11.45,,,,,,,,,,,,,,,,,,,,52,False,
+0d53ac4d-3795-45c7-a457-1d3f3ac3ccc0,Folio 3652,Duwbak,gtsschepen,145000.0,50.0,9.0,720.0,1983.0,,,,,,,,,,,,,,True,2900.0,201.39,43.0,122,False,
+0d6fa2c8-1be4-41ed-aec8-576d4277f06d,CDD Belumi 1&2,Motorvrachtschip,gtsschepen,,76.96,8.2,1087.0,1954.0,,,,,,,,,,,,,,,,,72.0,122,False,
+0ed3cccb-150c-4ff1-8172-380a7314dd6b,Titan,Motorvrachtschip,gsk,950000.0,105.0,9.5,1840.0,1971.0,,800.0,Doson,35.0,420.0,,1.0,welded,4.5,,True,True,,True,9047.62,516.3,55.0,122,False,
+0f1723ad-cdbc-471c-85da-a245f76209a0,Transitorio,Motorvrachtschip,pcshipbrokers,,60.08,7.26,738.0,1964.0,,,,,,,,,,,,,,,,,62.0,122,False,
+0f6a8e0e-34ce-4a56-9282-c4363e2cff5d,Ambulant,Motorvrachtschip,gtsschepen,450000.0,79.99,8.21,1110.0,1956.0,33075.0,860.0,Mitsubishi,25.0,320.0,20000.0,2.0,mixed,5.1,1700.0,,True,,True,5625.7,405.41,70.0,17,False,
+0f7ed88b-d04f-40af-a590-483f0eec42eb,KAMALIJ,Tankschip,rensendriessen,9250000.0,135.0,11.45,,,,,,,,,,,,,,,,,68518.52,,,115,False,
+10464f9b-a352-494f-bd4f-57f9d6479432,Odessa,Motorvrachtschip,gsk,280000.0,60.0,7.26,711.0,1965.0,12200.0,600.0,Caterpillar ,34.0,250.0,,2.0,,5.65,1050.0,,True,,,4666.67,393.81,61.0,122,False,
+1052c92c-22eb-482c-afe5-283f40dc902a,Farmsum,Motorvrachtschip,pcshipbrokers,699000.0,80.0,7.24,1234.0,1971.0,8413.0,750.0,Volvo,30.0,320.0,15000.0,,welded,5.0,1650.0,,True,,True,8737.5,566.45,55.0,80,False,
+11b51048-c9f7-44c4-9d52-d136f63e2b64,VERPUS,Duw/Sleepboot,rensendriessen,1550000.0,17.0,7.0,,,,,,,,,,,,,,,,,91176.47,,,115,False,
+1282f0e6-507c-4c37-880c-1ae2d62039d3,Zwaantje,Motorvrachtschip,pcshipbrokers,125000.0,55.0,7.2,632.0,1957.0,82750.0,610.0,"Detroit,",25.0,340.0,13000.0,,riveted,5.72,,,True,,False,2272.73,197.78,69.0,122,False,
+13321506-0f90-4f7c-b832-0a44cb283414,Amy,Motorvrachtschip,gtsschepen,625000.0,83.0,8.2,1246.0,1956.0,18963.0,450.0,Volvo Penta,60.0,330.0,12000.0,1.0,welded,5.0,1650.0,,True,,True,7530.12,501.61,70.0,122,False,
+135e8e54-50bd-46cf-a402-1a0105b0298b,Chrisya,Motorvrachtschip,pcshipbrokers,1395000.0,100.0,9.5,2356.0,1975.0,30250.0,1400.0,Cummins,60.0,340.0,23000.0,,welded,6.1,2800.0,,True,,True,13950.0,592.11,51.0,122,False,58d1d502-db20-4a37-868f-d28162aeab5e
+13e85b90-bbe5-42de-a992-f06da2076334,Alexandra,Woonschip,gsk,,33.78,6.5,100.0,2022.0,,,,19.0,,,,welded,5.36,,,,,,,,4.0,73,False,
+14103bd3-4760-4de0-8647-8e604439a59a,Sméagol ,Motorvrachtschip,pcshipbrokers,350000.0,72.9,8.2,1076.0,1963.0,30000.0,811.0,Caterpillar,37.0,196.0,21000.0,,riveted,5.2,1450.0,,True,,False,4801.1,325.28,63.0,122,False,
+144e453f-5e3b-4dcc-86f8-1782cbbdffc8,Meare,Motorvrachtschip,pcshipbrokers,1795000.0,109.0,11.4,3803.0,1974.0,10700.0,1825.0,Cummins,60.5,656.0,59000.0,,,7.1,3920.0,True,True,,True,16467.89,472.0,52.0,122,False,71ec5a56-d184-4ac4-89f2-e9deb4855fd8
+159d5058-057a-47c9-a599-5c45ef16aafb,Hilde,Beunschip,pcshipbrokers,,59.96,6.65,681.0,1971.0,,,,,,,,,,,,,,,,,55.0,122,False,
+15a7f837-96c0-4173-8b2c-52107373f450,Rumandy,Motorvrachtschip,pcshipbrokers,750000.0,80.0,8.24,1252.0,1975.0,3580.0,530.0,DAF,27.0,320.0,20000.0,,,5.3,1700.0,,True,,True,9375.0,599.04,51.0,122,False,
+15abdede-c987-444f-880c-ced64bf43865,Anna,Tankschip,gsk,1550000.0,84.9,9.44,1409.929,1974.0,87858.0,1230.0,Stork Werkspoor,75.0,,,,,6.35,,,True,2018.0,True,18256.77,1099.35,52.0,122,False,
+15ba879c-b25d-4cc8-a6d1-276a23ae2bfc,Imperieux,Motorvrachtschip,gsk,1795000.0,104.77,9.54,2143.0,1980.0,19000.0,1250.0,Caterpillar ,25.0,,,2.0,welded,6.0,2800.0,False,True,,True,17132.77,837.61,46.0,122,False,
+15f84222-913f-46d7-8b88-8db375f63bc0,Drakar,,gsk,675000.0,79.86,8.22,1008.0,1959.0,,,,,,,,,,,,,,,8452.29,669.64,67.0,87,False,
+1620b9a7-ba32-45a6-ad41-a03decf3e62b,Johanna I en Johanna II,Koppelverband,rensendriessen,5495000.0,99.78,11.45,2867.0,2009.0,77987.0,1837.0,Caterpillar,107.0,650.0,60000.0,,,,,,True,,True,55071.16,1916.64,17.0,122,False,
+169158aa-dc28-4f0e-9201-0f7897cc0c6d,CDD Prudentia,Motorvrachtschip,gtsschepen,,70.0,7.25,900.0,1958.0,,,,,,,,,,,,,,,,,68.0,122,False,
+16dcbb5e-59c8-48be-98e0-dcf9241e6396,Fundament,Motorvrachtschip,pcshipbrokers,895000.0,84.97,8.23,1307.0,1981.0,,,,,,,,,,,,,,,10533.13,684.77,45.0,108,False,
+16e23be7-9a0e-4e20-b16c-1f2aae6381ec,Dudaro,Motorvrachtschip,pcshipbrokers,,110.0,11.45,3250.0,2024.0,,,,,,,,,,,,,,,,,2.0,122,False,19790c06-346c-4996-ae62-af95021a9328
+170ff440-32c6-44b6-ba6d-1b60e335c2bf,Anne,Beunschip,gtsschepen,1480000.0,79.74,7.45,1226.0,2000.0,51600.0,639.0,Mitsubishi,60.0,320.0,25000.0,1.0,welded,5.6,851.0,True,True,2017.0,True,18560.32,1207.18,26.0,122,False,
+177f3e48-fad0-49ab-ab24-2b8b06e520b0,Janny werkschip,Overige,gtsschepen,60000.0,49.94,6.58,111.0,1912.0,31023.0,245.0,Detroit Diesel,27.0,168.0,,1.0,mixed,5.78,,False,True,,True,1201.44,540.54,114.0,24,False,
+17fadef4-2b18-4c51-b8be-4db1ec353f4f,Emma sophia,Motorvrachtschip,gsk,,74.0,8.2,1115.19,1948.0,46000.0,1510.5,Mitsubishi,35.0,410.0,,1.0,,6.5,1350.0,,True,2023.0,True,,,78.0,122,False,
+189e78eb-6f6d-4cee-a857-2fc289855a95,Europa,Duw/Sleepboot,gsk,400000.0,21.0,7.55,,1948.0,,600.0,Volvo,18.5,,,0.0,,,,False,,,,19047.62,,78.0,122,False,
+18e30872-7e2c-43db-8e70-ce677963b3ea,Ranna,Motorvrachtschip,gsk,,110.0,11.07,2500.0,1958.0,23835.0,990.0,Wartsila,35.0,420.0,,1.0,,6.05,2999.0,,True,,,,,68.0,122,False,
+191c78c7-ba41-4fd9-8ac4-ad45854ae31a,Edel turquoise,Motorvrachtschip,gsk,375000.0,67.0,8.0,1330.0,,,850.0,Caterpillar,18.0,,,1.0,,,,,True,,,5597.01,281.95,,122,False,
+19790c06-346c-4996-ae62-af95021a9328,DUDARO,Motorvrachtschip,rensendriessen,5895000.0,110.0,11.45,,,,,,,,,,,,,,,,,53590.91,,,115,False,
+1999210c-f1a4-4fa0-817a-67806f0a5ff5,Mediation,Koppelverband,rensendriessen,,86.0,11.4,2399.0,1988.0,,1800.0,ABC,50.0,600.0,55000.0,,,,,,True,2017.0,,,,38.0,122,False,
+19caaf60-a8bb-40bf-9d8a-36ae5b88c042,Festine Vere,Motorvrachtschip,pcshipbrokers,2750000.0,109.74,11.45,3255.0,1998.0,9700.0,1622.0,Caterpillar,65.0,,44000.0,,welded,6.2,3450.0,,,,True,25059.23,844.85,28.0,122,False,bedfca2d-8e6f-484b-aee8-41686e83fb5f
+1aebc550-955b-499b-8de5-9701e319f79d,Vega,Motorvrachtschip,gsk,,109.85,9.54,2053.056,1963.0,75000.0,1280.0,caterpillar,40.0,450.0,,3.0,welded,6.2,3300.0,,True,,,,,63.0,122,False,
+1ba8e484-6b2c-4b36-96a5-24df5a27062a,Fenny II,Motorvrachtschip,rensendriessen,3400000.0,110.0,11.45,2447.0,2011.0,44692.0,1700.0,Mitsubishi,63.0,650.0,,,,,,,True,,True,30909.09,1389.46,15.0,122,False,
+1bf3fb13-d239-4270-adaf-25364a0de9d3,Nivoma,Motorvrachtschip,galle,3925000.0,135.0,11.45,3905.243,2008.0,,,,,,,1.0,,4.29,,,,,,29074.07,1005.06,18.0,2,False,
+1bfccfd2-63e5-4498-a697-8e7567e6b1bf,Littoral,Motorvrachtschip,gsk,,108.35,11.4,2969.0,1958.0,49100.0,1520.0,Caterpillar,42.0,300.0,,2.0,,7.3,3900.0,True,True,2024.0,True,,,68.0,122,False,
+1c2e4554-45c5-4cd8-8b03-296d93f3a13c,Jesan,Woonschip,gsk,350000.0,31.0,5.05,,1931.0,,142.0,Caterpillar,14.5,,,0.0,,,,False,,,,11290.32,,95.0,122,False,
+1ce1b9cd-bbe6-4367-9d2e-85e40330d02c,Navis,Motorvrachtschip,gsk,120000.0,45.0,5.0,454.0,1963.0,,330.0,Cummins,17.5,,,2.0,,4.3,,,,2018.0,True,2666.67,264.32,63.0,122,False,
+1cfe9a7e-ae49-442a-b223-8e5c22827e29,Gibraltar,Tankschip,gtsschepen,5450000.0,109.96,11.44,2690.0,2020.0,5252.0,750.0,Volvo Penta,63.0,,,8.0,welded,5.6,3023.0,True,,,True,49563.48,2026.02,6.0,122,False,7af0668a-83ad-4ea6-9933-0fd45828fcbb
+1d06644d-1849-420d-99f4-a8e0b550359e,Arese,,gsk,4995000.0,135.0,11.45,4406.0,2009.0,,,,,,,,,,,,,,,37000.0,1133.68,17.0,122,False,
+1d70ab4f-fecb-41e3-9b97-adbed292d3ab,STADT KÖLN,Motorvrachtschip,rensendriessen,675000.0,99.84,11.0,,,,,,,,,,,,,,,,,6760.82,,,115,False,
+1dd311c5-43c2-40ba-ae3e-e1683c0a9780,Ariël,,gsk,875000.0,79.96,9.5,1350.0,1964.0,,,,,,,,,,,,,,,10942.97,648.15,62.0,122,False,
+1e447253-5a35-4f83-bc33-9a96ac81d227,Meander,Motorvrachtschip,gsk,,109.9,11.45,3233.51,2005.0,55000.0,1700.0,Caterpillar ,65.0,618.0,,1.0,welded,7.6,4000.0,True,True,,True,,,21.0,59,False,
+1f2033d7-38dc-41fb-8ba2-4b1a27bc60e6,Hayley-Rose,Motorvrachtschip,pcshipbrokers,235000.0,62.0,6.63,731.0,1963.0,36700.0,,Caterpillar,22.0,320.0,6000.0,,riveted,5.4,1100.0,,True,,False,3790.32,321.48,63.0,122,False,
+1f54f542-c75d-4191-b069-1b0436c3af85,Sjouwer & Sjouwer I,Koppelverband,pcshipbrokers,4995000.0,190.0,11.45,5985.0,2009.0,,,,,,,,,,,,,,,26289.47,834.59,17.0,122,False,
+207b7dcc-5bc4-42c9-9585-5cfcbf97ecae,Alcor,Motorvrachtschip,gtsschepen,265000.0,63.0,7.04,625.0,1942.0,33228.0,600.0,Cummins,20.0,220.0,9000.0,2.0,mixed,5.8,1025.0,,True,,True,4206.35,424.0,84.0,122,False,d30e12d9-a527-4177-97ab-daeff944b45e
+20d7e36d-4bb2-4843-b45e-854f84cced82,Retro,Motorvrachtschip,gsk,,80.16,8.22,1143.0,1958.0,,750.0,MWM,25.0,,,2.0,welded,4.7,1600.0,True,,1998.0,True,,,68.0,122,False,
+20ded37a-7631-4661-9675-655f965ca0e4,Mission,Motorvrachtschip,rensendriessen,3800000.0,135.0,11.45,2700.0,2006.0,,1280.0,Caterpillar,,,,,,,,,,2021.0,,28148.15,1407.41,20.0,122,False,
+2219245e-4f7e-4400-86f4-a0fe1f364b58,Octopussy,Motorvrachtschip,pcshipbrokers,1650000.0,105.0,9.5,2212.0,1981.0,,,,,,,,,,,,,,,15714.29,745.93,45.0,122,False,a5ef9e0e-5fc2-4b08-a8a7-df382806b0f8
+222eddb8-fe17-4831-88d3-220c41205998,Maria,Duwbak,gtsschepen,295000.0,90.0,11.1,2021.0,1927.0,,,,,,,2.0,riveted,,3000.0,False,,,True,3277.78,145.97,99.0,122,False,
+2238d782-07d8-46f5-8dc4-2ae435242071,Elly,Tankschip,gtsschepen,,25.42,5.01,104.0,1968.0,,165.0,DAF,,,,4.0,welded,4.25,107.0,False,,2014.0,True,,,58.0,122,False,
+2266f022-6d33-4689-b5e1-2b82a91fd599,Falaise,Motorvrachtschip,pcshipbrokers,350000.0,73.0,8.2,1022.0,1962.0,,300.0,Scania,27.0,220.0,20000.0,,,5.25,1575.0,,True,,True,4794.52,342.47,64.0,122,False,
+2291972d-d1a3-43cc-a918-65a085b12ee7,Emma Sophia,Motorvrachtschip,gtsschepen,,74.0,8.2,1115.0,1948.0,46000.0,1000.0,Mitsubishi,35.0,410.0,13000.0,1.0,welded,6.5,1350.0,False,True,2023.0,True,,,78.0,122,False,17fadef4-2b18-4c51-b8be-4db1ec353f4f
+22a553ec-ed1f-4c77-b368-b65cad388fe1,Orion,Motorvrachtschip,pcshipbrokers,2195000.0,110.0,11.45,3215.0,1988.0,68000.0,1521.0,Caterpillar,65.0,380.0,53000.0,,welded,6.8,3700.0,,True,,True,19954.55,682.74,38.0,122,False,
+22fef372-c4eb-434b-91c1-6429257e185c,Balance,Motorvrachtschip,gsk,,135.0,11.45,4005.0,2009.0,41954.0,1278.0,Mitsubishi,89.0,571.0,,1.0,welded,6.1,5200.0,,True,2021.0,True,,,17.0,122,False,
+233d3e41-cca7-4db4-9c5c-707c6f2377cc,Figaro,Motorvrachtschip,gtsschepen,290000.0,67.0,8.2,920.0,1956.0,,367.0,Detroit Diesel,30.0,320.0,16000.0,3.0,welded,4.9,1400.0,False,True,2006.0,False,4328.36,315.22,70.0,122,False,
+2340f935-5f6a-4289-8f65-97c99e19e025,Ferox,Motorvrachtschip,gtsschepen,285000.0,70.0,7.06,862.0,1948.0,,675.0,Detroit Diesel,17.5,270.0,16000.0,2.0,welded,6.0,1325.0,,True,2005.0,True,4071.43,330.63,78.0,122,False,
+24666228-d880-4591-8c12-b5aebf9852a6,Selodie,Motorvrachtschip,gsk,2350000.0,110.0,11.4,2807.54,1996.0,60300.0,1800.0,ABC,60.0,620.0,,1.0,welded,5.8,3850.0,,True,2016.0,True,21363.64,837.03,30.0,122,False,
+2496217c-9f60-4947-ad9d-1427486b4517,Bastiaan,Motorvrachtschip,pcshipbrokers,,105.0,9.5,1921.0,1969.0,,,,,,,,,,,,,,,,,57.0,122,False,
+25222086-55c6-4802-8bba-65e53dc164ea,Joost Kruijf,Tankschip,gtsschepen,150000.0,31.98,4.63,136.0,1927.0,,150.0,Volvo Penta,30.0,,,4.0,riveted,,170.0,,,,True,4690.43,1102.94,99.0,17,False,
+254275d5-1dc5-493d-a227-7cc9d02540e8,Evolutie,Beunschip,gtsschepen,,70.0,7.2,831.0,1966.0,5715.0,500.0,Scania,17.5,350.0,11000.0,2.0,mixed,5.8,493.0,True,True,,True,,,60.0,122,False,3c6af80c-c6cc-4d6b-833e-7ec463de57bf
+254b3689-2b1f-4aad-a2d9-5d3a4b077b96,SERANO,Tankschip,rensendriessen,,110.0,13.54,,,,,,,,,,,,,,,,,,,,101,False,
+2558fe72-3e60-4aaf-a7ab-c81d83ad0ec9,Salire,Motorvrachtschip,pcshipbrokers,1785000.0,86.0,9.5,1630.0,1980.0,,,,,,,,,,,,,,,20755.81,1095.09,46.0,87,False,
+25788b89-9897-4649-8d10-99baf1db1a53,Riposa,Motorvrachtschip,pcshipbrokers,6250000.0,135.0,14.27,5040.0,2009.0,,,,,,,,,,,,,,,46296.3,1240.08,17.0,122,False,
+25d6cbf4-fadc-4c38-ab91-a704c22796b2,Oli-chris,Motorvrachtschip,gsk,785000.0,80.0,8.26,1079.0,1960.0,,950.0,Mitsubishi,30.0,,,2.0,,5.8,1600.0,False,True,,True,9812.5,727.53,66.0,122,False,
+269dd2c4-de49-46cd-9fd3-69f6791aa1ef,Marjolein,Motorvrachtschip,gtsschepen,325000.0,80.0,8.2,1102.0,1953.0,,720.0,Doosan,13.5,168.0,10000.0,1.0,mixed,4.65,1300.0,True,True,2013.0,True,4062.5,294.92,73.0,94,False,
+26bbdb80-7ba4-4e99-b215-e6e8dc83465c,Progresso,,gsk,,84.84,9.5,1800.0,2002.0,,,,,,,,,,,,,,,,,24.0,38,False,eb79f94e-5e37-44e8-8ae7-616d6cb7f734
+27cc1791-1b76-426f-8933-73e2b6f08c1b,Cascade,Motorvrachtschip,gsk,,85.73,10.0,1608.0,2010.0,43182.0,862.0,Mitsubishi,65.0,392.0,,1.0,welded,6.4,2550.0,False,True,,True,,,16.0,122,False,606f1c2e-4e44-49c2-bb0c-e82945f72d14
+27d1e921-f5f0-4501-af5e-390ee0ad46e8,THREANT,Motorvrachtschip,rensendriessen,3075000.0,110.0,11.45,,,,,,,,,,,,,,,,,27954.55,,,115,False,7b7398ac-fcad-4079-acef-66439a159cd5
+280351a0-eca3-4572-8b51-e5a970b881eb,Rainbach,Motorvrachtschip,gsk,450000.0,79.8,9.48,1342.0,1962.0,18000.0,1000.0,Deutz,30.0,300.0,,2.0,,4.9,1800.0,,True,2019.0,True,5639.1,335.32,64.0,122,False,
+2844b866-4912-4700-8460-ee37700e6ce1,Melmar,,gsk,1280000.0,80.0,9.0,1375.0,1983.0,,,,,,,,,,,,,,,16000.0,930.91,43.0,122,False,
+298f73f6-5da0-48f2-aa1d-5dc783cebdd6,Annabell,Motorvrachtschip,pcshipbrokers,1725000.0,104.98,10.57,2369.0,1994.0,,,,,,,,,,,,,,,16431.7,728.16,32.0,122,False,
+2998f087-f281-4e31-83a4-e5061442ae36,Candesso,Motorvrachtschip,rensendriessen,1925000.0,110.0,11.45,2662.0,2000.0,90000.0,1521.0,Caterpillar,,626.0,63000.0,,,,,,True,2023.0,,17500.0,723.14,26.0,122,False,
+29ea6926-b269-466b-a450-11a3956cb669,Maris,Motorvrachtschip,gtsschepen,550000.0,79.82,8.2,1073.0,1957.0,9000.0,900.0,MAN,17.5,230.0,12000.0,2.0,mixed,5.3,1800.0,False,True,2022.0,True,6890.5,512.58,69.0,122,False,
+2a3923c4-a89f-47c2-862d-c05de1d2d66c,Venezuela,Motorvrachtschip,pcshipbrokers,575000.0,85.85,7.26,1521.0,1964.0,15000.0,240.0,GM,35.0,220.0,14000.0,,riveted,5.95,2000.0,,True,2025.0,True,6697.73,378.04,62.0,122,False,
+2a522a20-8b86-421a-b4bb-049d27c0d372,Speranza,Motorvrachtschip,gsk,,67.0,7.2,901.0,1966.0,,720.0,Caterpilar ,22.0,,,3.0,,5.3,1150.0,,True,2024.0,True,,,60.0,122,False,
+2a706b13-19ba-4d4f-8743-b074fe60d44e,Spido II,Motorvrachtschip,pcshipbrokers,299000.0,55.33,6.46,430.0,1924.0,13700.0,450.0,Volvo,28.0,196.0,5300.0,,,4.9,,,True,,False,5403.94,695.35,102.0,122,False,d3b18594-d272-47ae-abff-08bd692cf708
+2adc89e3-9f55-491f-941a-45b59d2d46ec,Hunter,Motorvrachtschip,gtsschepen,190000.0,80.0,8.2,1086.0,1961.0,,500.0,Deutz,15.0,320.0,12000.0,2.0,welded,5.1,1609.0,False,True,2019.0,True,2375.0,174.95,65.0,122,False,
+2b729950-cb8a-48a2-8375-7d6fe570d0b3,Bremare,Beunschip,pcshipbrokers,290000.0,64.62,7.52,800.0,1946.0,,400.0,Volvo,40.0,214.0,8500.0,,,5.8,,,True,,True,4487.77,362.5,80.0,122,False,
+2bfd291a-c261-4437-b50c-13ea108a613c,Alberanto,Motorvrachtschip,pcshipbrokers,2225000.0,110.0,11.4,3003.0,1993.0,122950.0,2150.0,Caterpillar,60.0,550.0,51000.0,,,7.0,3500.0,,True,,True,20227.27,740.93,33.0,122,False,
+2d755009-8597-4b1b-8159-f9b166b8aabf,Hendrik 9,Duw/Sleepboot,gsk,350000.0,16.9,4.56,16.0,1976.0,3000.0,480.0,G.M.,28.0,38.0,,,,,,,True,,True,20710.06,21875.0,50.0,45,False,b6325b6e-2e79-48d7-beea-d999e6cfbfbd
+2d8914c0-08b7-4126-9370-d6f720017646,Trickster,Motorvrachtschip,pcshipbrokers,,105.0,10.5,2309.0,1994.0,,,,,,,,,,,,,,,,,32.0,122,False,
+2dd7cc15-d915-45d5-8118-9e02f5925d8a,Grindelwald,Koppelverband,rensendriessen,,105.0,11.45,2008.0,2000.0,65536.0,1014.0,Caterpillar,65.0,350.0,,,,,,,True,,True,,,26.0,122,False,
+2de6fc8d-6169-47ea-a46e-d440443008b1,Rimari,Motorvrachtschip,pcshipbrokers,4095000.0,135.0,11.45,4232.0,2007.0,52000.0,1278.0,Mitsubishi,80.0,558.0,63000.0,,welded,7.1,,True,True,2023.0,True,30333.33,967.63,19.0,122,False,c07690f6-5781-469a-9a26-c34373ec8940
+2e147a77-08b8-4aea-abdf-4d375864fa40,Crescendo,Beunschip,pcshipbrokers,295000.0,60.0,8.2,844.0,1963.0,61300.0,730.0,Caterpillar,40.0,320.0,22000.0,,welded,6.3,,,True,,False,4916.67,349.53,63.0,122,False,
+2eab41dd-1d82-464e-836e-f61fb8238cd3,Hendi W,Motorvrachtschip,gtsschepen,,62.0,7.5,740.0,1963.0,,480.0,MTU,25.0,220.0,10000.0,1.0,mixed,5.0,1140.0,False,True,,True,,,63.0,115,False,
+2eb25f67-f77f-42fb-9591-e4237d43a852,Candesso,Motorvrachtschip,pcshipbrokers,2250000.0,110.0,11.45,2915.0,2000.0,,,,,,,,,,,,,,,20454.55,771.87,26.0,122,False,2998f087-f281-4e31-83a4-e5061442ae36
+2ed04688-e85f-4514-a52c-feeae81f649d,Rea,Tankschip,gsk,2200000.0,85.99,10.0,1708.88,1927.0,11075.0,600.0,Volvo Penta,295.0,401.0,,,,5.0,,,True,,True,25584.37,1287.39,99.0,31,False,
+2f060a84-a9ae-475a-b4db-57aed146cff3,Mordicus,Motorvrachtschip,pcshipbrokers,430000.0,69.96,7.16,856.0,1962.0,27853.0,650.0,Volvo,24.0,320.0,17000.0,,welded,5.33,1375.0,,True,,True,6146.37,502.34,64.0,31,False,
+2f78ac2e-ee5c-4d28-b591-00a5d21b15c7,Sélodie,Motorvrachtschip,pcshipbrokers,,110.0,11.4,2807.0,1996.0,60300.0,1800.0,ABC,60.0,620.0,54000.0,,,5.8,3850.0,,True,2016.0,True,,,30.0,122,False,
+30436f54-89f5-471a-bb6a-64108da2072d,Amor Fide,Motorvrachtschip,gtsschepen,325000.0,62.37,6.6,752.0,1962.0,10500.0,540.0,Detroit Diesel,25.0,200.0,14000.0,1.0,mixed,4.86,1150.0,False,True,,True,5210.84,432.18,64.0,122,False,
+30dc3042-fa9e-40c8-8526-8160996aa5af,Jurand,,gtsschepen,120000.0,35.03,9.1,518.0,1983.0,,,,,,,,welded,3.82,,,,,True,3425.64,231.66,43.0,122,False,f5cb9e45-fb78-4a34-b80c-569f27e04d9d
+3187b482-32ed-4500-9a31-1bb6bfc61293,Carco Grup 10,Motorvrachtschip,gtsschepen,600000.0,104.97,9.5,2285.0,1974.0,,1000.0,Deutz,,,20000.0,1.0,welded,4.9,2334.0,True,,2005.0,True,5715.92,262.58,52.0,122,False,
+31c3e96a-1828-4a5c-96c6-83df6adf15bd,Carina,Beunschip,pcshipbrokers,1350000.0,69.98,8.2,1042.0,2000.0,27353.0,600.0,Volvo Penta,60.0,360.0,27000.0,,welded,5.4,,,True,,True,19291.23,1295.59,26.0,122,False,
+3234036a-a902-4be2-a3e1-708356fd1c75,Loukoum,Motorvrachtschip,pcshipbrokers,495000.0,69.63,5.77,960.0,1985.0,29000.0,500.0,Volvo,25.0,240.0,12000.0,,welded,3.5,1100.0,,True,,True,7109.0,515.62,41.0,94,False,
+327f84d5-e2df-4b51-81a9-31b8afb61868,Janneke,Beunschip,pcshipbrokers,1450000.0,84.66,8.25,1306.0,1980.0,18500.0,680.0,Caterpillar,42.0,320.0,24000.0,,welded,,,,True,,True,17127.33,1110.26,46.0,122,False,
+32edeabb-ee14-42d9-8f68-fda1a89caefe,Jasmin,Motorvrachtschip,gtsschepen,875000.0,85.0,9.53,1377.0,1960.0,6000.0,450.0,Volvo Penta,65.0,450.0,35000.0,2.0,welded,5.2,1950.0,,True,,True,10294.12,635.44,66.0,122,False,5e31703e-5aca-4b02-94e8-22326fa40cd0
+332b953b-4a9c-4d41-bc3e-78ad9ad68455,Osalerno,Ponton,pcshipbrokers,50000.0,18.0,8.0,120.0,1963.0,,,,,,,,welded,3.0,,,,,False,2777.78,416.67,63.0,17,False,
+332e027a-345a-4b0b-8a27-609956fff877,Antonie-C,Tankschip,galle,,110.0,,4284.0,2010.0,,,,,,,,,4.2,,,,,,,,16.0,2,False,
+338529b5-2070-4ce7-bb9a-e596f1e5a587,Le pays de liege,Passagiersschip,gsk,,40.99,7.25,154.615,1989.0,,500.0,DAF,,,,,welded,,,,,,,,,37.0,122,False,
+33b73ff1-25a6-48da-827c-bfc1fd65476c,Aldeano,Motorvrachtschip,gtsschepen,350000.0,80.6,9.0,1361.0,1966.0,30000.0,1014.0,Caterpillar,30.0,220.0,25000.0,2.0,welded,4.35,1700.0,False,True,,True,4342.43,257.16,60.0,122,False,
+346d19bc-62e0-4d5c-9ad6-1b5eaaffe57d,Treasure,Tankschip,rensendriessen,1595000.0,109.34,9.58,2016.0,1973.0,32865.0,1278.0,Mitsubishi,42.0,370.0,,,,,,,True,,,14587.53,791.17,53.0,122,False,
+34c32c81-1c3a-48b6-889e-3227e7404ffc,CHRIDA,Motorvrachtschip,rensendriessen,1200000.0,84.35,9.5,,,,,,,,,,,,,,,,,14226.44,,,115,False,414dd78f-f0e2-4ac5-a0ff-9d108e35e326
+34cb3fc2-10d4-492e-b196-416ce6d9c728,Amista,Motorvrachtschip,gsk,,80.0,8.2,1188.0,1961.0,28000.0,1014.0,Caterpillar,20.0,320.0,,2.0,,5.03,1800.0,,True,,,,,65.0,122,False,
+34d43aba-236b-48d1-96e3-e33f3bc48979,Valé,Motorvrachtschip,gsk,400000.0,69.92,7.25,887.0,1963.0,7800.0,811.0,Cummins,34.0,280.0,,2.0,welded,5.5,1300.0,,True,,True,5720.82,450.96,63.0,122,False,
+34d5a464-768d-489e-abe4-9703c96854d9,Vigilate,Motorvrachtschip,gsk,3750000.0,135.0,11.45,3763.0,2006.0,46421.0,1064.0,Caterpillar,60.0,535.0,,,welded,7.0,,True,True,,True,27777.78,996.55,20.0,66,False,
+35138c62-704c-4245-ac6d-d7ae61ad4403,Hermina,Motorvrachtschip,rensendriessen,2600000.0,110.0,11.4,2410.0,1994.0,24832.0,1825.0,Cummins,65.0,600.0,55000.0,,,,,,True,,True,23636.36,1078.84,32.0,122,False,
+35296a47-9742-4651-ba76-9e066a1a7d89,Grindelwald-Mürren,Koppelverband,pcshipbrokers,,177.97,11.45,,2000.0,63000.0,1014.0,Caterpillar,100.0,350.0,,,,,,,True,,True,,,26.0,122,False,
+35a43e78-ff37-4198-aa30-d0dd8b1e8e7f,El Teide,Motorvrachtschip,pcshipbrokers,,105.0,11.45,2706.0,2007.0,,,,,,,,,,,,,,,,,19.0,122,False,
+35e9d560-23db-4301-a310-b90864d499ef,Eloise,Motorvrachtschip,gtsschepen,,80.4,8.19,975.0,1935.0,,500.0,Deutz,15.0,165.0,12600.0,2.0,riveted,4.2,1400.0,,True,,True,,,91.0,122,False,
+3620e876-cc4f-4f01-9fce-dcfbeecca65c,Serena,,gsk,,84.8,9.5,1628.0,1970.0,,,,,,,,,,,,,,,,,56.0,108,False,
+3633568a-ed94-4bfd-94a4-b64c765b7208,Skyfall,Motorvrachtschip,pcshipbrokers,650000.0,84.7,8.15,1210.0,1950.0,23700.0,800.0,MTU,34.0,320.0,16000.0,,welded,5.5,1750.0,,True,,True,7674.14,537.19,76.0,31,False,
+3738f6de-3245-471c-aa0d-afe79e8ce14d,Grigoriana 2,Duwbak,gtsschepen,,55.07,8.19,828.0,1963.0,,,,,,,,,,,,,,,,,63.0,122,False,
+375a2d76-b598-43f7-bcb7-00476319c82c,Custos,Motorvrachtschip,pcshipbrokers,1450000.0,85.0,9.5,1851.0,1996.0,,,,,,,,,,,,,,,17058.82,783.36,30.0,122,False,
+37765646-6113-40de-8334-1f0936110eab,Te koop: Goedlopend rondvaartbedrijf in Midden-Nederland,,gtsschepen,,,,,,,,,,,,,,,,,,,,,,,122,False,
+38033496-3376-49d3-a25f-9a2bc05cb838,Antje,Duw/Sleepboot,gtsschepen,90000.0,17.57,4.31,,1940.0,,328.0,Caterpillar,30.0,,4000.0,,mixed,,,,,,True,5122.37,,86.0,24,False,
+381a7d05-dd6c-4c7c-ab4d-17a1744f249c,Thanos,,gsk,180000.0,54.88,5.09,537.0,1959.0,,,,,,,,,,,,,,,3279.88,335.2,67.0,122,False,
+383e80bf-b334-4443-8479-d66083b031da,Maris,,gsk,525000.0,79.82,8.2,1073.0,1957.0,,,,,,,,,,,,,,,6577.3,489.28,69.0,122,False,29ea6926-b269-466b-a450-11a3956cb669
+383f10e3-dd0f-4014-bf3d-e6ce54b900bb,Tervant 159,Motorvrachtschip,gtsschepen,245000.0,53.94,7.2,707.0,1962.0,4000.0,480.0,Doosan,17.5,240.0,,2.0,mixed,5.0,1100.0,False,True,,True,4542.08,346.53,64.0,122,False,
+3889756f-3830-4a7f-987c-a4d0ff154269,Serenity,Motorvrachtschip,gtsschepen,95000.0,68.0,7.22,750.0,1955.0,46647.0,600.0,GM,10.0,150.0,8000.0,2.0,mixed,5.15,,False,True,2011.0,True,1397.06,126.67,71.0,122,False,
+389c94f6-49de-44ad-b631-982975f2278c,Jutter,,gsk,1650000.0,85.78,11.4,2187.0,1993.0,,,,,,,,,,,,,,,19235.25,754.46,33.0,122,False,
+391746fd-e870-40f3-b25e-fd4dfe530918,Febe,Tankschip,galle,,134.7,14.99,6167.974,2005.0,,,,,,,,,6.7,6815.0,,,,,,,21.0,2,False,
+39ac247e-69a8-4fd2-a55c-29cdd8f9d7ce,Harja 2,Motorvrachtschip,gtsschepen,,55.0,6.6,690.0,1930.0,,380.0,M.A.N.,,,6000.0,2.0,mixed,5.0,1000.0,False,,2020.0,True,,,96.0,122,False,
+3a05d295-0d7f-4c8e-9ec7-e309d911e02e,Ponton joey,Duwbak,gsk,,19.95,9.5,300.0,2013.0,,,,,,,,,,,,,,,,,13.0,122,False,
+3a3b929d-5636-420d-8b81-da47c2bb2677,Fatal,,gsk,,85.94,9.5,1661.0,1964.0,,,,,,,,,,,,,,,,,62.0,122,False,036e4421-c0df-4803-bdee-f5d51e6d71ad
+3a5cf5e7-ad90-4bc7-9be2-20f1651a0406,Carisma 2,Duwbak,gtsschepen,,79.48,11.45,2398.0,1997.0,9262.0,350.0,Scania,110.0,446.0,5000.0,1.0,welded,4.6,2755.0,True,True,2024.0,True,,,29.0,122,False,
+3b145f69-896a-4ca9-ba50-db4afe144ee9,Kemp,Motorvrachtschip,pcshipbrokers,175000.0,50.99,6.61,641.0,1963.0,,,,,,,,,,,,,,,3432.05,273.01,63.0,122,False,
+3b1d30d1-d7a3-4b5b-9db8-c4d61d29edc6,Con Amore,Motorvrachtschip,pcshipbrokers,598000.0,80.0,8.22,1227.0,1962.0,,,,,,,,,,,,,,,7475.0,487.37,64.0,87,False,8022db25-cbe7-4afe-91e4-0fa37bb4fb92
+3b6ae738-dab3-4b61-bc1a-e4243d0e8e48,Salutare,Motorvrachtschip,gsk,,94.88,9.5,1822.0,1964.0,65950.0,600.0,Cummins ,42.0,220.0,,2.0,welded,5.75,2850.0,,True,2021.0,True,,,62.0,122,False,
+3bc21423-8646-4d9e-8c70-899ab74e4032,Wendy,Motorvrachtschip,pcshipbrokers,3650000.0,86.0,10.0,1750.0,2024.0,,,,,,,,,,,,,,,42441.86,2085.71,2.0,122,True,
+3c19d961-8f78-486b-8ba6-3336f79149ee,Valé,Motorvrachtschip,pcshipbrokers,400000.0,69.92,7.25,887.0,1963.0,6370.0,,Cummins,34.0,280.0,13500.0,,welded,5.5,1300.0,,True,,True,5720.82,450.96,63.0,122,False,34d43aba-236b-48d1-96e3-e33f3bc48979
+3c6af80c-c6cc-4d6b-833e-7ec463de57bf,Evolutie,Beunschip,pcshipbrokers,395000.0,70.0,7.2,831.0,1966.0,,,,,,,,,,,,,,,5642.86,475.33,60.0,122,False,
+3cb32d21-0087-434a-befe-ba375a79adc2,Star Flyer,Motorvrachtschip,pcshipbrokers,,84.9,9.35,1303.0,1969.0,,,,,,,,,,,,,,,,,57.0,122,False,
+3d521f82-7e0b-4e6d-a62c-7f24a7a5cbc6,ALAIN D,Tankschip,rensendriessen,2600000.0,85.9,9.5,,,,,,,,,,,,,,,,,30267.75,,,115,False,
+3dc45492-591b-4239-9e3b-5d9db90e08ce,Rs rose,Motorvrachtschip,gsk,1275000.0,85.64,9.51,1793.99,1973.0,53768.0,1379.0,Caterpillar,42.5,,,1.0,welded,7.0,1850.0,True,True,2022.0,True,14887.9,710.71,53.0,122,False,
+3df53807-4a60-49af-85a1-2b9eea9f515c,Cigno Minore,Motorvrachtschip,rensendriessen,2150000.0,105.0,9.5,1833.0,2002.0,54173.0,1278.0,Mitsubushi,40.0,450.0,33000.0,,,,,,True,,True,20476.19,1172.94,24.0,122,False,
+3e332a8f-bc14-4418-a19f-0f2e0c4f1e53,Bornrif,Motorvrachtschip,gsk,2200000.0,110.0,11.4,3105.0,1994.0,,,,,,,,,,,,,,,20000.0,708.53,32.0,122,False,
+3e3621eb-2411-4f31-9b1c-275520c980f1,Via,Motorvrachtschip,gtsschepen,140000.0,67.0,7.04,693.0,1960.0,50000.0,720.0,MWM,17.5,320.0,10000.0,1.0,welded,4.0,1100.0,False,True,2018.0,True,2089.55,202.02,66.0,87,False,
+3e6f5467-85f7-40da-bf97-32fdbf9cb69a,Seceda,Motorvrachtschip,pcshipbrokers,625000.0,63.0,7.2,806.0,2002.0,8234.0,500.0,Scania,65.0,344.0,12000.0,,welded,5.5,1027.0,,True,,True,9920.63,775.43,24.0,52,False,
+3e74397d-eb7b-4810-80e1-513527531a3d,Mercurius (kraanschip),Overige,pcshipbrokers,,86.0,11.55,2153.0,2005.0,,860.0,Caterpillar,65.0,608.0,,,,,,,True,,True,,,21.0,122,False,
+3eabc002-aa3e-4e2f-bed9-9c4dc65652c0,Horizon,Beunschip,pcshipbrokers,425000.0,62.0,7.18,762.0,1963.0,28221.0,600.0,Cummins,25.0,300.0,13000.0,,welded,5.55,,,True,2021.0,True,6854.84,557.74,63.0,122,False,
+3ebdce8d-72d7-475e-aeaf-53f60dc344c4,Navigatio,Motorvrachtschip,pcshipbrokers,495000.0,80.65,9.2,1260.0,1926.0,5000.0,600.0,Cummins,25.0,320.0,11800.0,,riveted,5.25,1950.0,,True,,True,6137.63,392.86,100.0,122,False,
+3ece4b81-16a8-42fb-aabe-0254b5d0e8d0,Arese,,pcshipbrokers,4995000.0,135.0,11.44,4405.0,2009.0,,,,,,,,,,,,,,,37000.0,1133.94,17.0,122,False,1d06644d-1849-420d-99f4-a8e0b550359e
+3ee81eac-2ab6-4939-a14b-4f941896a40c,Stavria,Tankschip,pcshipbrokers,2850000.0,85.98,9.6,1598.0,2009.0,,,,,,,,,,,,,,,33147.24,1783.48,17.0,122,False,
+3f715d94-c507-4810-8517-7f1f623a70a5,Pergo,Motorvrachtschip,pcshipbrokers,695000.0,80.06,9.22,1525.0,1928.0,21159.0,450.0,Volvo,,510.0,19000.0,,riveted,5.35,2300.0,,True,,True,8680.99,455.74,98.0,122,False,
+3f79017c-9239-445f-b567-d41ebe16be18,Corja,Beunschip,gtsschepen,,86.0,9.5,1907.0,1996.0,65300.0,960.0,Caterpillar,16.5,300.0,22000.0,1.0,welded,5.7,1186.0,True,True,2018.0,True,,,30.0,122,False,
+3fb147fe-e6ba-476b-b5b6-d9eb3b0cae15,Watna,Motorvrachtschip,gtsschepen,750000.0,85.97,11.0,1545.0,1963.0,,800.0,Deutz,45.0,230.0,35000.0,2.0,welded,5.05,2295.0,True,True,2018.0,True,8723.97,485.44,63.0,87,False,eb395f17-691b-49f5-82b4-97efcb2ba861
+3fc50bc3-ac6d-4ef9-90d7-6856d13317f6,Nomadisch,,gsk,,92.98,11.45,2664.0,1998.0,,,,,,,,,,,,,,,,,28.0,66,False,8c0392c3-929f-47c3-8359-e87b9f553848
+3fd2394a-57a4-4d18-8df2-839ea8985efd,Asdeta,Motorvrachtschip,pcshipbrokers,3175000.0,110.0,11.45,3225.0,2008.0,50800.0,,Caterpillar,,571.0,55000.0,,welded,5.9,3600.0,,True,,True,28863.64,984.5,18.0,24,False,fad199fa-588a-431d-b3f6-89f9127b39a7
+3fdc46b8-0c33-4e90-acd7-58afa20eed19,Dakota,Motorvrachtschip,gtsschepen,,85.0,8.2,1173.0,1959.0,,,,,,,,,,,,,,,,,67.0,122,False,ad287a68-a690-42a7-9e62-dfe9ec9c49b3
+40698257-15bd-45ac-b1c0-ee065f182efe,Mi Vida,Motorvrachtschip,pcshipbrokers,1995000.0,109.0,10.5,2502.0,1992.0,48106.0,1522.0,Caterpillar,65.0,350.0,28000.0,,welded,5.5,3000.0,,True,,True,18302.75,797.36,34.0,122,False,05cad7be-d69c-4358-bc0c-4dc47b05a8cd
+406a0db9-6ef6-4dfb-9109-6046cd8b45c2,Spintore & Spintore II,Koppelverband,rensendriessen,2795000.0,104.99,11.4,2987.0,1982.0,4000.0,,Caterpillar,,,,,,,,,,2024.0,True,26621.58,935.72,44.0,122,False,
+40cdfa0f-09b1-40b4-9003-496b88e25369,Credo,Motorvrachtschip,pcshipbrokers,650000.0,85.86,9.5,1493.0,1957.0,3755.0,450.0,Caterpillar,30.0,360.0,19000.0,,,4.9,2200.0,,True,,True,7570.46,435.37,69.0,122,False,a20f960c-eb38-4da5-9754-d738eaa4eaa1
+40d087ef-c7c5-4db2-80c0-3e624739d8fc,Mira delisioza,Motorvrachtschip,gsk,,108.5,11.4,3178.0,1986.0,,1102.0,Wartsila ,65.0,,,1.0,,,3600.0,True,,,True,,,40.0,122,False,
+414dd78f-f0e2-4ac5-a0ff-9d108e35e326,Chrida,Motorvrachtschip,pcshipbrokers,1200000.0,84.35,9.48,1575.0,1988.0,,,,,,,,,,,,,,,14226.44,761.9,38.0,122,False,
+4218d695-56de-4c87-ade8-fc5fecfe3f49,Johanna Adriana,Beunschip,pcshipbrokers,395000.0,57.28,7.02,833.0,1963.0,,550.0,Volvo Penta,,220.0,10000.0,,,5.6,,,True,2021.0,True,6895.95,474.19,63.0,122,False,
+42bd3ee1-360b-471a-acd3-cf956ef48a15,Debussy,Motorvrachtschip,pcshipbrokers,,86.0,9.5,1816.0,2000.0,,1014.0,Caterpillar,45.0,450.0,40000.0,,welded,,,,True,,True,,,26.0,122,False,7b6a1234-d8a0-4f1f-83c5-6170e9561712
+43562c2a-7bb6-427f-a772-0c09b05ece8c,General,Motorvrachtschip,gsk,1200000.0,85.12,10.0,1410.0,1962.0,700.0,608.0,Cummins,,,,2.0,,6.46,,,True,,True,14097.74,851.06,64.0,122,False,
+435e1440-c380-467f-bc1c-af472e17b1fb,Cetus,Motorvrachtschip,rensendriessen,1995000.0,110.0,11.4,2414.0,1993.0,,,Caterpillar,,,,,,,,,,,True,18136.36,826.43,33.0,10,False,
+4362d6c4-508a-4fe5-8cb3-d031c243e036,Via Nova,Motorvrachtschip,pcshipbrokers,339500.0,60.1,6.6,610.0,1963.0,22750.0,550.0,Volvo,25.0,,8500.0,,riveted,4.47,1025.0,,,,True,5648.92,556.56,63.0,2,False,
+4368d6e4-4775-4857-916a-fd741e178bc6,Emma Sophia,Motorvrachtschip,pcshipbrokers,,74.0,8.2,1115.0,1951.0,46000.0,1197.0,Mitsubishi,,,14500.0,,,6.5,1350.0,,,,True,,,75.0,122,False,17fadef4-2b18-4c51-b8be-4db1ec353f4f
+436e8234-3c1d-4e6b-857a-0e29fb4b405a,Johannes,Tankschip,galle,4995000.0,134.98,11.45,4135.0,2004.0,,,,637.0,,,,,5.73,5091.624,,,,,37005.48,1207.98,22.0,2,False,86a7207f-e5a9-4558-8ab1-b13c30cd1473
+43d2f971-cce8-483d-8dad-a26218109a47,Laco 9,Duwbak,gtsschepen,,64.67,8.36,1181.0,1962.0,,,,,,,,,,,,,,,,,64.0,122,False,d1f319ea-3949-491f-9b27-864e71bb70cc
+4401e4c5-76e1-4415-9cc8-a08fbbce6834,Compaan,Tankschip,galle,4075000.0,109.87,11.45,3594.549,2010.0,,,,71.0,,,,,5.41,3768.0,,,,,37089.29,1133.66,16.0,2,False,
+447423bb-27a3-49e4-a22c-8d3aad1723b6,Storm,Motorvrachtschip,gsk,200000.0,69.96,7.25,1038.0,1964.0,,,,,,,,,,,,,,,2858.78,192.68,62.0,38,False,
+4476d7af-a85e-42b1-aad9-bcd2cec2757f,Belvona,Motorvrachtschip,gsk,,80.0,9.5,1366.0,1958.0,22500.0,862.0,Mitsubishi,40.0,320.0,,2.0,welded,5.6,2000.0,False,True,,True,,,68.0,122,False,
+45512c37-c950-4f38-b97c-c37ea68236ef,Friendship,Woonschip,gsk,,40.0,15.0,,1965.0,,,,,,,,,,,,,,,,,61.0,122,False,
+4579fc4b-70ac-4180-95cb-9006963a7292,Annapurna,Tankschip,gsk,950000.0,85.0,8.99,1411.0,1987.0,54525.0,1014.0,Caterpillar,70.0,235.0,,,welded,,,,True,,False,11176.47,673.28,39.0,122,False,
+45803dcb-f10f-4097-acc9-0f0a58f80fdd,Impuls,Koppelverband,galle,5195000.0,92.96,11.45,2504.95,2005.0,,,,,,,1.0,,,,,,,,55884.25,2073.89,21.0,2,False,
+45c797b2-da95-4ce9-8518-6110013da281,Hermina ,Motorvrachtschip,pcshipbrokers,2600000.0,110.0,11.4,3009.0,1994.0,29000.0,,Cummins,75.0,600.0,60000.0,,welded,5.8,3360.0,,True,,True,23636.36,864.07,32.0,122,False,35138c62-704c-4245-ac6d-d7ae61ad4403
+461383e5-2f84-484c-b348-f2e32b55f461,Tim I en II,Koppelverband,rensendriessen,4500000.0,110.0,11.45,2556.0,2000.0,,,Caterpillar,,470.0,52000.0,,,,,,True,,True,40909.09,1760.56,26.0,122,False,
+46238150-a96e-4933-ab54-0b98d2e42ffa,Bernard,Motorvrachtschip,gsk,250000.0,55.0,7.2,734.0,1964.0,,304.0,Caterpillar ,17.0,,,2.0,,5.0,1000.0,False,,2023.0,True,4545.45,340.6,62.0,122,False,
+46c0ac2e-f13f-460a-ad82-4bfec6952480,Sanitas,Motorvrachtschip,pcshipbrokers,1100000.0,85.58,11.05,2021.0,1958.0,11500.0,650.0,Volvo Penta,40.0,320.0,54000.0,,riveted,6.0,2800.0,,True,,True,12853.47,544.29,68.0,17,False,
+46dfee45-fdd4-44e6-8eb8-4916869c33d6,Laco,Duwbak,pcshipbrokers,400000.0,85.0,11.4,2111.0,1979.0,,,,,,,,,,,,,,True,4705.88,189.48,47.0,122,False,
+46fdd2d6-976d-4243-9aa5-c2a80e2e74a0,Amigos,Motorvrachtschip,gsk,1350000.0,84.09,9.58,1765.0,1970.0,15820.0,1100.0,Caterpillar,45.0,320.0,,2.0,welded,5.75,2550.0,,True,,True,16054.23,764.87,56.0,122,False,
+4775b6f5-c117-4959-9be4-ad736240d03d,Jogo 3,Motorvrachtschip,gtsschepen,195000.0,67.0,8.2,873.0,1943.0,,720.0,Deutz,25.0,200.0,14000.0,2.0,mixed,4.25,1250.0,False,True,,True,2910.45,223.37,83.0,122,False,087641b9-3e87-4b6f-9787-8a41fe0264c2
+47cd042f-27c8-4dfb-b5bf-7b6e051b7e89,Kevalia,Motorvrachtschip,pcshipbrokers,585000.0,80.0,8.2,1076.0,1958.0,8000.0,829.0,Yammar,33.0,270.0,13000.0,,riveted,5.05,1600.0,,True,,True,7312.5,543.68,68.0,87,False,e2bbdb48-8c8a-4031-9754-8754b4939743
+4845e741-895f-4d25-bb32-d6be2b64e4bc,Dylanni,Motorvrachtschip,rensendriessen,3950000.0,135.0,11.45,3089.0,2009.0,33313.0,1600.0,Mitsubishi,81.0,524.0,2000.0,,,,,,True,,True,29259.26,1278.73,17.0,122,False,
+48c16376-6a82-4c02-97c8-6b692cf251e3,Isella,Motorvrachtschip,pcshipbrokers,850000.0,84.95,9.48,1815.0,1970.0,,,,,,,,,,,,,,,10005.89,468.32,56.0,122,False,abbbbad8-79dd-4df2-be69-1b1e2b4af702
+499259b5-bb64-4a51-8bca-db170c8187d2,Menapiër,,gsk,,110.0,11.4,2721.0,1994.0,,,,,,,,,,,,,,,,,32.0,122,False,
+49cb2d52-fe1b-4b3a-bb2d-8ec1d22e9f16,Mojo,Motorvrachtschip,gsk,120000.0,55.37,7.06,610.0,1959.0,6000.0,210.0,Detroit Diesel,25.0,,,1.0,welded,4.8,925.0,,True,2018.0,,2167.24,196.72,67.0,115,False,fdfd437f-5656-4bf4-8365-cc37a74c02cf
+4a469ebc-ffa0-4d52-83d5-6dd794e70cc6,Arina hendrika,Motorvrachtschip,gsk,175000.0,59.91,6.62,654.0,1962.0,44500.0,510.0,Volvo Penta,17.5,280.0,,1.0,welded,,1070.0,,True,,True,2921.05,267.58,64.0,122,False,
+4a5fd271-a0c2-4fba-85ff-e67341c3da1c,Mister Ed,Duw/Sleepboot,gtsschepen,200000.0,10.78,5.1,,1989.0,,140.0,Schönebecker,,,5800.0,,welded,,,,,,True,18552.88,,37.0,17,False,
+4b92a5e1-52a3-41e0-814a-c8b72335e976,Dragon fly,Motorvrachtschip,gsk,,110.0,11.45,3146.0,1998.0,105500.0,1810.0,Caterpillar ,65.0,350.0,,1.0,welded,6.8,,,True,,True,,,28.0,122,False,
+4bad3ad6-e2b7-4865-915c-dcdc16a62fd2,Berjan,Motorvrachtschip,gsk,,107.0,11.4,2908.0,1983.0,,1200.0,MAK,45.0,680.0,,1.0,welded,6.1,3250.0,True,True,2020.0,True,,,43.0,38,False,
+4bb99b9c-b0af-422b-83bd-84fe4884c990,Mercurius,Motorvrachtschip,gsk,,86.0,11.5,2152.0,2005.0,,886.0,2 x Caterpillar,63.5,610.0,,2.0,,,2383.0,,True,,False,,,21.0,122,False,
+4c1447f8-97ed-4e64-8780-45f308cd1271,Passage,Motorvrachtschip,gsk,545000.0,80.0,9.45,1706.0,1930.0,37758.0,485.0,Caterpillar,40.0,350.0,,2.0,,6.0,2200.0,,True,2018.0,True,6812.5,319.46,96.0,73,False,
+4c1b2218-34c9-41ab-96be-2d0ade42857d,Ariki,Motorvrachtschip,gtsschepen,210000.0,79.92,8.2,1111.0,1953.0,52000.0,700.0,Detroit Diesel,25.0,300.0,15000.0,1.0,,5.0,1450.0,True,True,,True,2627.63,189.02,73.0,122,False,
+4c3d9178-9d08-4f09-9680-ffb7fb369f80,Alwine,Woonschip,gsk,199000.0,28.92,5.02,,1927.0,,,Doosan,16.0,,,,,,,,,,,6881.05,,99.0,122,False,
+4c5d2f5c-461b-452b-a172-7c095e9383bf,Kruier & Kruier I,Koppelverband,pcshipbrokers,3495000.0,172.0,11.45,5249.0,2005.0,,,,,,,,,,,,,,,20319.77,665.84,21.0,122,False,
+4cac44db-28e3-4e55-9c1f-c9a60273d406,Socandes,,gsk,,135.0,11.4,3851.0,2006.0,,,,,,,,,,,,,,,,,20.0,122,False,
+4ccaa9ad-8436-4683-b30b-d541e4759296,Sandra W,Motorvrachtschip,rensendriessen,,135.0,11.45,2989.0,2013.0,36310.0,1217.0,Caterpillar,55.0,538.0,56000.0,,,,,,True,2019.0,True,,,13.0,122,False,
+4d18e79e-aadb-456f-bbd9-c63d906f4cba,Storky,Duw/Sleepboot,gsk,145000.0,19.62,4.53,15.0,1923.0,,280.0,Stork Ricardo,15.0,,,,,4.85,,,,2004.0,True,7390.42,9666.67,103.0,10,False,d177b94a-bd55-4edd-8309-3937482d5fe0
+4d9983aa-74aa-4129-a39a-cc23eaaf725f,Godesia,Passagiersschip,gtsschepen,1250000.0,38.6,8.6,,1986.0,,355.0,Volvo Penta,199.0,,,,welded,8.0,,,,,True,32383.42,,40.0,122,False,
+4dc6bbef-9f36-4263-ad5a-45e9262f1bc1,Inspiratio,Motorvrachtschip,gsk,695000.0,85.0,8.2,1238.0,1962.0,35454.0,750.0,Cummins,28.0,320.0,,1.0,,5.8,2000.0,,True,,True,8176.47,561.39,64.0,122,False,
+4e9ca0c3-b8c6-429b-a3f8-cd5820e95226,Nocht,Motorvrachtschip,galle,445000.0,72.0,8.21,990.0,1954.0,,,,,,,2.0,,,,,,,,6180.56,449.49,72.0,2,False,562c9cd7-5873-4249-a2e9-23f56c8cabc8
+4e9f36e2-46a4-44ad-aca3-8972358f95fa,VIOS,Motorvrachtschip,rensendriessen,5150000.0,135.0,11.45,,,,,,,,,,,,,,,,,38148.15,,,115,False,
+4ed3664b-25da-4db6-b387-bb05b44e7615,Calendula 12,Tankschip,rensendriessen,950000.0,85.95,9.49,1410.0,1986.0,,,Caterpillar,,,,,,,,,,,True,11052.94,673.76,40.0,87,False,
+4f023838-c694-4046-9387-23a7963cd137,Janny,Tankschip,gtsschepen,70000.0,27.04,5.27,148.0,1965.0,,230.0,DAF,30.0,,,2.0,welded,4.1,,False,,,True,2588.76,472.97,61.0,73,False,
+4f263309-fffb-437c-8abd-03b7fe9c7aaa,Imperieux,Motorvrachtschip,pcshipbrokers,1795000.0,104.77,9.54,2143.0,1980.0,20000.0,1250.0,Caterpillar,25.0,350.0,29000.0,,welded,6.0,2800.0,,True,,True,17132.77,837.61,46.0,122,False,15ba879c-b25d-4cc8-a6d1-276a23ae2bfc
+4f4375a1-48ff-4968-b8c0-a97652001d40,Edith,Duw/Sleepboot,pcshipbrokers,715000.0,23.46,5.97,,1943.0,,,,,,,,,,,,,,,30477.41,,83.0,122,False,
+4fd51d73-485e-4599-9510-a670d7a16ce7,Vios,Motorvrachtschip,pcshipbrokers,,135.0,11.45,4098.0,2019.0,,,,,,,,,,,,,,,,,7.0,122,False,4e9f36e2-46a4-44ad-aca3-8972358f95fa
+4fe4344e-bcd1-4eb6-b0fc-79d1660f5090,Eivissa,Accomodatieschip,pcshipbrokers,425000.0,64.36,7.16,535.0,1934.0,,270.0,Volvo,145.0,313.0,,,,,,,True,,False,6603.48,794.39,92.0,73,False,
+5010763b-034b-406e-8111-2e025161ce6b,Carisma & Carisma 2,Koppelverband,gtsschepen,4950000.0,92.48,11.45,2584.0,1997.0,14234.0,1278.0,Mitshubishi,80.0,503.0,50000.0,1.0,welded,5.35,2755.0,True,True,,True,53525.09,1915.63,29.0,122,False,
+5103817c-3f72-4540-bb08-20c432cd4c4e,Terschellinger Bank,Motorvrachtschip,pcshipbrokers,,56.0,13.02,240.0,1954.0,,579.2,2x,,,12500.0,,welded,,,,,,True,,,72.0,122,False,
+5128cb54-c3ec-4faf-a43a-b20aecbd148d,Karina 3,Motorvrachtschip,gtsschepen,400000.0,79.8,10.08,1307.0,1949.0,76382.0,1001.0,Caterpillar,30.0,230.0,,2.0,mixed,6.2,1750.0,True,True,2007.0,True,5012.53,306.04,77.0,122,False,
+5135ea1b-325a-46e0-82e3-fb57a259a136,ARM 25,Motorvrachtschip,gtsschepen,560000.0,104.76,9.5,1768.0,1969.0,,,,,,,,,,,,,,,5345.55,316.74,57.0,122,False,
+514a5d9b-d158-4729-acf6-fe088e1be53b,Sméagol,,gsk,350000.0,72.9,8.2,1076.0,1963.0,,,,,,,,,,,,,,,4801.1,325.28,63.0,122,False,14103bd3-4760-4de0-8647-8e604439a59a
+5164d4d0-6c98-48c8-91dc-cc2d90af5629,Joker,Duw/Sleepboot,gsk,,12.5,5.05,,1930.0,,545.0,Scania,9.0,,,,,3.6,,,,,,,,96.0,122,False,
+517413d0-9644-4f03-8822-518b8b7c19e0,Dekschuiten Amsterdam,Ponton,pcshipbrokers,,32.26,6.29,,1956.0,,,,,,,,,,,,,,False,,,70.0,122,False,
+51ed2428-1f6e-44fd-9f28-f0bdc7e7689b,Cybra,Duwbak,rensendriessen,1200000.0,70.82,11.45,1606.0,2004.0,,,,15.0,400.0,,,,,,,True,,,16944.37,747.2,22.0,80,False,
+52185206-55b4-473f-a06c-6dcc6e649ec9,Spes,Duw/Sleepboot,gsk,,13.0,5.0,580.0,1958.0,,,Dewoo,16.0,,,,,5.5,,,,2025.0,False,,,68.0,122,False,
+52ae0186-d43f-4b92-82e8-199a1b83d947,Kenavo,Motorvrachtschip,gsk,,85.9,9.02,1615.0,1971.0,,905.0,Caterpillar ,30.0,,,1.0,,,2150.0,False,,,True,,,55.0,122,False,
+546088b6-3f31-4aa4-a3a1-bb3ab3d3328d,Tranquilo,Motorvrachtschip,pcshipbrokers,1400000.0,109.99,12.54,3932.0,1988.0,,2081.0,Wartsila,80.0,400.0,30000.0,,,9.3,5300.0,,True,2018.0,True,12728.43,356.05,38.0,122,False,
+5527d807-41a7-4a35-b07c-fc8195b63222,Credendo Vides III,Motorvrachtschip,gtsschepen,950000.0,84.65,9.5,1428.0,1957.0,27700.0,750.0,Cummins,55.0,279.0,55000.0,1.0,welded,5.15,1950.0,,True,,True,11222.68,665.27,69.0,122,False,
+555d892c-c366-47ba-be2f-bd385df6955e,Marja (donau),Motorvrachtschip,gsk,100000.0,54.95,6.6,618.0,1927.0,,370.0,Caterpillar,14.0,230.0,,2.0,,5.05,940.0,,True,,True,1819.84,161.81,99.0,122,False,
+557a5d07-3a7a-418a-808c-788f324e85b3,Kenora,Tankschip,gtsschepen,,85.9,8.58,1254.0,1985.0,26067.0,1065.0,Caterpillar,35.0,380.0,25000.0,3.0,welded,6.0,1532.0,,True,,True,,,41.0,122,False,78c3390a-0913-4f69-b29d-e9a2b3b90508
+56095823-bebe-4673-b50a-7f6530f6ed78,Deo Gratias,Motorvrachtschip,galle,,110.0,11.45,3225.587,2019.0,,,,,,,1.0,,3.68,,,,,,,,7.0,2,False,
+5617357c-2e0e-4771-b77c-70a19ea74a5d,Duende,Motorvrachtschip,gsk,,110.0,11.45,3240.0,2006.0,28900.0,1620.0,Caterpillar,65.0,,,1.0,welded,5.95,3800.0,True,,,True,,,20.0,122,False,
+562c9cd7-5873-4249-a2e9-23f56c8cabc8,Nocht,Motorvrachtschip,gsk,445000.0,72.0,8.21,1000.54,1954.0,21594.0,650.0,Volvo,31.0,300.0,,2.0,welded,5.55,1525.0,,True,,True,6180.56,444.76,72.0,31,False,
+566d28a7-103f-484e-869c-27263f25f201,Mira vita,Motorvrachtschip,gsk,,84.88,8.27,1148.23,1958.0,54396.0,941.0,Cummins,42.0,230.0,,2.0,,,,,True,2008.0,,,,68.0,122,False,a688bd4f-7908-461a-a651-a16d6fdd86d8
+56ae1789-6ec3-44ce-aef2-8d6ef332c103,Abeona,Motorvrachtschip,gtsschepen,,46.9,5.1,398.0,1964.0,,400.0,Volvo Penta,50.0,,5000.0,2.0,welded,4.8,550.0,False,,2018.0,True,,,62.0,122,False,
+56f33a4a-b06a-43a6-bc27-f359705d1ff5,Celeste,Motorvrachtschip,gsk,2995000.0,105.0,11.45,3047.0,2004.0,65080.0,1521.0,Caterpillar,60.0,534.0,,1.0,welded,6.1,3500.0,True,True,,True,28523.81,982.93,22.0,115,False,955c352d-5293-428f-9678-417dcd58348d
+572d20cc-e01a-458b-93a6-bde2d0453ed1,Orta,Duw/Sleepboot,pcshipbrokers,575000.0,26.47,5.51,,1948.0,5223.0,608.0,Caterpillar,30.0,,11000.0,,riveted,,,,,,True,21722.7,,78.0,31,False,
+57d433fc-8bed-4110-992b-8f99696a030e,Flottant,Tankschip,pcshipbrokers,695000.0,67.0,8.26,805.0,1954.0,6395.0,,Cummins,40.0,320.0,12600.0,,riveted,5.0,,,True,,True,10373.13,863.35,72.0,122,False,ba5f2f68-6b24-4175-84de-07825d30e92c
+582e2cc8-88b7-44bb-a6d5-18084292437d,Juntos,Motorvrachtschip,gsk,915000.0,82.0,9.3,1225.0,1970.0,46000.0,1000.0,Cummins ,30.0,320.0,,2.0,,5.9,1800.0,,True,2019.0,True,11158.54,746.94,56.0,94,False,6bcf658a-8193-4cea-94bd-8be686f605f3
+58d1d502-db20-4a37-868f-d28162aeab5e,Chrisya,Motorvrachtschip,gsk,1400000.0,100.0,9.5,2356.0,1975.0,30000.0,1400.0,Cummins,60.0,340.0,,2.0,,7.0,2799.0,,True,,True,14000.0,594.23,51.0,122,False,
+58e59898-fc14-4f1a-99ed-3ced180bb981,Carco Grup 8,Duwbak,gtsschepen,200000.0,76.9,10.0,1083.0,1988.0,,,,,,,4.0,,2.7,,,,,True,2600.78,184.67,38.0,122,False,
+58eaa2ce-a0e6-4a37-9829-3948038474f3,Aspasia,Motorvrachtschip,gsk,,85.87,10.0,1833.0,2008.0,43660.0,1278.0,Mitsubischi ,45.0,460.0,,1.0,welded,6.3,2500.0,,True,,False,,,18.0,122,False,
+599bff86-8c9a-4aba-84fc-02fc58c75e19,Amigos,Motorvrachtschip,galle,2950000.0,134.7,11.45,3921.758,,,,,,,,1.0,,,,,,,,21900.52,752.21,,2,False,
+59ebf2e3-7ca0-4166-bec3-1150f862c0c3,Admiral,Tankschip,galle,4100000.0,109.87,11.44,2780.182,2009.0,,,,,,,,,3.31,3023.0,,,,,37316.83,1474.72,17.0,2,False,
+5ac97519-ab76-4d87-966b-8bd1e4dad1ae,Menapiër,Motorvrachtschip,pcshipbrokers,,110.0,11.4,2721.0,1994.0,,,,,,,,,,,,,,,,,32.0,122,False,499259b5-bb64-4a51-8bca-db170c8187d2
+5b95e72b-c6c0-4d42-a5b7-392f4b1774f4,Antje,Duw/Sleepboot,gsk,90000.0,17.57,4.31,,1940.0,,328.0,Caterpillar,30.0,,,,welded,,,,,,True,5122.37,,86.0,10,False,38033496-3376-49d3-a25f-9a2bc05cb838
+5bf6ebde-9c35-4370-9b8a-97ace3b86c78,Sos,Duw/Sleepboot,gsk,220000.0,12.7,5.05,,1964.0,13800.0,450.0,Deutz,18.0,,,,,,,,,,,17322.83,,62.0,122,False,
+5c5b5b3a-acc2-42a3-b600-8421ed2effe9,RS Alinda,Motorvrachtschip,gtsschepen,269000.0,85.92,8.2,1282.0,1953.0,33092.0,650.0,Cummins,30.0,250.0,15000.0,2.0,welded,5.5,1650.0,,True,2010.0,True,3130.82,209.83,73.0,122,False,fd42a887-d217-42d0-95f5-49118ef51c55
+5ca43e55-73a6-47de-837d-734674e51da8,Merlin,Motorvrachtschip,pcshipbrokers,1590000.0,102.99,9.6,2134.0,1981.0,90000.0,1377.3,Caterpillar,65.0,460.0,44000.0,,welded,5.7,2750.0,,True,,True,15438.39,745.08,45.0,115,False,
+5d77e0ea-a61a-4921-a953-c1721acd2f32,Grete - marie,,gsk,2950000.0,85.9,9.46,1498.0,2010.0,,,,,,,,,,,,,,,34342.26,1969.29,16.0,122,False,
+5d7bd30d-4d5c-4d59-995f-2509fcd33213,Saffier,Motorvrachtschip,pcshipbrokers,680000.0,66.89,8.17,985.0,1960.0,27600.0,760.0,Caterpillar,40.0,241.0,8800.0,,welded,4.3,1650.0,,True,,True,10165.94,690.36,66.0,122,False,
+5db416a9-c7f1-4fe4-b17d-767950c990a7,Sicera,Motorvrachtschip,gsk,,104.99,9.5,2142.0,1981.0,,,,,,,,,,,,,,,,,45.0,38,False,
+5dbe3d8b-02ef-4884-bb74-04aa5086689b,Je-pa,Motorvrachtschip,pcshipbrokers,525000.0,80.0,9.0,1351.0,1956.0,,,,,,,,,,,,,,,6562.5,388.6,70.0,80,False,a0e25681-a11c-4a1e-ab3d-a1193fafbc2b
+5e0bddf7-544d-45ef-93e3-5424bae13311,Oscar,Motorvrachtschip,gtsschepen,260000.0,73.0,8.26,1080.0,1964.0,48000.0,875.0,Deutz,17.0,180.0,22000.0,2.0,welded,5.2,1650.0,False,True,2011.0,True,3561.64,240.74,62.0,101,False,
+5e31703e-5aca-4b02-94e8-22326fa40cd0,Jasmin,Motorvrachtschip,gsk,875000.0,85.0,9.5,1377.24,1960.0,19500.0,450.0,Volvo,65.0,450.0,,2.0,welded,6.25,1950.0,,True,,True,10294.12,635.33,66.0,122,False,
+5e8b0cb2-9610-4158-b71e-622c8c86f91f,Deviatie,Motorvrachtschip,pcshipbrokers,,109.98,11.45,3225.0,2010.0,,,,,,,,,,,,,,,,,16.0,122,False,
+5ea398eb-3d21-4f9c-967d-6088df6e8eaa,Palysando ,Motorvrachtschip,pcshipbrokers,450000.0,80.0,9.5,1300.0,1922.0,22440.0,350.0,Cummins,35.0,320.0,18000.0,,riveted,5.2,1800.0,,True,,True,5625.0,346.15,104.0,122,False,c4b17394-b6cc-412d-b696-ece331151de6
+5eb72e8f-72e9-40d5-9036-5518f817742a,Ina,Motorvrachtschip,gsk,,104.64,11.45,3044.0,2009.0,47631.0,1700.0,Cummins,64.0,660.0,,1.0,,7.0,3500.0,,True,,True,,,17.0,122,False,
+5f3ab074-dd00-4446-9257-3d7f09bd4e91,Hermina 1 ,Duwbak,pcshipbrokers,,76.53,11.47,2896.0,2002.0,,,,65.0,475.0,18000.0,,welded,5.34,2670.0,,True,,True,,,24.0,122,False,
+5f48ea9e-6fdc-45cf-8927-033a50561cad,Suzanna,Motorvrachtschip,pcshipbrokers,,104.98,10.57,2380.0,1994.0,,,,,,,,,,,,,,,,,32.0,122,False,
+6011a258-69b7-4e2c-9496-0e1c5939da83,Compari,Motorvrachtschip,gsk,3150000.0,134.65,11.45,3778.0,1998.0,21000.0,1015.0,Caterpillar ,65.0,550.0,,1.0,welded,,,True,True,,True,23393.98,833.77,28.0,73,False,
+604e0383-f509-461a-a4db-161ce973fb57,Radar,Motorvrachtschip,gsk,,75.0,8.27,1058.0,1961.0,,,Boudouin,18.0,,,2.0,welded,,1550.0,,True,,,,,65.0,122,False,d720eb0a-ece0-4659-a544-969a2bd17e56
+606f1c2e-4e44-49c2-bb0c-e82945f72d14,Cascade,Motorvrachtschip,rensendriessen,,85.73,10.0,1479.0,2010.0,41422.0,862.0,Mitsubishi,65.0,392.0,46800.0,,,,,,True,2025.0,True,,,16.0,122,False,
+6076a6b3-62b1-45d0-9f09-6fd31302bf23,Kenora,Tankschip,pcshipbrokers,,86.0,8.58,1255.0,1980.0,23523.0,1065.0,Type,75.0,,25000.0,,welded,,,,,,True,,,46.0,122,False,78c3390a-0913-4f69-b29d-e9a2b3b90508
+60ad59cf-368d-4909-acf7-8ee2a355c31c,Pergo,Motorvrachtschip,gtsschepen,695000.0,80.0,9.22,1525.0,1928.0,20300.0,450.0,Volvo Penta,17.5,510.0,19000.0,2.0,mixed,5.3,2300.0,False,True,,True,8687.5,455.74,98.0,122,False,3f715d94-c507-4810-8517-7f1f623a70a5
+60ddc496-6790-4e0a-8923-ec82e826811b,Antverpia 60,Duwbak,rensendriessen,1100000.0,88.17,11.5,2292.0,2006.0,,,,,,,,,,,,,,,12475.9,479.93,20.0,122,False,
+6108afd0-2588-48de-9fb2-3b7510e5442a,Sympharosa,Motorvrachtschip,gsk,1100000.0,73.0,7.04,803.0,1963.0,,653.0,Mitsubischi,30.0,,,0.0,,,902.0,True,,,,15068.49,1369.86,63.0,122,False,
+6124521c-aa68-4924-afac-7ccbbb70468d,Vios,Motorvrachtschip,gsk,,135.0,11.43,4098.0,2019.0,9814.0,1218.0,Caterpillar,60.0,585.0,,1.0,welded,,4600.0,True,True,,True,,,7.0,122,False,4e9f36e2-46a4-44ad-aca3-8972358f95fa
+612e5a70-4a0a-4806-8e2c-cf544b9f14d5,Duos,Motorvrachtschip,gsk,,67.21,8.2,1010.0,1949.0,,450.0,Volvo,17.0,,,2.0,,4.5,1450.0,,,,True,,,77.0,122,False,
+6147d348-aeb8-4bc8-a21f-05174aa7e22d,Micanto,Motorvrachtschip,gtsschepen,450000.0,80.0,9.0,1273.0,1973.0,33175.0,1179.0,MTU,,320.0,,1.0,welded,4.3,1700.0,True,True,2020.0,True,5625.0,353.5,53.0,122,False,
+6298aa68-90d4-4945-b173-4a2cbf2d49d2,Kirsten,,gsk,2650000.0,110.0,11.45,3038.0,2001.0,,,,,,,,,,,,,,,24090.91,872.28,25.0,73,False,
+6301865a-2876-422b-a9df-807634058f00,Denver,Motorvrachtschip,gsk,650000.0,82.0,8.28,1170.0,1961.0,36000.0,863.0,Mitsubishi,34.0,220.0,,1.0,welded,5.0,1450.0,,True,,,7926.83,555.56,65.0,122,False,
+631febe0-0f9e-482f-81ef-124c79da3b97,Kraanschip Mercurius,Motorvrachtschip,rensendriessen,,86.0,11.55,1674.0,2006.0,45907.0,886.0,Caterpillar,530.0,,20000.0,,,,,,,2021.0,True,,,20.0,122,False,
+63773c6b-b4e6-4afd-9d92-227fd56b0859,Anna,Motorvrachtschip,gtsschepen,155000.0,49.5,6.6,513.0,1956.0,46298.0,300.0,DAF,23.0,200.0,9800.0,1.0,mixed,4.44,757.0,False,True,2006.0,True,3131.31,302.14,70.0,122,False,
+64f1ce84-9fdc-49b0-85c0-2895e4482404,Misonda,Motorvrachtschip,gtsschepen,,84.95,8.2,1146.0,1955.0,,,,,,,,,,,,,,,,,71.0,122,False,a7f53126-4f29-4596-8864-d11a98942d8d
+66070fca-718e-4ae6-8eea-2240ad439ba0,Montana II,Duwbak,gsk,895000.0,92.12,11.49,2480.23,1992.0,1172.0,775.0,Cummins,70.0,500.0,,1.0,welded,,2700.0,,True,,True,9715.59,360.85,34.0,3,False,
+6608df59-5f26-4a5b-9ea3-9074d4b0633a,Alexandra,Motorvrachtschip,gsk,,135.0,14.2,5502.68,2009.0,15590.0,1414.0,Mitsubishi ,100.0,600.0,,1.0,,7.62,6475.0,,True,,True,,,17.0,122,False,
+664ab920-034c-4c4d-880f-893c3a6999ac,TDL 110,Tankschip,rensendriessen,,110.0,11.4,2950.0,1984.0,,,,72.0,380.0,4770.0,,,,,,True,,True,,,42.0,10,False,
+6717d4ad-5a9a-49f9-b3ab-cb175fa916c8,Naxos,Motorvrachtschip,gtsschepen,220000.0,60.49,6.65,713.0,1964.0,33550.0,360.0,Scania,12.5,150.0,14000.0,2.0,mixed,5.45,1075.0,False,True,2018.0,True,3636.96,308.56,62.0,52,False,92c4a1ff-e325-4d4b-a657-e1f869cab3a0
+67a5ecf3-af48-424a-b751-d0312e2c76cf,Bpn-5,Duwbak,gsk,,32.51,8.19,447.0,1980.0,,,,,,,,,,,,,,True,,,46.0,122,False,
+68a2ab5d-ab0b-4d43-b148-690e8e36b131,Progresso,,gsk,,84.84,9.5,1800.0,2002.0,,,,,,,,,,,,,,,,,24.0,66,False,eb79f94e-5e37-44e8-8ae7-616d6cb7f734
+68de5863-ce2e-4a5d-aaa7-311dff633692,Commando,Motorvrachtschip,pcshipbrokers,895000.0,93.89,9.5,1804.0,1957.0,,720.0,Deutz,37.0,350.0,30000.0,,welded,5.8,2100.0,True,True,2024.0,True,9532.43,496.12,69.0,101,False,
+6903f080-e4c4-410c-a08d-b7dac99b3d9e,Rumandy,Motorvrachtschip,gsk,,80.0,8.24,1252.0,1975.0,,,,,,,,,,,,,,,,,51.0,122,False,15a7f837-96c0-4173-8b2c-52107373f450
+6936faf4-c0b1-40ff-a931-5077cc14c098,Waterweg,Duw/Sleepboot,pcshipbrokers,550000.0,15.62,4.64,,1979.0,19355.0,,Caterpillar,13.0,,7000.0,,welded,4.2,,,,,False,35211.27,,47.0,122,False,
+69976f52-408c-435f-a62d-9b987b1b4bc9,Kraftprotz,Kraanschip,gtsschepen,245000.0,22.8,7.8,85.0,1962.0,,260.0,Deutz,30.0,,5800.0,,welded,5.1,,,,,True,10745.61,2882.35,64.0,122,False,
+6b71715c-19e3-4607-8a41-086476d0fd18,Micanto,Motorvrachtschip,galle,630000.0,79.92,9.0,1272.0,1973.0,,,,45.0,,,1.0,,,,,,,,7882.88,495.28,53.0,2,False,6147d348-aeb8-4bc8-a21f-05174aa7e22d
+6b81ffcc-c950-4a0f-830a-4ac8b5bb4f46,CALENDULA 7,Tankschip,rensendriessen,295000.0,45.48,6.05,,,,,,,,,,,,,,,,,6486.37,,,115,False,
+6bcc91d4-2cea-4398-b0a7-bde887c6aff2,Mission,Motorvrachtschip,gtsschepen,3800000.0,134.95,11.45,3873.0,2006.0,65000.0,1278.0,Caterpillar,71.0,,61000.0,1.0,welded,6.1,4950.0,True,,,True,28158.58,981.15,20.0,122,False,20ded37a-7631-4661-9675-655f965ca0e4
+6bcf658a-8193-4cea-94bd-8be686f605f3,Juntos,Motorvrachtschip,gtsschepen,915000.0,82.0,9.3,1254.0,1970.0,45817.0,1000.0,Cummins,17.0,320.0,16000.0,2.0,welded,4.5,1800.0,,True,2019.0,True,11158.54,729.67,56.0,122,False,
+6ca0497f-8eca-4a27-b56c-994fdc00f94a,Käthe Krieger,Motorvrachtschip,gtsschepen,450000.0,104.89,10.0,1821.0,1963.0,,800.0,Deutz,17.5,325.0,23700.0,1.0,welded,5.5,2200.0,True,True,,True,4290.21,247.12,63.0,122,False,
+6ccf3fe9-f35a-461b-b37f-6ae39656c5dc,Salutare,Motorvrachtschip,gtsschepen,,95.0,9.5,1882.0,1964.0,68500.0,600.0,Cummins,42.5,220.0,25000.0,2.0,welded,5.6,2980.0,False,True,2021.0,True,,,62.0,122,False,3b6ae738-dab3-4b61-bc1a-e4243d0e8e48
+6d619416-cfdc-4b99-aad2-95f678242fa4,Navata,Motorvrachtschip,rensendriessen,1100000.0,85.93,9.48,1398.0,1971.0,10000.0,1015.0,Caterpillar,17.0,280.0,19000.0,,,,,,True,,True,12801.12,786.84,55.0,122,False,
+6da74746-d233-40a4-b0c3-507405960b64,Concentus,Tankschip,galle,4500000.0,110.0,11.4,2520.179,2009.0,,,,,,,,,4.8,3008.0,,,,,40909.09,1785.59,17.0,2,False,
+6dab4c2b-1090-4c8a-8e8a-d445b9baff13,Quo-Vadis,Motorvrachtschip,pcshipbrokers,185000.0,60.0,6.67,613.0,1960.0,25241.0,450.0,Scania,24.0,,,,riveted,5.33,,,,,True,3083.33,301.79,66.0,122,False,
+6e8a25de-963c-4d85-99dc-7c3f1a23fe7a,Heinrich k,Motorvrachtschip,pcshipbrokers,695000.0,86.0,11.05,2100.0,1958.0,8135.0,680.0,Caterpillar,25.0,420.0,57000.0,,riveted,5.8,3000.0,,True,,True,8081.4,330.95,68.0,3,False,
+6f41884d-20ef-4ea1-818b-7c0b291e9a4e,Drakar,Motorvrachtschip,pcshipbrokers,550000.0,79.86,8.22,1008.0,1959.0,,,,,,,,,,,,,,,6887.05,545.63,67.0,24,False,15f84222-913f-46d7-8b88-8db375f63bc0
+6fd7d357-d967-4325-9d0d-b9ac493ae217,Centaure,Motorvrachtschip,gsk,,94.95,9.54,1626.92,1965.0,104342.0,1280.0,Caterpillar,40.0,280.0,,2.0,,,2500.0,,True,2020.0,True,,,61.0,122,False,f6c28a64-d6ce-418a-ad6c-663b29632ba8
+700b5141-b6fb-4fb4-b6e7-1227195f9e57,Nieuwbouw,Motorvrachtschip,gsk,,110.0,11.45,3550.0,2025.0,,,,,,,1.0,,,,True,,,,,,1.0,122,False,
+700ebdba-d780-4f87-a76e-4658705428bc,Irene,Tankschip,gtsschepen,350000.0,36.66,4.99,248.0,1958.0,11000.0,180.0,GM,15.0,,,8.0,,,310.0,,,,True,9547.19,1411.29,68.0,17,False,
+71422065-ed3b-46dd-a741-a2ceb9ac868f,Obelix,Duwbak,gtsschepen,,85.0,9.5,1504.0,1958.0,,250.0,DAF,35.0,,500.0,2.0,mixed,4.1,2100.0,,,,True,,,68.0,122,False,
+717600d4-83fd-4300-a49b-5c2611916b9c,Mironi,Motorvrachtschip,gsk,725000.0,84.42,7.03,1154.3,2001.0,18000.0,400.0,Caterpillar,42.5,325.0,,1.0,welded,5.55,1275.0,True,True,2018.0,True,8588.01,628.09,25.0,122,False,
+71b92cae-3089-4165-a966-83df108e678d,Vagari,Motorvrachtschip,gtsschepen,,49.37,5.12,467.0,1962.0,68095.0,250.0,Cummins,11.0,145.0,3000.0,2.0,mixed,4.0,580.0,False,True,2009.0,True,,,64.0,122,False,
+71cb6cd0-4fab-4d56-bef1-6ef312e33f9c,Aurora,Motorvrachtschip,pcshipbrokers,59500.0,39.26,5.1,364.0,1964.0,,,,,,,,,,,,,,,1515.54,163.46,62.0,122,False,
+71ec5a56-d184-4ac4-89f2-e9deb4855fd8,Meare,Motorvrachtschip,gsk,1795000.0,108.69,11.4,3800.0,1974.0,9300.0,1824.6,Cummins,60.5,656.0,,1.0,welded,8.1,3900.0,True,True,,True,16514.86,472.37,52.0,122,False,
+720c5f03-1655-4e5b-a097-fdf2f91fa8eb,Nimar,,gsk,,77.0,8.2,1100.0,1956.0,,,,,,,,,,,,,,,,,70.0,80,False,f49ff23c-45df-4430-be49-0e24ca4619ec
+723c09d3-0afb-43bc-ba53-c32fcd0486fa,Hedy,Duw/Sleepboot,pcshipbrokers,,18.0,4.7,71.0,1946.0,,,,,,,,,,,,,,,,,80.0,122,False,
+729a13eb-aaf4-4f9c-ae96-5eee3139d343,Asteria,Tankschip,galle,,124.8,11.45,3999.0,2007.0,,,,,,,,,5.48,4439.0,,,,,,,19.0,2,False,
+72abe732-2120-4848-9dda-417ddc22b172,Pitbull,Koppelverband,gsk,90000.0,39.16,5.08,367.0,1968.0,24277.0,455.0,John Deere,20.0,,,2.0,,4.35,380.0,,,,False,2298.26,245.23,58.0,122,False,
+72f85cac-0921-4376-8a0b-18d0c5b947e8,Amavi,Beunschip,gtsschepen,,61.96,7.18,756.0,1966.0,,,,,,,,,,,,,,,,,60.0,122,False,e3e8a9c9-04f9-44ed-bfe1-e0a86de39e05
+7315b989-cd68-47da-a923-2a75b6bbc272,Nomadisch ii,Duwbak,gsk,,78.98,11.45,2434.0,1998.0,,,,65.0,675.0,,1.0,welded,,,True,True,,True,,,28.0,122,False,
+7342ae9c-5c66-4f62-a452-165a0528f990,Wilina,Motorvrachtschip,gsk,1695000.0,109.89,10.06,2550.0,1972.0,51900.0,1600.0,Caterpillar,60.0,500.0,,0.0,welded,6.3,3400.0,False,True,,True,15424.52,664.71,54.0,122,False,
+740d83fd-d334-4a3a-9c54-8dba5d8e8d4b,Dylanni,Motorvrachtschip,gsk,,135.0,11.45,4023.0,2009.0,33313.0,1278.0,Mitsubishi ,81.0,524.0,,1.0,welded,7.1,4949.0,,True,,True,,,17.0,122,False,4845e741-895f-4d25-bb32-d6be2b64e4bc
+741e8ca6-5126-49ae-b619-d8a7804f055a,Eemsteyn III,,gtsschepen,69500.0,16.93,6.03,105.0,,,,,,,,,welded,,,,,,True,4105.14,661.9,,122,False,
+7437b506-0fcd-492a-9a0f-3735eaebb0ed,Katja,Motorvrachtschip,gtsschepen,1050000.0,99.63,9.5,2189.0,1971.0,,1100.0,MWM,20.0,400.0,22000.0,1.0,welded,5.2,2015.0,True,True,2021.0,False,10538.99,479.67,55.0,122,False,
+74db24db-111d-4b85-9cb6-8c096572ff80,Amesa,Motorvrachtschip,galle,,80.0,8.2,1303.114,1964.0,,,,20.0,,,1.0,,2.81,,,,,,,,62.0,2,False,88c8ad6b-f502-4608-96a1-9131fd0005a2
+758cfb34-ba22-43b5-909c-1438e0bd782e,Mi vida,Motorvrachtschip,gsk,,109.0,10.5,2502.0,1992.0,,1522.0,Caterpillar,60.0,,,1.0,,5.56,2700.0,True,,,,,,34.0,122,False,05cad7be-d69c-4358-bc0c-4dc47b05a8cd
+75c4bed9-12ba-49bc-b30d-c38e587cbb33,Liquidos,Tankschip,rensendriessen,1350000.0,100.0,10.5,,1986.0,17167.0,1200.0,Caterpillar,65.0,360.0,44000.0,,,,,,True,2021.0,True,13500.0,,40.0,122,False,
+7605a14b-54bd-467f-817e-e523d3761824,Custos,,gsk,,85.0,9.5,1851.0,1996.0,,,,,,,,,,,,,,,,,30.0,122,False,375a2d76-b598-43f7-bcb7-00476319c82c
+76915d22-5a9a-4f79-ba0d-fdf715519fb3,Jericho,Motorvrachtschip,pcshipbrokers,875000.0,90.0,9.97,1915.0,1903.0,,630.0,Caterpillar,40.0,220.0,28000.0,,riveted,6.2,2650.0,,True,,True,9722.22,456.92,123.0,122,False,8c21678b-c14f-432c-9c5b-a33a02a537df
+76c71836-0887-4965-8576-c268a9b2b3b3,Frisian Hopper,Motorvrachtschip,gtsschepen,,63.0,7.2,848.0,2000.0,,,,,,,,,,,,,,,,,26.0,122,False,
+76f0bea2-21f1-4903-bc2f-7956d12b0a80,Littoral,Motorvrachtschip,pcshipbrokers,,108.35,11.4,2969.0,1958.0,,,,,,,,,,,,,,,,,68.0,122,False,1bfccfd2-63e5-4498-a697-8e7567e6b1bf
+7708c331-74ea-4eae-8567-a939b539d109,MRD-Responder,Tankschip,pcshipbrokers,57500.0,19.17,3.72,50.0,1964.0,,,Mercedes,,,,,welded,,,,,,False,2999.48,1150.0,62.0,122,False,
+774df2e2-2979-472a-8cb3-b92c31e7bf8c,Salutare,Motorvrachtschip,pcshipbrokers,,94.88,9.5,1822.0,1964.0,65728.0,600.0,Cummins,42.5,220.0,25000.0,,,5.6,2980.0,,True,,True,,,62.0,122,False,3b6ae738-dab3-4b61-bc1a-e4243d0e8e48
+7764a392-578c-4c77-a2dd-cb41518b3c1c,Leontine-S,Duw/Sleepboot,gtsschepen,460000.0,22.4,5.96,,1954.0,9000.0,520.0,Kmd,20.0,,9000.0,,mixed,4.2,,,,,True,20535.71,,72.0,122,False,
+78c3390a-0913-4f69-b29d-e9a2b3b90508,Kenora,Tankschip,gsk,,86.0,8.6,1255.0,1980.0,20142.0,1065.0,Caterpillar,75.0,380.0,,,welded,5.85,,,True,,True,,,46.0,122,False,
+78d65d3e-7ad8-4132-9b59-e9b2f5b67416,Victor,Motorvrachtschip,gsk,,105.0,9.5,2000.0,1979.0,48971.0,760.0,Caterpillar,67.0,440.0,,2.0,welded,7.2,2700.0,,True,2022.0,True,,,47.0,115,False,
+7930ac90-ff4e-41e7-b02d-3d0f8ed84c17,Chateau Lafaurie,Motorvrachtschip,gtsschepen,,73.54,8.2,955.0,1952.0,,,,,,,,,,,,,,,,,74.0,122,False,
+7a26e20d-70eb-4a60-b202-1279c38b0a31,Duc in altum,Motorvrachtschip,gsk,,135.0,11.45,3903.0,2009.0,42295.0,1278.0,Mitsubishi SB,63.0,560.0,,1.0,welded,6.9,5000.0,True,True,,True,,,17.0,122,False,8d507775-f3e6-45d7-9d22-1c9151be1890
+7a3647ba-a490-44a3-9d5a-7f19de827f70,Ortelius,Motorvrachtschip,pcshipbrokers,2375000.0,86.0,10.0,1832.0,2005.0,,,,,,,,,,,,,,,27616.28,1296.4,21.0,31,False,bf6fa8c4-687b-4c7e-9b7f-1da76b034cf6
+7a9d989b-cf77-472e-a648-ccc770db2369,Salisso,,gsk,295000.0,67.17,8.22,888.0,1938.0,,,,,,,,,,,,,,,4391.84,332.21,88.0,122,False,
+7aa96563-610d-4942-8338-ddbbaa165040,Django,Motorvrachtschip,gsk,,39.0,5.1,353.0,1963.0,,410.0,Scania,18.0,,,2.0,welded,,436.0,,,,,,,63.0,122,False,
+7ae64cb4-f625-4adb-876c-84f2d066da19,VIKING KARVE,Tankschip,rensendriessen,,81.2,10.19,,,,,,,,,,,,,,,,,,,,52,False,
+7af0668a-83ad-4ea6-9933-0fd45828fcbb,Gibraltar,Tankschip,rensendriessen,5450000.0,110.0,11.45,1934.0,2020.0,,750.0,Volvo Penta,436.0,449.0,,,,,,,True,,True,49545.45,2817.99,6.0,122,False,
+7b0362e0-d5fa-43c2-bb8c-2abe9d46d5ae,Farmsum,Motorvrachtschip,gsk,,80.07,7.24,1234.0,1971.0,8413.0,750.0,Volvo,30.0,320.0,,1.0,,,1650.0,,True,,True,,,55.0,122,False,1052c92c-22eb-482c-afe5-283f40dc902a
+7b1574e5-dc7d-40d2-b3b0-43f1d9cef9a7,Dythar,Motorvrachtschip,pcshipbrokers,995000.0,79.98,9.03,1342.0,1966.0,17692.0,812.0,Cummins,35.0,370.0,25000.0,,,5.62,2200.0,,True,,True,12440.61,741.43,60.0,122,False,
+7b6a1234-d8a0-4f1f-83c5-6170e9561712,Debussy,,gsk,1825000.0,86.0,9.46,1729.0,2000.0,,,,,,,,,,,,,,,21220.93,1055.52,26.0,122,False,
+7b7398ac-fcad-4079-acef-66439a159cd5,Threant,Motorvrachtschip,pcshipbrokers,3075000.0,110.0,11.45,3650.0,2008.0,,,,,,,,,,,,,,,27954.55,842.47,18.0,122,False,
+7b96d6f3-8b3b-4133-95d0-3d7d1e70ecff,Jasmar,Tankschip,rensendriessen,3695000.0,105.0,10.03,1880.0,2010.0,35880.0,1278.0,Mitsubishi,163.0,,52000.0,,,,,,,,,35190.48,1965.43,16.0,122,False,
+7baf8d0b-e147-4738-8a18-471bcd8cdef3,Deo Confidentes,Motorvrachtschip,galle,4495000.0,135.0,11.45,3748.0,2008.0,,,,,,,1.0,,4.25,,,,,,33296.3,1199.31,18.0,2,False,
+7bdc2b30-e3b8-481a-9be6-e54761be643c,Tiësto,Motorvrachtschip,galle,,110.0,11.45,2826.0,2002.0,,,,70.0,,,1.0,,,,,,,,,,24.0,2,False,eca9ad0f-e0aa-4122-9df7-922f0d8640d1
+7be3e221-a534-4134-9fe9-7865787bd784,Saga,Motorvrachtschip,gtsschepen,495000.0,79.82,8.2,1086.0,1961.0,49975.0,862.0,Mitsubishi,30.0,400.0,20000.0,1.0,welded,4.4,1600.0,,True,2016.0,True,6201.45,455.8,65.0,122,False,0856a285-cda6-418a-8474-04022719f7db
+7c89791d-9798-478f-bbc8-eec17324d9ff,Fortuna 2,Duwbak,pcshipbrokers,120000.0,57.38,8.8,1135.0,1970.0,,,,,,,,,,,,,,,2091.32,105.73,56.0,122,False,
+7cc4dc3e-31a2-4167-9918-bc2d18b7ffca,Avontuur,Beunschip,pcshipbrokers,385000.0,62.8,7.26,712.0,1961.0,14886.0,400.0,Scania,27.5,220.0,3000.0,,riveted,5.55,,,True,,False,6130.57,540.73,65.0,122,False,
+7d1bda2a-b42c-4efa-b7eb-129ae5926b17,Neris,Tankschip,gtsschepen,2350000.0,85.85,9.5,1490.0,2007.0,52940.0,1197.0,MTU,50.0,600.0,38000.0,6.0,welded,5.25,1710.0,True,True,2018.0,True,27373.33,1577.18,19.0,122,False,
+7d7d7984-9ec3-4330-b43a-77fc0ba5fb14,Marvik,Tankschip,gtsschepen,,50.9,6.39,414.0,1966.0,,,,,,,,,,,,,,,,,60.0,122,False,
+7dc05eb0-465a-4a5d-9959-e5119427ae7c,Andromeda,Motorvrachtschip,gsk,245000.0,67.0,7.45,799.16,1949.0,59500.0,625.0,Caterpillar,30.0,315.0,,2.0,,5.8,1250.0,,True,2013.0,True,3656.72,306.57,77.0,122,False,
+7e494b01-1e33-438f-af1f-925edf2ef19b,Forza,Motorvrachtschip,pcshipbrokers,175000.0,57.07,7.24,672.0,1962.0,,680.0,Caterpillar,25.0,228.0,11000.0,,welded,,1050.0,,True,,True,3066.41,260.42,64.0,24,False,
+7f3002f5-67f6-4ea9-8d34-99e9a20fe52c,STILLE VERKOOP,Motorvrachtschip,gtsschepen,,110.0,9.5,,,,,,,,,,welded,,,,,,,,,,122,False,
+7f8d5ea1-6143-4b89-9fa1-91bfeae43c89,Drakar,,gsk,675000.0,79.86,8.22,1008.0,1959.0,,,,,,,,,,,,,,,8452.29,669.64,67.0,66,False,15f84222-913f-46d7-8b88-8db375f63bc0
+8022db25-cbe7-4afe-91e4-0fa37bb4fb92,Con Amore,Motorvrachtschip,pcshipbrokers,598000.0,80.0,8.22,1227.0,1962.0,,,,,,,,,,,,,,,7475.0,487.37,64.0,122,False,
+803effa2-98e2-4bbe-8f32-8cbff6cc9dab,Follow me,Duw/Sleepboot,gsk,150000.0,26.45,7.58,,1963.0,,610.0,Stork Ricardo ,60.0,,,,welded,13.5,,,,2006.0,True,5671.08,,63.0,122,False,
+80c8057a-a386-47f0-aeaf-23dcd2946572,Alfa-mea ,Motorvrachtschip,pcshipbrokers,3285000.0,110.0,11.45,3232.0,2009.0,46800.0,,Mitsubishi,65.0,575.0,65000.0,,welded,6.1,3700.0,,True,2024.0,True,29863.64,1016.4,17.0,122,False,
+80cc065e-1ca5-4369-9b53-0a39d1328a6b,Candesso II,Duwbak,rensendriessen,1050000.0,72.82,11.45,1868.0,2012.0,,,,,580.0,,,,,,,True,,True,14419.12,562.1,14.0,24,False,
+81263cba-c02c-4b58-9791-4ac8bbde7797,Archimedes,Motorvrachtschip,pcshipbrokers,2995000.0,109.92,11.45,3379.0,2010.0,,,,,,,,,,,,,,,27247.09,886.36,16.0,122,False,
+8169c80b-1a78-4843-bb56-6c57b482b6e0,Saffier,Motorvrachtschip,gsk,,67.0,8.2,985.0,1960.0,28057.0,750.0,Caterpillar ,40.0,270.0,,2.0,,4.3,,,True,,True,,,66.0,122,False,5d7bd30d-4d5c-4d59-995f-2509fcd33213
+81e76ba9-47b6-4771-b3a1-f388dc3ffd52,Isella,Motorvrachtschip,galle,850000.0,85.0,9.5,1815.0,1970.0,,,,,,,1.0,,,,,,,,10000.0,468.32,56.0,2,False,abbbbad8-79dd-4df2-be69-1b1e2b4af702
+8252e6b1-61fd-4be8-99db-d24ef60981ca,Con Amore,Beunschip,pcshipbrokers,430000.0,67.2,7.1,826.0,1966.0,,500.0,Cummins,42.0,200.0,11500.0,,welded,5.75,,,True,2022.0,False,6398.81,520.58,60.0,122,False,
+844a151a-b8cc-4ac1-960e-3e3541385ba4,Fiveltrans,,gsk,,84.65,9.6,1577.0,2002.0,,,,,,,,,,,,,,,,,24.0,122,False,
+85aa1377-cae8-4edf-925a-243f7af01999,Disponible,Motorvrachtschip,gtsschepen,169000.0,54.92,7.57,655.0,1964.0,9250.0,625.0,Scania,20.0,220.0,10000.0,1.0,mixed,5.2,880.0,False,True,,True,3077.2,258.02,62.0,122,False,
+86a7207f-e5a9-4558-8ab1-b13c30cd1473,Johannes,Tankschip,rensendriessen,4995000.0,135.0,11.45,3568.0,2004.0,,1015.0,Caterpillar,637.0,730.0,49000.0,,,,,,True,,True,37000.0,1399.94,22.0,122,False,
+87044bb3-a36a-454f-aec2-481d90920ce3,Pelagus,Motorvrachtschip,rensendriessen,3850000.0,110.0,11.45,2505.0,2017.0,34500.0,1523.0,Caterpillar,62.0,608.0,,,,,,,True,,True,35000.0,1536.93,9.0,80,True,
+8733faa6-abdf-4ee5-9012-b707d2d8e2e7,Inspiratio,Motorvrachtschip,galle,695000.0,84.91,8.24,1237.89,1962.0,,,,20.0,,,1.0,,,,,,,,8185.14,561.44,64.0,2,False,4dc6bbef-9f36-4263-ad5a-45e9262f1bc1
+8868ee32-fdca-46ba-a61f-d1d8b0173e10,Sablo,Beunschip,pcshipbrokers,,66.94,8.23,865.0,1955.0,,630.0,Caterpillar,,200.0,12000.0,,,5.0,,,True,,True,,,71.0,122,False,
+888938f9-23b7-4e40-a513-fc8a5fbd47ba,Johanna Adriana,Beunschip,gtsschepen,395000.0,57.13,7.02,833.0,1963.0,20000.0,551.0,Volvo Penta,40.0,220.0,10000.0,1.0,welded,5.3,469.0,True,True,2021.0,,6914.06,474.19,63.0,122,False,4218d695-56de-4c87-ade8-fc5fecfe3f49
+88c8ad6b-f502-4608-96a1-9131fd0005a2,Amesa,Motorvrachtschip,gsk,585000.0,80.0,8.2,1303.11,1964.0,,816.0,MTU,20.0,235.0,,1.0,welded,5.8,2100.0,,True,,,7312.5,448.93,62.0,122,False,
+8932b939-7348-4fdb-b3ee-2d13b22b8bf3,Aloha,Tankschip,pcshipbrokers,1400000.0,95.0,11.4,2223.0,1985.0,22000.0,800.0,MTU,110.0,350.0,48000.0,,,,,,True,,True,14736.84,629.78,41.0,122,False,
+89c6166c-fe5e-4eaf-8054-403f6924a623,Tiësto,,gsk,,110.0,11.45,2826.0,2002.0,,,,,,,,,,,,,,,,,24.0,45,False,eca9ad0f-e0aa-4122-9df7-922f0d8640d1
+8a3f4bb6-1c48-4760-865a-08175e0f4e37,RIPOSA,Motorvrachtschip,rensendriessen,,135.0,14.27,,,,,,,,,,,,,,,,,,,,115,False,25788b89-9897-4649-8d10-99baf1db1a53
+8af09c60-c965-4ced-b733-25245186db77,Bonanza,Duw/Sleepboot,gsk,,22.24,11.0,447.0,1974.0,21984.0,1225.0,Caterpillar,60.0,500.0,,,welded,,,,True,,True,,,52.0,94,False,
+8bc97cd0-d0df-4b5e-aee2-1d50737a0689,Brenta,Motorvrachtschip,pcshipbrokers,2675000.0,110.0,11.4,3072.0,1987.0,,,,,,,,,,,,,,,24318.18,870.77,39.0,122,False,
+8c0298f1-dc10-40fb-a54a-591b53454844,Zuiderzee,Passagiersschip,gsk,,50.0,6.6,,1968.0,,750.0,Volvo,110.0,,,,,5.0,,,,,,,,58.0,122,False,
+8c0392c3-929f-47c3-8359-e87b9f553848,Nomadisch,Koppelverband,gsk,,92.98,11.45,2664.0,1998.0,135000.0,1549.9,MAK,65.0,389.0,,,welded,6.1,,True,True,,True,,,28.0,38,False,
+8c1f7d98-101e-445e-b417-007245382caa,Panera,Motorvrachtschip,pcshipbrokers,,94.95,9.49,2374.0,1973.0,,1600.2,Cummins,50.0,440.0,34000.0,,welded,6.2,2400.0,,True,,True,,,53.0,73,False,
+8c21678b-c14f-432c-9c5b-a33a02a537df,Jericho,Motorvrachtschip,gsk,925000.0,90.0,10.0,1915.0,1909.0,,630.0,Caterpillar,41.0,,,2.0,,6.2,2600.0,False,,2008.0,,10277.78,483.03,117.0,122,False,
+8cefe9c8-d447-4490-b0f1-e083d1a37793,Cetus,Duw/Sleepboot,gsk,,21.16,8.02,,1979.0,33000.0,720.0,Doosan,35.0,,,,welded,,,,,2010.0,True,,,47.0,122,False,
+8d0d466f-a585-469f-9a27-0c1a47855cad,Navata,,gsk,,85.93,9.48,1460.0,1971.0,,,,,,,,,,,,,,,,,55.0,66,False,6d619416-cfdc-4b99-aad2-95f678242fa4
+8d176331-be0b-45f1-9e9d-3e2a525d94e7,Calidris,Beunschip,pcshipbrokers,,85.0,9.5,1744.0,1974.0,,,,,,,,,,,,,,,,,52.0,122,False,
+8d2f9734-3f89-4084-a423-10bb7d0ac9cb,Naomi,Motorvrachtschip,pcshipbrokers,495000.0,70.35,7.25,1015.0,1966.0,8500.0,400.0,Volvo Penta,24.0,353.5,10500.0,,riveted,5.2,1600.0,,True,,True,7036.25,487.68,60.0,122,False,
+8d3b256f-0889-45d0-948e-1d520a4f05fa,Esmee,Motorvrachtschip,gtsschepen,1295000.0,104.75,9.5,2291.0,1972.0,22500.0,1015.0,Caterpillar,42.5,450.0,26000.0,1.0,welded,5.3,2500.0,True,True,2024.0,True,12362.77,565.26,54.0,122,False,
+8d507775-f3e6-45d7-9d22-1c9151be1890,Duc in Altum,Motorvrachtschip,rensendriessen,,135.0,11.45,3768.0,2009.0,42295.0,1278.0,Mitsubishi,63.0,560.0,61000.0,,,,,,True,,True,,,17.0,122,False,
+8df7f0dc-1afa-4da6-aa2c-713b3a7afdef,Vertrouwen,Motorvrachtschip,gtsschepen,260000.0,73.0,7.06,946.0,1947.0,36500.0,862.0,Mitsubishi,35.0,320.0,15000.0,2.0,welded,5.3,1400.0,False,True,2022.0,True,3561.64,274.84,79.0,122,False,
+8e002699-cc4f-41fc-a1db-019bbdad28dc,Galypsos,Tankschip,rensendriessen,4000000.0,134.79,11.45,3594.0,1999.0,49588.0,2778.0,W6L,,400.0,,,,,,,True,2024.0,True,29675.79,1112.97,27.0,3,False,
+8e2b4b50-7238-40b0-98db-9b4f656e14f8,Geronimo,,gsk,,110.0,11.45,3263.0,2010.0,,,,,,,,,,,,,,,,,16.0,122,False,
+8e4bdb6f-6eb1-4457-8977-460f327f60e7,Saffira,Tankschip,pcshipbrokers,1300000.0,85.97,9.48,1495.0,1971.0,23508.0,1217.0,Caterpillar,266.0,,20300.0,,welded,4.6,,,,,True,15121.55,869.57,55.0,108,False,
+8fe8338e-1790-4f32-839f-869e20ca9c78,Ronaris,Motorvrachtschip,gtsschepen,375000.0,80.17,8.22,1132.0,1959.0,,525.0,MWM,15.0,350.0,20000.0,2.0,welded,4.9,1650.0,,True,2021.0,True,4677.56,331.27,67.0,10,False,
+9051061d-388c-4954-849b-18ee759b9fbc,Bonanza II,Duw/Sleepboot,gsk,,22.62,6.84,289.0,1983.0,17360.0,750.0,Cummins,60.0,,,,,,,,,,True,,,43.0,94,False,
+9065ea25-1524-4358-8920-0c5cb32aba1f,Storm (donau),,gsk,200000.0,69.96,7.25,1038.0,1964.0,,,,,,,,,,,,,,,2858.78,192.68,62.0,122,False,
+90c10d8b-3bef-40e6-ac58-cdedc1bd70d2,Integro,Motorvrachtschip,pcshipbrokers,725000.0,80.0,9.5,1400.0,1968.0,34100.0,1160.0,MTU,,285.0,18000.0,,welded,5.2,1484.0,,True,,True,9062.5,517.86,58.0,122,False,
+91629dd8-925d-4b22-bf07-0209010bd66d,OTTO DEYMANN,Tankschip,rensendriessen,,109.92,11.4,,,,,,,,,,,,,,,,,,,,115,False,
+91a48d3b-e47a-4b84-a54f-9ad451349102,Laco,Duwbak,gtsschepen,400000.0,85.0,11.4,2111.0,1979.0,,,,35.0,400.0,,1.0,,5.0,1233.0,True,True,,False,4705.88,189.48,47.0,122,False,46dfee45-fdd4-44e6-8eb8-4916869c33d6
+9206c407-583d-490b-9d0c-d03b8bc9fadf,Hermina & Hermina I,Koppelverband,rensendriessen,3600000.0,110.0,11.4,2410.0,1994.0,24832.0,1825.0,Cummins,65.0,600.0,55000.0,,,,,,True,,True,32727.27,1493.78,32.0,122,False,
+92a49476-2561-4b24-b2d8-d7e6d15b8299,Amata,Beunschip,gtsschepen,125000.0,63.0,7.05,767.0,1949.0,,650.0,Mitsubishi,20.0,270.0,,2.0,mixed,6.0,500.0,True,True,,True,1984.13,162.97,77.0,122,False,
+92b8902b-5c21-4b17-90d6-8a4bb3a92175,Diane,Motorvrachtschip,gsk,,55.0,6.62,800.0,1967.0,1400.0,369.8,Detroit ,22.0,35.0,,2.0,welded,,950.0,,True,2019.0,True,,,59.0,122,False,
+92c4a1ff-e325-4d4b-a657-e1f869cab3a0,Naxos ,Motorvrachtschip,pcshipbrokers,220000.0,60.49,6.65,713.0,1964.0,34000.0,,Scania,,,14000.0,,,5.45,1075.0,,,2018.0,False,3636.96,308.56,62.0,122,False,
+92cd356b-ff77-4c0b-af3c-497d5b06608d,Noortje b,Motorvrachtschip,gsk,,79.92,8.2,1099.0,1955.0,,599.6,2 x Volvo Penta,24.0,162.0,,1.0,welded,4.6,1550.0,True,True,,True,,,71.0,122,False,
+935b40fc-ebe1-4a9e-b94c-7c72252f7e44,Silencio,Motorvrachtschip,pcshipbrokers,595000.0,85.0,8.2,1400.0,1954.0,20000.0,750.0,Volvo,27.0,230.0,35500.0,,riveted,5.33,1900.0,,True,,True,7000.0,425.0,72.0,52,False,
+93abd22b-d4ad-4f0a-b636-6c1c1834280c,Vitesse,Motorvrachtschip,gtsschepen,180000.0,63.44,6.35,619.0,1959.0,21761.0,510.0,Volvo Penta,17.5,165.0,9200.0,2.0,welded,5.2,975.0,False,True,2020.0,True,2837.33,290.79,67.0,122,False,
+93e2fa1d-f060-4bfb-a3c1-cd7d79d499c1,Taz ii,Koppelverband,gsk,800000.0,80.0,12.54,3300.522,1987.0,,,,,,,1.0,,,4000.0,,True,,False,10000.0,242.39,39.0,122,False,
+93e4d534-b9c3-4e71-80fa-9fdedb45e443,Petite fleur,Motorvrachtschip,gsk,1995000.0,110.0,10.5,2385.0,1988.0,55000.0,1520.0,Caterpillar,65.0,320.0,,2.0,welded,6.2,3300.0,False,True,,True,18136.36,836.48,38.0,122,False,
+9415b257-46df-4fa2-8d01-a5a732da7960,Labiata,Duw/Sleepboot,gtsschepen,280000.0,23.33,6.2,30.0,1955.0,,680.0,Deutz,25.0,,9000.0,,welded,7.0,,,,2019.0,True,12001.71,9333.33,71.0,122,False,
+942298b0-0a07-4915-8b6c-79bec27fc43a,Sicera,,gsk,,104.99,9.5,2142.0,1981.0,,,,,,,,,,,,,,,,,45.0,45,False,5db416a9-c7f1-4fe4-b17d-767950c990a7
+9423f7f3-667b-4847-b3d8-65f382466475,Carco Grup 1,Duwbak,gtsschepen,650000.0,84.95,11.4,3109.0,1974.0,,,,,360.0,,,,,,,True,,True,7651.56,209.07,52.0,122,False,
+944c48f8-c7e9-4776-8c82-51e20df5d356,Regina-w,Tankschip,gsk,,80.0,9.0,1059.0,1963.0,,1150.0,Deutz,,180.0,,,,4.1,,,True,2022.0,True,,,63.0,122,False,
+947359ea-4c85-4a09-a872-a2cb73af8ab0,Tormenta,Motorvrachtschip,pcshipbrokers,,135.0,11.45,4038.0,2011.0,,,,81.0,550.0,69070.0,,,7.1,4550.0,,True,,True,,,15.0,122,False,a24e80e7-4e5c-4412-9080-63f9a1e367ab
+954f8c66-0dc5-43a9-a3e7-77ff81c5c8f2,Bpn-3,Duwbak,gsk,,55.34,8.24,626.0,1954.0,,,,,,,,,,,,,,True,,,72.0,122,False,
+955c352d-5293-428f-9678-417dcd58348d,Celeste,Motorvrachtschip,pcshipbrokers,2995000.0,105.0,11.45,3047.0,2004.0,65090.0,1521.0,Caterpillar,60.0,534.0,71100.0,,welded,6.1,3500.0,,True,,True,28523.81,982.93,22.0,122,False,
+95840756-aa2c-4ee2-aca5-a319a764dcfb,Gottardo,Motorvrachtschip,pcshipbrokers,,110.0,11.45,2771.0,1983.0,120000.0,880.0,"MWM,",65.0,440.0,50000.0,,,5.2,3600.0,,True,,True,,,43.0,122,False,
+95aeddec-6f1b-4c3f-92f2-856b7fbf8d7b,PHOENIX 6,Duwbak,rensendriessen,,90.0,11.45,,,,,,,,,,,,,,,,,,,,108,False,
+95f46d42-cf10-42eb-935d-188e0d271de9,Tyda-Kyra,Motorvrachtschip,pcshipbrokers,3695000.0,135.0,11.45,4202.0,2008.0,,,,,,,,,,,,,,,27370.37,879.34,18.0,122,False,
+95fdc211-5a79-434e-b5e5-cc69ce28dcec,Franca,Motorvrachtschip,gsk,1500000.0,105.0,9.6,2164.0,1972.0,,1400.0,Cummins,41.0,,,,welded,5.1,2335.0,True,True,,,14285.71,693.16,54.0,122,False,
+96119d66-4b5a-4b56-a2d5-07b7f06755ea,Libel,Motorvrachtschip,pcshipbrokers,695000.0,80.92,8.24,1235.0,1964.0,16724.0,862.0,Mitsubishi,27.0,,23500.0,,riveted,5.2,2000.0,,,,True,8588.73,562.75,62.0,108,False,
+96353a65-8b3a-40c9-8f9b-2f37e1c98e78,Nova Spes,Motorvrachtschip,gtsschepen,250000.0,57.8,6.63,680.0,1965.0,13714.0,379.0,MAN,14.5,270.0,5800.0,1.0,welded,4.85,1050.0,False,True,,True,4325.26,367.65,61.0,52,False,
+966976ba-5b22-4460-a6d9-16e7aae532fd,Indigo ii,,gsk,2950000.0,110.0,11.45,3009.0,2005.0,,,,,,,,,,,,,,,26818.18,980.39,21.0,122,False,
+96992c07-398f-46d0-b09d-7f9c02637417,Ilse-Marie,Beunschip,gtsschepen,480000.0,69.3,8.24,994.0,1965.0,,600.0,Deutz,24.0,380.0,7800.0,2.0,welded,5.7,600.0,True,True,2019.0,True,6926.41,482.9,61.0,122,False,
+970b1b22-f22c-4ee7-b341-92a1332ad618,Piranha,Motorvrachtschip,gsk,,69.97,8.17,957.0,1948.0,13000.0,600.0,Caterpillar,18.0,,,1.0,,6.5,,,,,True,,,78.0,122,False,
+978e3f4a-93ce-4b8e-b78e-514373322b0d,Folio 3629,Tankschip,gtsschepen,,110.0,11.4,,1995.0,,,,,,,,,,,,,,,,,31.0,122,False,
+97e103ad-4618-495e-a9be-1d37b033b353,Navigar 3,Duw/Sleepboot,gsk,,24.99,5.35,,1978.0,,550.0,Scania,,,,,,,,,,,,,,48.0,94,False,
+97e269c4-312c-44ba-a063-8fe1c4f94394,Hasta la Vista,Motorvrachtschip,gsk,650000.0,80.0,9.27,1352.0,1971.0,29760.0,1380.0,Mitsubishi,30.0,250.0,,1.0,welded,5.6,1700.0,,True,,True,8125.0,480.77,55.0,66,False,
+980eb5ab-4499-428f-9961-10d235c035bb,Svad 1,Motorvrachtschip,gtsschepen,235000.0,73.45,8.12,1101.0,1939.0,40000.0,800.0,MTU,,360.0,20000.0,2.0,riveted,6.1,1300.0,False,True,,True,3199.46,213.44,87.0,122,False,
+98fd7abb-68eb-4e26-9391-fecde6e7710c,Sus en zo,Beunschip,pcshipbrokers,830000.0,69.99,8.94,1215.0,1961.0,5600.0,,Volvo Penta,34.0,195.0,10000.0,,riveted,,,,True,,True,11858.84,683.13,65.0,122,False,
+98feb764-141f-4f1c-bc61-902bfe1f1ef4,Mercur,Motorvrachtschip,gsk,,86.0,11.45,2278.0,2000.0,,,,,,,,,,,,,,,,,26.0,122,False,b07e0cb6-32ff-421e-9d9e-78e6c6f3a96a
+9a0d2c87-552f-4034-bb00-c1818410d328,Marpie,Tankschip,gtsschepen,325000.0,29.92,5.47,149.0,1958.0,,380.0,MAN,71.5,140.0,,4.0,welded,,170.0,,True,,True,10862.3,2181.21,68.0,17,False,
+9ace9ecd-fd7c-4e59-99ca-5bd1969774e9,Folio 3414,Duwbak,gtsschepen,440000.0,76.5,11.4,2757.0,1993.0,,,,,,,1.0,welded,,2730.0,True,,,True,5751.63,159.59,33.0,122,False,
+9b9bfe61-52b6-481a-89ae-99eccc6f09b6,Replay,Motorvrachtschip,gsk,1050000.0,86.0,9.53,1443.0,1956.0,28000.0,650.0,Volvo Penta,34.0,510.0,,2.0,,6.6,2200.0,False,True,,False,12209.3,727.65,70.0,122,False,
+9bc53638-7ed8-4d8e-afab-2ef5691758b3,Gibraltar,Tankschip,gsk,,110.0,11.45,2690.0,2020.0,3643.0,750.0,2 x Volvo Penta,436.0,330.0,,,,5.6,,,True,,True,,,6.0,122,False,7af0668a-83ad-4ea6-9933-0fd45828fcbb
+9c1dd150-b207-4275-b68a-94a320da529a,Ferox,Motorvrachtschip,gsk,,69.63,7.06,862.0,1948.0,,675.0, Detroit Diesel,20.0,,,2.0,,6.0,1325.0,False,,2005.0,True,,,78.0,122,False,2340f935-5f6a-4289-8f65-97c99e19e025
+9c4d25bf-a9f8-448b-ba35-e26f298f2a86,Franca,Motorvrachtschip,gtsschepen,1500000.0,105.0,9.6,2164.0,1972.0,27380.0,1400.0,Cummins,31.0,320.0,19000.0,1.0,welded,4.9,2300.0,True,True,,True,14285.71,693.16,54.0,122,False,95fdc211-5a79-434e-b5e5-cc69ce28dcec
+9c60dd46-a1ab-48d9-a878-caae243c1022,Maasdam,Motorvrachtschip,gsk,1650000.0,101.9,9.49,2352.0,1977.0,6789.0,1200.0,Caterpillar,60.0,400.0,,2.0,welded,5.5,2550.0,True,True,,True,16192.35,701.53,49.0,122,False,
+9e38f66c-87f7-4a96-b10b-d45f92603d3b,The-An I,Motorvrachtschip,gtsschepen,145000.0,63.0,6.67,762.0,1963.0,23000.0,400.0,Volvo Penta,16.25,120.0,7500.0,2.0,mixed,,1075.0,False,True,,True,2301.59,190.29,63.0,10,False,
+9e3fab93-2ac1-454d-a816-c0599f994e66,Consensus,Motorvrachtschip,pcshipbrokers,595000.0,79.95,8.2,1067.0,1957.0,11500.0,705.0,Mitsubishi,35.0,315.0,10000.0,,riveted,4.15,1650.0,,True,,True,7442.15,557.64,69.0,122,False,
+9ec1d434-b358-447a-a997-e4ed8e7f33eb,Gibraltar,Tankschip,pcshipbrokers,5450000.0,109.96,11.44,2690.0,2020.0,4000.0,750.0,Volvo Penta,72.0,,2.0,,,4.6,,,,,True,49563.48,2026.02,6.0,122,False,7af0668a-83ad-4ea6-9933-0fd45828fcbb
+9f055c1f-6241-4e5c-bca3-eb8c512d06f5,Navata,,gsk,,85.93,9.48,1460.0,1971.0,,,,,,,,,,,,,,,,,55.0,115,False,6d619416-cfdc-4b99-aad2-95f678242fa4
+9f26f2f3-4ad0-45c0-91dc-d528ee4913f4,Fury,Motorvrachtschip,gsk,150000.0,47.0,5.11,437.0,1962.0,25000.0,450.0,Volvo,22.0,180.0,,2.0,,4.9,600.0,,True,,True,3191.49,343.25,64.0,122,False,
+9f8eb5c5-f1b5-431e-bc5f-57007c17864e,Nijverheid,Beunschip,pcshipbrokers,1250000.0,86.0,9.46,1707.0,1954.0,,,,,,,,,,,,,,,14534.88,732.28,72.0,122,False,
+a0315802-4c04-4cfe-819f-aaa738c4406f,Amice,Motorvrachtschip,rensendriessen,4750000.0,135.0,11.45,3804.0,2008.0,60012.0,1015.0,Caterpillar,75.0,608.0,55000.0,,,,,,True,2023.0,True,35185.19,1248.69,18.0,122,False,
+a052602f-02e8-4a07-80c0-41a015e8c5e0,Sobrino,Duw/Sleepboot,pcshipbrokers,,16.8,4.12,10.0,1951.0,,380.0,Deutz,,,,,,,,,,,False,,,75.0,122,False,
+a0e25681-a11c-4a1e-ab3d-a1193fafbc2b,Je-pa,Motorvrachtschip,gsk,525000.0,80.0,9.0,1351.118,1956.0,9450.0,500.0,Volvo Penta,49.0,370.0,,1.0,welded,6.6,1850.0,False,True,,True,6562.5,388.57,70.0,108,False,
+a0ed7d6b-efba-4432-95ec-9702f48d42d8,Shrek,Motorvrachtschip,gsk,,54.89,6.58,603.0,1962.0,37000.0,400.0,Iveco,47.0,250.0,,2.0,,,1000.0,,True,,,,,64.0,122,False,
+a120c04e-b999-4e32-a5b7-12e3439411d5,Montana,Motorvrachtschip,galle,2395000.0,109.85,11.45,2663.199,2001.0,,,,72.5,,,1.0,,,,,,,,21802.46,899.29,25.0,2,False,eeeb8a4f-d4cb-45d2-888e-be1706151055
+a16b1c56-5229-49ab-b528-37cdd7645fb0,Laurens,Duwbak,pcshipbrokers,,76.5,11.45,2870.0,2010.0,,,,30.0,530.0,1000.0,,,,,,True,,True,,,16.0,122,False,
+a20f960c-eb38-4da5-9754-d738eaa4eaa1,Credo,Motorvrachtschip,gsk,650000.0,85.84,9.5,1499.0,1957.0,,,,,,,,,,,,,,,7572.23,433.62,69.0,122,False,
+a24e80e7-4e5c-4412-9080-63f9a1e367ab,Tormenta,Motorvrachtschip,gsk,,135.0,11.45,4038.24,2012.0,38000.0,1278.0,Wartsila ,81.0,550.0,,1.0,,7.1,4850.0,,True,,True,,,14.0,122,False,
+a26967b8-9981-4ec6-9400-49dbb87b32ea,Porthos,Motorvrachtschip,pcshipbrokers,2400000.0,84.77,9.6,1500.0,2011.0,20000.0,750.0,Volvo Penta,72.0,405.0,32600.0,,welded,4.9,2078.0,True,True,,True,28311.9,1600.0,15.0,122,True,
+a29d064a-75e1-42a3-a33f-448a88ff7e23,Riposa,,gsk,,135.0,14.27,5040.0,2019.0,,,,,,,,,,,,,,,,,7.0,122,False,25788b89-9897-4649-8d10-99baf1db1a53
+a3431363-81a3-462e-965e-5b28f0f363da,MICHAELANGELO,Motorvrachtschip,rensendriessen,4250000.0,135.0,11.45,,,,,,,,,,,,,,,,,31481.48,,,115,False,d385684a-dee0-458e-b8b4-00115ae8387c
+a34bcbbc-e959-4675-89c9-079ef823578d,Antwerp,Tankschip,rensendriessen,3595000.0,110.0,11.45,2825.0,2005.0,39289.0,1801.0,ABC,498.0,600.0,51000.0,,,,,,True,,True,32681.82,1272.57,21.0,122,False,
+a3a1c494-1397-42bc-b1f4-467db13a2fca,Viper,Motorvrachtschip,gtsschepen,,109.94,9.5,2300.0,1987.0,62000.0,1521.0,Caterpillar,30.0,300.0,44000.0,2.0,welded,5.7,3000.0,,True,2012.0,True,,,39.0,122,False,
+a3a72175-24a5-4754-9188-7800142c0b87,Saffier,Motorvrachtschip,gtsschepen,680000.0,67.0,8.2,985.0,1960.0,23000.0,750.0,Caterpillar,40.0,260.0,9000.0,3.0,welded,4.3,1300.0,False,True,,True,10149.25,690.36,66.0,122,False,5d7bd30d-4d5c-4d59-995f-2509fcd33213
+a3d1c66c-6ccb-4a1c-a4b2-31b3d56b8f84,Hybrid,Motorvrachtschip,pcshipbrokers,1295000.0,109.92,10.5,2588.0,1985.0,23500.0,1200.0,Deutz,45.0,259.7,26000.0,,,5.2,2700.0,True,True,,True,11781.3,500.39,41.0,122,False,
+a43d5c5f-e38a-4c78-8389-4023b1db93f0,Dolfijn,Overige,gtsschepen,82500.0,19.2,5.6,45.0,1992.0,12474.0,360.0,Scania,,,3000.0,,welded,,,,,,True,4296.88,1833.33,34.0,122,False,
+a464320d-7ff3-4a80-9bf0-e6ac1d11dc30,Vivo,Motorvrachtschip,gsk,145000.0,60.0,6.64,638.0,1962.0,35269.0,253.0,John Deere,30.0,250.0,,2.0,welded,,1000.0,,True,,False,2416.67,227.27,64.0,122,False,
+a4994868-591c-4c47-99a8-17568b0cdd74,Liverpool,Tankschip,galle,2795000.0,85.75,9.55,1475.868,2000.0,,,,,,,,,4.72,1721.0,,,,,32594.75,1893.8,26.0,2,False,
+a4c3073b-191c-40f8-9680-d121b8b79117,Franca,Motorvrachtschip,pcshipbrokers,1500000.0,105.0,9.6,2164.0,1972.0,27380.0,,Cummins,41.0,300.0,19000.0,,,6.4,2230.0,,True,,True,14285.71,693.16,54.0,122,False,95fdc211-5a79-434e-b5e5-cc69ce28dcec
+a4e0f7cd-2a4e-4eb3-8425-a1c4c11e3009,Korundis,Tankschip,pcshipbrokers,995000.0,69.99,7.5,975.0,1989.0,17240.0,611.8,Mitsubishi,30.0,220.0,22000.0,,,5.3,,,True,,True,14216.32,1020.51,37.0,122,False,
+a556119d-1f86-45fe-8572-20ebb27177ba,La camargue,Motorvrachtschip,gsk,,105.0,11.4,2882.0,1973.0,25000.0,1073.0,Caterpillar ,35.0,350.0,,2.0,welded,7.0,3100.0,,True,,True,,,53.0,122,False,
+a5ef9e0e-5fc2-4b08-a8a7-df382806b0f8,Octopussy,Motorvrachtschip,gsk,1650000.0,104.0,9.5,2211.0,1981.0,,1227.0,Caterpillar,34.0,360.0,,2.0,welded,6.3,3100.0,,True,2019.0,,15865.38,746.27,45.0,122,False,
+a6463043-99a2-4b8f-8dc9-ea72ef4aba43,GRETE-MARIE,Tankschip,rensendriessen,2950000.0,85.9,9.46,,,,,,,,,,,,,,,,,34342.26,,,115,False,
+a688bd4f-7908-461a-a651-a16d6fdd86d8,Mira Vita,Motorvrachtschip,gtsschepen,450000.0,84.88,8.27,1148.0,1958.0,54396.0,940.0,Cummins,28.0,230.0,12000.0,2.0,welded,,1550.0,False,True,2023.0,False,5301.6,391.99,68.0,122,False,
+a6e68a34-dd6e-4011-ade6-df787cad04a5,CDD Belumi 2,Duwbak,gtsschepen,,67.12,8.2,1010.0,1929.0,,,,,,,,,,,,,,,,,97.0,122,False,
+a6f1ae30-0036-4a2d-a4de-71203a42c5fe,FPS Rijn,Motorvrachtschip,pcshipbrokers,4500000.0,135.0,14.2,5207.0,2008.0,,,,,,,,,,,,,,,33333.33,864.22,18.0,122,False,f38bd339-eabd-4174-bd24-1f0ae6c58df5
+a723dd66-0be6-49a4-8a0c-70f77ef9c7cc,Kalithea,Motorvrachtschip,gtsschepen,,86.0,8.2,1194.0,1959.0,,,,,,,,,,,,,,,,,67.0,80,False,
+a74c7042-a6c0-4bb6-a4bc-1640d932dce7,Alberanto,Motorvrachtschip,gsk,,110.0,11.4,3004.0,1993.0,,,,,,,,,,,,,,,,,33.0,122,False,2bfd291a-c261-4437-b50c-13ea108a613c
+a7c59521-72e1-4acc-ac63-7a058f748df3,Zwarte Zee,Motorvrachtschip,gtsschepen,395000.0,80.14,8.21,1128.0,,29990.0,953.0,Mitsubishi,20.0,320.0,20000.0,2.0,mixed,4.87,1550.0,False,True,,True,4928.87,350.18,,2,False,
+a7f1ccf7-80bd-407f-b0e1-ab14c8fbc04f,Meteor,Duw/Sleepboot,gsk,,21.7,7.7,,1932.0,9600.0,1012.9,Wartsila,45.0,450.0,,,welded,6.2,,,True,,False,,,94.0,122,False,
+a7f53126-4f29-4596-8864-d11a98942d8d,Misonda,,gsk,445000.0,84.95,8.2,1147.0,1955.0,,,,,,,,,,,,,,,5238.38,387.97,71.0,122,False,
+a8a1ee58-e96d-40c7-a953-7a284225c725,CDD Koert,Duwbak,gtsschepen,,65.61,8.21,1076.0,1962.0,,,,,,,,,,,,,,,,,64.0,122,False,
+a8cf1ca3-5b70-4d9b-a773-a7d51b3fbe18,Archelle,Tankschip,pcshipbrokers,,84.9,9.58,1492.0,2016.0,,,,,,,,,,,,,,,,,10.0,122,False,
+a8de9ec9-e3b2-43ba-83ba-f612059b7ce6,Shalona,Motorvrachtschip,gtsschepen,995000.0,85.02,9.53,1690.0,1972.0,72485.0,1200.0,Cummins,35.0,480.0,38000.0,1.0,welded,5.52,1800.0,True,True,2024.0,True,11703.13,588.76,54.0,122,False,
+a8e0a0ba-2080-4e72-8c7d-98b2965bed08,Amigos,Motorvrachtschip,pcshipbrokers,1350000.0,84.09,9.58,1765.0,1970.0,17450.0,,CAT,45.0,320.0,50000.0,,welded,5.75,2550.0,,True,,True,16054.23,764.87,56.0,122,False,46fdd2d6-976d-4243-9aa5-c2a80e2e74a0
+a967e5bf-eb3a-4327-92c5-494f3e7a8ecc,Orlando,Motorvrachtschip,pcshipbrokers,695000.0,80.0,8.2,1143.0,1958.0,,,,,,,,,,,,,,,8687.5,608.05,68.0,122,False,
+a9705392-7d9e-499c-9721-71269eef5347,Poseidon,Tankschip,pcshipbrokers,2850000.0,110.0,11.45,2511.0,2000.0,35750.0,1834.0,Caterpillar,,336.0,42000.0,,welded,6.2,,,True,,True,25909.09,1135.01,26.0,59,False,ddcc726b-524c-4b26-99aa-c2ab3a801cb3
+a980a089-0751-4d6f-bea4-9f8dfe793634,Grigoriana & Grigoriana 2,Koppelverband,gtsschepen,,80.0,8.26,1135.0,1964.0,,,,,,,,,,,,,,,,,62.0,122,False,
+aa11f546-0978-4626-a2f3-6f7c48149fea,Navigar 7,Duw/Sleepboot,gsk,99000.0,14.14,8.17,,1966.0,,150.0,2 x DMW ,,,,,,,,,,,False,7001.41,,60.0,122,False,
+aa202350-ef62-4e0c-b1e1-f98e4ddb0422,Miryana,Motorvrachtschip,pcshipbrokers,2495000.0,105.0,11.4,2800.0,1994.0,46000.0,,MTU,60.0,,60000.0,,,5.8,3400.0,True,,,True,23761.9,891.07,32.0,122,False,
+aa849a56-96d7-4b4a-9ddd-266ffaba22e2,Majesty,Motorvrachtschip,pcshipbrokers,2095000.0,110.0,9.5,2234.0,1982.0,22900.0,1400.0,Mitsubishi,34.0,400.0,24000.0,,welded,5.6,2975.0,,True,,True,19045.45,937.78,44.0,122,False,
+aaf7f288-cedf-4fc8-9a80-ebcf18ce4841,Alcyon,Duw/Sleepboot,gtsschepen,295000.0,21.5,6.38,25.0,1962.0,,910.0,Mitsubishi,,,,,,,,,,,True,13720.93,11800.0,64.0,122,False,
+ab88c395-bc03-4579-9d72-1076eedb5f57,Independance,Motorvrachtschip,gsk,,69.87,7.1,690.0,1959.0,,650.0,Volvo Penta,31.0,310.0,,1.0,,4.41,,,True,,,,,67.0,122,False,
+abbbbad8-79dd-4df2-be69-1b1e2b4af702,Isella,Motorvrachtschip,gsk,850000.0,85.0,9.5,1815.0,1970.0,,550.0,Scania,32.0,,,1.0,welded,5.5,1920.0,True,True,2019.0,,10000.0,468.32,56.0,122,False,
+ac10516f-fc57-4952-a1ee-09cc18f444d5,Kiya,Motorvrachtschip,pcshipbrokers,995000.0,85.52,11.04,2037.0,1959.0,,,,,,,,,,,,,,,11634.71,488.46,67.0,122,False,ba7d46cf-9fae-45b3-97d4-89afaa304ed3
+acb80bf2-bd54-4eea-92dd-7f02083bd4eb,Yug,Motorvrachtschip,gsk,250000.0,85.0,9.19,1319.0,1929.0,,1269.0,Deutz,30.0,300.0,,1.0,,,1650.0,True,True,,,2941.18,189.54,97.0,122,False,
+ad287a68-a690-42a7-9e62-dfe9ec9c49b3,Dakota,Beunschip,pcshipbrokers,1200000.0,85.9,8.45,1498.0,1979.0,22597.0,1015.0,Caterpillar,65.0,400.0,18100.0,,welded,5.0,,,True,2026.0,True,13969.73,801.07,47.0,73,False,
+ade986d7-58c9-4313-aafb-57b6601fb6f3,Storm,,gsk,200000.0,69.96,7.25,1038.0,1964.0,,,,,,,,,,,,,,,2858.78,192.68,62.0,66,False,447423bb-27a3-49e4-a22c-8d3aad1723b6
+ae01e261-a6b5-4b2b-bd09-ae8aabf6b920,Martha maria,Woonschip,gsk,215000.0,22.38,5.45,10.0,1907.0,,,DAF ,,,,,,,,,,,,9606.79,21500.0,119.0,122,False,
+ae147f5d-fdf8-45a0-be2f-c7d02caf4b2f,Ponton se1,Duwbak,gsk,495000.0,45.0,12.37,,1975.0,,,,,,,,,,,,,,,11000.0,,51.0,122,False,
+af81cbdb-9e13-4664-ac4f-489702f0f3c6,Dafernya,Beunschip,pcshipbrokers,449000.0,70.1,7.32,1006.0,1966.0,,,,,,,,,,,,,,,6405.14,446.32,60.0,122,False,
+af8342c8-a3a8-42bb-bf0f-8d44f93b638c,Ventis,Motorvrachtschip,gtsschepen,,55.0,7.2,683.0,1961.0,,,,,,,,,,,,,,,,,65.0,122,False,
+afe72b6f-05a7-4042-9f90-01d91675def6,Belier,Duw/Sleepboot,gsk,,23.05,8.5,,1963.0,,850.0,2 x CAterpillar,60.0,,,,,,,,,,,,,63.0,122,False,
+affc57d9-188a-48ea-a8ec-dd7c14153f14,Cyrius,Duwbak,gsk,800000.0,79.0,9.6,2293.0,1998.0,,,,35.0,450.0,,1.0,welded,,2450.0,True,True,,,10126.58,348.89,28.0,122,False,
+b07896dd-883f-4390-8fe1-1cca579e59ae,Viper,Motorvrachtschip,gsk,,109.94,9.5,2299.0,1987.0,64400.0,1521.0,Catterpilar ,65.0,300.0,,2.0,welded,6.6,3100.0,,True,2012.0,True,,,39.0,17,False,a3a1c494-1397-42bc-b1f4-467db13a2fca
+b07e0cb6-32ff-421e-9d9e-78e6c6f3a96a,Mercur,Motorvrachtschip,pcshipbrokers,1995000.0,86.0,11.45,2229.0,2000.0,,860.0,Caterpillar,650.0,707.0,68000.0,,,5.75,2345.0,True,True,,True,23197.67,895.02,26.0,122,False,
+b0f54275-c072-4bf0-9c71-a220933b8c0b,Serval,Motorvrachtschip,gsk,125000.0,67.26,8.2,877.0,1958.0,29728.0,540.0,Mitsubischi ,16.4,270.0,,2.0,,4.9,1250.0,,True,,True,1858.46,142.53,68.0,122,False,
+b18125e6-b637-4311-907e-9e0acc70dd9f,Anna,Tankschip,rensendriessen,1550000.0,84.9,9.44,1317.0,1974.0,92570.0,1230.0,Stork,75.0,320.0,25000.0,,,,,,True,2018.0,True,18256.77,1176.92,52.0,45,False,15abdede-c987-444f-880c-ced64bf43865
+b1e13a3f-4ac3-4c1e-a9fa-b489b31092ce,CDD Eemspoort,Motorvrachtschip,gtsschepen,,76.2,8.2,1085.0,1960.0,,,,,,,,,,,,,,,,,66.0,122,False,
+b2c0644e-3e50-40c6-826a-564f0499b6aa,El viajero,,gsk,1600000.0,110.0,9.5,2192.0,1988.0,,,,,,,,,,,,,,,14545.45,729.93,38.0,122,False,e7dc7aa7-c7b0-4ca3-b511-f92e69c6f2a4
+b2ec1a23-dace-4307-b95c-1cbdef847235,Sterre der Zee,,gsk,230000.0,58.0,6.6,561.0,1955.0,,,,,,,,,,,,,,,3965.52,409.98,71.0,80,False,
+b319d700-f5c4-4658-b1fb-fe45deeb5cdc,Korundis,Tankschip,gtsschepen,,69.99,7.5,975.0,1988.0,12506.0,640.0,Mitsubishi,20.0,320.0,22000.0,8.0,welded,5.2,1080.0,True,True,,True,,,38.0,122,False,a4e0f7cd-2a4e-4eb3-8425-a1c4c11e3009
+b392f775-3c9c-447a-857e-23fcda99e1d2,Tokaj 4,Motorvrachtschip,pcshipbrokers,1595000.0,109.99,11.07,2321.0,1973.0,32896.0,750.0,Cummins,37.0,,40000.0,,,,2640.0,,,,True,14501.32,687.2,53.0,122,False,
+b4579d18-3c79-4817-837b-ac2f772c343c,Valencia,Motorvrachtschip,gsk,,85.0,9.5,1742.0,1972.0,,1160.0,SKL,40.0,400.0,,1.0,,5.85,2150.0,,True,2009.0,True,,,54.0,122,False,
+b509c0f4-84d3-42d6-bb54-763c8c47e2f5,Anna,Tankschip,pcshipbrokers,1550000.0,84.9,9.44,1410.0,1974.0,83043.0,1230.0,Stork,75.0,320.0,26000.0,,,5.3,,,True,,True,18256.77,1099.29,52.0,122,False,15abdede-c987-444f-880c-ced64bf43865
+b5ad07c2-414f-4477-a1da-7aace557a57b,CDD Lauwrens,Motorvrachtschip,gtsschepen,,74.95,7.46,899.0,1966.0,,,,,,,,,,,,,,,,,60.0,122,False,
+b5bbc3ef-96a5-4d47-9170-b7117fd0e478,Prodigio,Motorvrachtschip,pcshipbrokers,2695000.0,110.0,11.45,3164.0,2004.0,,,,,,,,,,,,,,,24500.0,851.77,22.0,122,False,
+b60e59c5-9b3e-47a2-887e-1b08ecd540fd,Milano 4,Duwbak,pcshipbrokers,,76.5,11.45,2379.0,2020.0,,,,,639.0,,,welded,,,,True,,True,,,6.0,122,False,
+b62c1a4e-0d86-49b6-814f-70b25f678530,Navata,Motorvrachtschip,pcshipbrokers,1100000.0,85.93,9.48,1459.0,1971.0,,,,,,,,,,,,,,,12801.12,753.94,55.0,122,False,6d619416-cfdc-4b99-aad2-95f678242fa4
+b6325b6e-2e79-48d7-beea-d999e6cfbfbd,Hendrik 9,Duw/Sleepboot,pcshipbrokers,350000.0,16.9,4.56,16.0,1976.0,3000.0,480.0,G.M.,28.0,38.0,19500.0,,,,,,True,,True,20710.06,21875.0,50.0,122,False,
+b65cb454-8584-47b8-b7d6-d2f627a81f1b,Tarkana,Motorvrachtschip,gtsschepen,325000.0,80.0,8.2,1024.0,1959.0,42982.0,730.0,Caterpillar,35.0,320.0,11000.0,2.0,welded,4.1,,True,True,,True,4062.5,317.38,67.0,122,False,
+b6944f6e-3763-460b-b13f-a3b71e7ec907,Barend,,gsk,,110.0,11.4,3050.0,1994.0,,,,,,,,,,,,,,,,,32.0,17,False,
+b709a5b2-db93-489d-bd80-9d6375df4728,Esmee,Motorvrachtschip,pcshipbrokers,1295000.0,104.75,9.5,2293.0,1972.0,22900.0,,Caterpillar,42.5,430.0,24000.0,,welded,5.3,2500.0,,True,2024.0,True,12362.77,564.76,54.0,101,False,8d3b256f-0889-45d0-948e-1d520a4f05fa
+b7bc00d5-a69a-45bd-9d46-f7e3b4088dbd,Astrid,Motorvrachtschip,gtsschepen,325000.0,79.93,8.23,1126.0,1955.0,19500.0,720.0,Daewoo,13.5,168.0,10600.0,1.0,mixed,4.65,1400.0,True,True,2016.0,True,4066.06,288.63,71.0,122,False,
+b7e9f8f9-7bb6-4bb4-a45b-111d2e7053b6,Specter,Motorvrachtschip,gtsschepen,2300000.0,110.0,11.4,3006.0,1993.0,109100.0,1835.0,Caterpillar,60.0,535.0,48000.0,1.0,welded,6.0,3800.0,True,True,,True,20909.09,765.14,33.0,122,False,
+b81b55db-c39d-4eeb-a0dc-0b9fc3739f69,Bornrif,Motorvrachtschip,pcshipbrokers,2200000.0,110.0,11.4,3105.0,1994.0,107476.0,,Caterpillar,60.0,550.0,48000.0,,welded,5.75,3500.0,True,True,,True,20000.0,708.53,32.0,122,False,3e332a8f-bc14-4418-a19f-0f2e0c4f1e53
+b8ec1114-7cbc-4f05-8def-bab88b1d98a8,Navigar 7,Duw/Sleepboot,gtsschepen,99000.0,14.14,8.18,,1966.0,,150.0,DMW,,,,,welded,3.87,,,,,True,7001.41,,60.0,122,False,aa11f546-0978-4626-a2f3-6f7c48149fea
+b9234b9d-47c1-48c1-a9eb-6421f63f30a2,Silke,Tankschip,rensendriessen,4300000.0,110.0,11.45,2884.0,2008.0,41719.0,,Mitsubishi,,,36000.0,,,,,,,,True,39090.91,1490.98,18.0,122,False,
+b9721b48-d7ec-48ee-8f82-dd19afdd69c9,Rik,Duwbak,pcshipbrokers,,89.0,11.0,2448.0,1989.0,,,,30.0,266.5,2000.0,,welded,5.5,2800.0,True,True,,True,,,37.0,94,False,
+ba5c8aef-037f-4de7-b007-b0688be0dac2,Pieternella,Beunschip,gtsschepen,,74.92,8.2,1294.0,1970.0,45000.0,644.0,Caterpillar,22.0,475.0,15000.0,2.0,welded,7.0,750.0,True,True,,True,,,56.0,122,False,
+ba5f2f68-6b24-4175-84de-07825d30e92c,Flottant,Tankschip,gsk,695000.0,67.0,8.26,804.0,1954.0,,,,,,,,,,,,,,,10373.13,864.43,72.0,122,False,
+ba6cd1c1-b085-475c-9ba3-10ba565dbb55,Primair,Motorvrachtschip,gtsschepen,,109.98,10.5,2802.0,1989.0,,,,,,,,,,,,,,,,,37.0,122,False,
+ba7d46cf-9fae-45b3-97d4-89afaa304ed3,Kiya,Motorvrachtschip,gsk,995000.0,85.52,11.04,2037.0,1959.0,,730.0,Caterpillar ,40.0,422.0,,3.0,,,2700.0,,True,2020.0,True,11634.71,488.46,67.0,122,False,
+bb6dc5c2-45ee-475f-b211-3eefd6afadb1,Tycho,Motorvrachtschip,gsk,995000.0,84.77,9.32,1292.0,1968.0,,1000.0,MAN,40.0,400.0,,1.0,welded,5.25,1600.0,True,True,,,11737.64,770.12,58.0,122,False,
+bc2cf146-b7b5-4d37-becf-a389d9d4303c,Vitesse,Motorvrachtschip,galle,2375000.0,110.0,11.45,3102.772,2002.0,,,,,,,1.0,,,,,,,,21590.91,765.44,24.0,2,False,
+bc53ae71-f452-4a3f-a9c3-872ea64f28ce,Serfra,Motorvrachtschip,pcshipbrokers,225000.0,67.0,8.2,850.0,1947.0,,560.0,Deutz,30.0,220.0,15600.0,,,4.25,1200.0,,True,2003.0,True,3358.21,264.71,79.0,122,False,
+bcde1fc2-2e9f-43d3-b5b1-84de7680ce75,Anna-Maria,Motorvrachtschip,pcshipbrokers,360000.0,62.5,7.58,780.0,1961.0,19529.0,650.0,Volvo,25.0,210.0,13000.0,,riveted,5.5,1200.0,,True,,True,5760.0,461.54,65.0,122,False,
+bd0a63b3-2159-46c7-857a-c1a13f1f97a4,Majesty,Motorvrachtschip,gsk,2000000.0,110.0,9.5,2234.0,1982.0,21430.0,1414.0,Mitsubishi,34.0,400.0,,2.0,welded,6.5,3000.0,False,True,,True,18181.82,895.26,44.0,108,False,aa849a56-96d7-4b4a-9ddd-266ffaba22e2
+bd40d4df-73e1-446e-8e17-c2f2144a3ac4,Ritrabo,Motorvrachtschip,gsk,,135.0,11.45,3902.91,2008.0,40000.0,1065.0,Caterpillar,65.0,553.0,,1.0,welded,,5100.0,True,True,,True,,,18.0,45,False,
+bd460cf2-91fc-42ef-8b3b-d35651d184b0,Linsi,Beunschip,gtsschepen,900000.0,80.94,8.2,1283.0,1960.0,9150.0,450.0,Scania,27.0,,18000.0,1.0,welded,6.85,800.0,True,,,True,11119.35,701.48,66.0,122,False,
+bdab82f3-1690-43d2-9e0e-a24373b0951b,Ultimo,Motorvrachtschip,gsk,,79.0,8.26,1066.0,1964.0,8644.0,830.0,Deutz,32.0,320.0,,2.0,,5.2,1550.0,,True,2019.0,True,,,62.0,122,False,
+bdd93479-6492-4f43-90c9-6a2f0a83a7a0,Claudia,Beunschip,pcshipbrokers,,86.0,9.55,1936.0,1972.0,46068.0,1000.0,MAN,60.0,,36000.0,,welded,,,,,,True,,,54.0,122,False,
+be5c67b3-8c07-4927-8501-35d8457e2d8e,Vera s,Motorvrachtschip,gsk,650000.0,80.0,9.51,1535.0,1971.0,,1410.0,MTU,52.0,260.0,,1.0,,4.5,1600.0,True,True,,True,8125.0,423.45,55.0,122,False,
+be6f0979-ee59-4ebc-ba26-23ebef579921,Orion,Motorvrachtschip,gtsschepen,2195000.0,109.85,11.4,3215.0,1988.0,70000.0,1521.0,Caterpillar,45.0,380.0,52000.0,1.0,welded,6.9,3670.0,True,True,,True,19981.79,682.74,38.0,122,False,22a553ec-ed1f-4c77-b368-b65cad388fe1
+beb2c0ae-63f9-46c6-ab6d-4e703cfd2ee8,Res & Res II,Koppelverband,gtsschepen,2495000.0,95.0,11.39,2671.0,1987.0,86200.0,1000.0,Caterpillar,60.0,238.0,52000.0,1.0,welded,6.6,2600.0,True,True,2014.0,True,26263.16,934.11,39.0,122,False,
+bedfca2d-8e6f-484b-aee8-41686e83fb5f,Festine vere,Motorvrachtschip,gsk,2695000.0,109.74,11.45,3254.88,1998.0,8100.0,1622.0,Caterpillar,65.0,571.0,,1.0,welded,7.2,3450.0,True,True,,True,24558.05,827.99,28.0,122,False,
+bf210399-39b4-44f0-83e6-ff954d00a7ed,Avatar,Motorvrachtschip,pcshipbrokers,1795000.0,100.0,11.4,3152.0,1973.0,24000.0,862.0,Caterpillar,77.5,469.1,65000.0,,welded,6.3,3300.0,,True,,True,17950.0,569.48,53.0,2,False,
+bf51fbaa-a0ac-4da2-853d-792b1e58385c,Honte,Beunschip,pcshipbrokers,250000.0,65.56,7.52,894.0,1954.0,5332.0,,"Paccar,",65.0,150.0,32000.0,,riveted,5.4,,,True,,True,3813.3,279.64,72.0,122,False,
+bf5c138e-2532-4639-a069-d4bddc8023cb,Res II,Duwbak,gtsschepen,,85.0,11.39,2471.0,1987.0,3684.0,450.0,CAT,60.0,490.0,3000.0,1.0,welded,6.6,2660.0,True,True,,True,,,39.0,122,False,
+bf6fa8c4-687b-4c7e-9b7f-1da76b034cf6,Ortelius,,gsk,2375000.0,85.99,10.0,1832.0,2005.0,,,,,,,,,,,,,,,27619.49,1296.4,21.0,31,False,
+c020ba8b-1150-41f3-a0b0-33141f1b67fa,Aquamarin,Tankschip,pcshipbrokers,,109.93,11.35,2738.0,1996.0,74.0,1500.0,Baudouin,420.0,,49500.0,,,6.1,,,,,True,,,30.0,122,False,
+c07690f6-5781-469a-9a26-c34373ec8940,Rimari,Motorvrachtschip,rensendriessen,4095000.0,135.0,11.45,3104.0,2007.0,52000.0,1278.0,Mitsubishi,50.0,558.0,63000.0,,,,,,True,2023.0,True,30333.33,1319.27,19.0,122,False,
+c0d21251-86c6-4e71-84c0-1cf44a49875f,Clifton,Woonschip,gsk,,39.14,5.1,,1914.0,,165.0,GM,16.0,,,,,,,,,,True,,,112.0,108,False,
+c0d6ff60-a6a4-4fd6-9246-64c29c41fe27,Adeline,Motorvrachtschip,pcshipbrokers,2485000.0,109.84,10.5,2504.0,2001.0,70000.0,1521.0,CAT,60.0,397.0,39840.0,,welded,5.9,3500.0,,True,2016.0,True,22623.82,992.41,25.0,122,False,
+c206d6a0-29b2-4efa-8b34-0d4a5e2d895e,Scaldia,Duw/Sleepboot,gtsschepen,335000.0,22.8,5.4,54.0,1947.0,27316.0,750.0,Volvo Penta,20.0,,6100.0,,mixed,5.6,,,,2022.0,True,14692.98,6203.7,79.0,122,False,
+c2864e7a-1997-47cc-915f-d6d20de1dfd1,Maya,,gsk,,104.99,9.5,2142.0,1981.0,,,,,,,,,,,,,,,,,45.0,122,False,
+c2c0e308-d7ad-498d-90ad-62a088719bf1,Trijari,Tankschip,rensendriessen,3800000.0,109.93,11.44,2876.0,2004.0,,1800.0,ABC,694.0,,51400.0,,,,,,,2018.0,True,34567.45,1321.28,22.0,17,False,
+c31d62ff-9279-4be8-b42d-7c51572b72be,Dorothea,Motorvrachtschip,gtsschepen,250000.0,67.0,8.2,1062.0,1928.0,35500.0,650.0,Cummins,40.0,220.0,10000.0,2.0,riveted,5.9,1650.0,False,True,,True,3731.34,235.4,98.0,122,False,
+c31e702d-786d-47a7-a143-c3124bbf7d38,Aquaplan,Motorvrachtschip,gtsschepen,,85.94,9.2,1606.0,1930.0,,,,,,,,,,,,,,,,,96.0,122,False,
+c4298f55-a84c-4d76-8108-91f35c946b90,Cambio,Motorvrachtschip,gsk,,61.95,5.71,635.0,1947.0,15000.0,500.0,Scania,20.0,240.0,,2.0,,5.2,890.0,,True,,True,,,79.0,122,False,
+c4406fc3-cb62-40f7-b7a1-dd3bd80ae272,Pertinax,Motorvrachtschip,pcshipbrokers,1275000.0,105.0,9.0,1802.0,1971.0,,,,,,,,,,,,,,,12142.86,707.55,55.0,101,False,
+c44ddb46-95e1-4914-8a81-70e96eea6591,Sailing-home,Motorvrachtschip,gsk,325000.0,73.0,8.2,1127.0,1964.0,,750.0,Deutz,25.0,270.0,,2.0,welded,5.45,1600.0,,True,2000.0,True,4452.05,288.38,62.0,122,False,
+c4a84439-5db6-40b5-b2d5-9e4624ce08e6,Duwaco 3,Tankschip,rensendriessen,175000.0,47.0,5.08,384.0,1991.0,,283.0,Scania,95.0,,6600.0,,,,,,,,True,3723.4,455.73,35.0,122,False,
+c4ada841-63cb-4cdf-85aa-2843bb36a25b,Sméagol,Motorvrachtschip,gsk,350000.0,72.9,8.2,1076.0,1963.0,30000.0,811.0,Caterpillar,37.0,196.0,,2.0,welded,,1450.0,,True,2002.0,,4801.1,325.28,63.0,38,False,14103bd3-4760-4de0-8647-8e604439a59a
+c4b17394-b6cc-412d-b696-ece331151de6,Palysando,Motorvrachtschip,gsk,450000.0,79.2,9.5,1300.0,1922.0,17100.0,350.0,Cummins,35.0,320.0,,2.0,,5.4,1850.0,,True,,,5681.82,346.15,104.0,122,False,
+c4bad688-9a23-4a1b-a617-a1525507fed8,Drakar,Motorvrachtschip,pcshipbrokers,,79.86,8.22,1008.0,1959.0,22500.0,953.0,Mitsubishi,36.0,260.0,11000.0,,welded,4.18,1850.0,,True,,True,,,67.0,10,False,15f84222-913f-46d7-8b88-8db375f63bc0
+c535c8e7-f4ac-4043-877b-fe3f8dfbbd3f,Replay,Motorvrachtschip,pcshipbrokers,1050000.0,86.0,9.53,1443.0,1956.0,,,,,,,,,,,,,,,12209.3,727.65,70.0,122,False,9b9bfe61-52b6-481a-89ae-99eccc6f09b6
+c576b71c-45e3-46a8-9e8d-e1b8840a4128,Nomadisch,,gsk,,92.98,11.45,2664.0,1998.0,,,,,,,,,,,,,,,,,28.0,122,False,8c0392c3-929f-47c3-8359-e87b9f553848
+c5bab52d-0a01-49a9-a3f8-a25ac620bd18,Mi Vida,Motorvrachtschip,gtsschepen,1985000.0,109.0,10.5,2502.0,1992.0,48500.0,1522.0,Caterpillar,35.0,350.0,28.0,1.0,welded,6.09,3000.0,True,True,,True,18211.01,793.37,34.0,122,False,05cad7be-d69c-4358-bc0c-4dc47b05a8cd
+c5f5c619-6846-4ece-a4e8-0887975e6d49,Joley,Motorvrachtschip,gtsschepen,169500.0,67.0,8.25,1027.0,1929.0,46000.0,600.0,MTU,30.0,240.0,12000.0,2.0,mixed,6.1,1400.0,False,True,2015.0,True,2529.85,165.04,97.0,3,False,
+c61449ab-f272-4538-8689-0d05b4dfd7b8,Aeolus,Motorvrachtschip,gsk,800000.0,84.94,9.48,1375.823,1962.0,,1080.0,Deutz,60.0,320.0,,1.0,welded,,1800.0,True,True,,True,9418.41,581.47,64.0,122,False,
+c68d8d01-1c4d-4c24-a511-8276ef2c790c,Senda,Tankschip,rensendriessen,3150000.0,84.94,9.64,1180.0,2006.0,,,Mitsubishi,350.0,,28000.0,,,,,,,,,37085.0,2669.49,20.0,122,False,
+c6d19108-b56a-48df-bcbf-1ad8c5ef771d,Communitas,Motorvrachtschip,gtsschepen,,56.99,7.25,683.0,1963.0,,,,,,,,,,,,,,,,,63.0,122,False,
+c76614d5-771b-447f-974f-d47033795004,Buizerd,Tankschip,gtsschepen,70000.0,22.0,4.18,55.0,1963.0,,100.0,DAF,6.0,,800.0,4.0,welded,3.93,60.0,,,2024.0,True,3181.82,1272.73,63.0,73,False,
+c783933f-1c1a-47e0-aadd-c76e0cf979a7,Laura,Duw/Sleepboot,pcshipbrokers,,18.83,8.13,15.0,1989.0,900.0,530.0,Doosan,30.0,240.0,21000.0,,welded,5.7,,,True,2024.0,True,,,37.0,94,False,
+c81c1163-5cf2-495a-808c-604df89954e2,Antares,Tankschip,gtsschepen,450000.0,39.76,6.05,264.0,1960.0,,380.0,MAN,159.0,,,6.0,mixed,,331.0,,,,,11317.91,1704.55,66.0,17,False,
+c88b9f82-4786-4760-8f72-39517d67022e,Till Benelux,Tankschip,rensendriessen,2500000.0,109.96,11.45,2978.0,2006.0,,450.0,Volvo Penta,120.0,,28000.0,,,,,,,,,22735.54,839.49,20.0,66,False,
+c8b8c63e-c08f-44c7-b357-50bc525ffa37,Celeritas,Motorvrachtschip,gsk,95000.0,39.04,5.07,367.0,1969.0,12500.0,360.0,Doosan,15.0,,,1.0,welded,4.0,420.0,,,2015.0,True,2433.4,258.86,57.0,122,False,
+c8c7b3c7-8c6d-4736-8b45-c20c0024dc99,Bausyl,Motorvrachtschip,gsk,575000.0,80.0,8.2,1269.0,1954.0,12729.0,750.0,Volvo,27.0,,,1.0,,5.9,1900.0,,True,,,7187.5,453.11,72.0,122,False,
+c8df3d1b-cc73-4244-bd84-dfa0887f9582,Ferox,Motorvrachtschip,rensendriessen,,70.0,7.06,,1947.0,,675.0,GM,12.0,270.0,,,,,,,True,2006.0,,,,79.0,122,False,2340f935-5f6a-4289-8f65-97c99e19e025
+c8f5520c-b25f-440f-8912-0e7b2d0d22ec,Manoë,Motorvrachtschip,gsk,,104.9,9.5,1831.691,1973.0,5200.0,1250.0,DEUTZ,25.0,520.0,,1.0,welded,5.0,2455.0,,True,2021.0,False,,,53.0,122,False,e7bfd3ad-6a00-434d-8302-dc71efb7d7f4
+c93efef6-6785-40c1-a371-a23fe69d9ae7,Wilina,Motorvrachtschip,pcshipbrokers,1695000.0,109.93,10.06,2549.0,1972.0,48000.0,1600.0,Caterpillar,65.0,500.0,32000.0,,,6.4,3400.0,,True,,True,15418.9,664.97,54.0,122,False,7342ae9c-5c66-4f62-a452-165a0528f990
+c958314f-2979-4907-b4fa-d6826d42410b,Deo Volente,Motorvrachtschip,gtsschepen,680000.0,80.0,9.3,1196.0,1970.0,13685.0,700.0,Mitsubishi,12.5,200.0,350.0,2.0,welded,5.1,1600.0,False,True,,True,8500.0,568.56,56.0,122,False,
+c96f695d-8b6f-4c1e-94c4-3eee2f4724d7,Time Cloud,Passagiersschip,gtsschepen,,25.08,4.62,98.0,1930.0,,105.0,DAF,45.0,10.0,4000.0,,welded,3.65,,,True,,True,,,96.0,122,False,
+ca2ffb86-2338-4f46-9538-2dfab054d963,Vigilate ,Motorvrachtschip,pcshipbrokers,3750000.0,135.0,11.45,3763.0,2007.0,47646.0,1064.0,Caterpillar,60.0,535.0,64000.0,,welded,6.0,4860.0,,True,,True,27777.78,996.55,19.0,66,False,34d5a464-768d-489e-abe4-9703c96854d9
+cac5f7be-c06f-45cf-a5be-7ef00993ca12,Bpn 15,Duwbak,gsk,,34.95,8.68,345.0,1976.0,,,,,,,,,,,,,,,,,50.0,94,False,
+cadc4e78-7846-4cee-bbeb-320cb2677798,THALYS,Tankschip,rensendriessen,12995000.0,135.0,17.58,,,,,,,,,,,,,,,,,96259.26,,,80,False,
+cb684eb0-07cf-4538-a943-b5e7c08d6257,Eclips,Motorvrachtschip,galle,3550000.0,135.0,11.45,3504.176,2003.0,,,,,,,2.0,,4.25,,,,,,26296.3,1013.08,23.0,2,False,d40b04d6-e1fe-4653-b007-37eb3564192a
+cba2b450-e272-4b2e-b229-ccd578b77c7c,Maasdam,Motorvrachtschip,pcshipbrokers,1650000.0,101.9,9.49,2352.0,1977.0,,,,,,,,,,,,,,,16192.35,701.53,49.0,122,False,9c60dd46-a1ab-48d9-a878-caae243c1022
+cbb0a399-26bf-4109-afc3-9d0f7a4fd53d,Res I & Res II,Koppelverband,pcshipbrokers,2495000.0,176.0,11.39,5200.0,1987.0,91586.0,,Caterpillar,60.0,715.0,52000.0,,,6.6,2600.0,,True,,True,14176.14,479.81,39.0,122,False,
+cbb8b267-9aed-4750-af90-9a84de1ef8af,Bausyl,Motorvrachtschip,pcshipbrokers,575000.0,80.0,8.2,1269.0,1954.0,12630.0,750.0,Volvo,27.0,220.0,15000.0,,riveted,5.2,1900.0,,True,,True,7187.5,453.11,72.0,122,False,c8c7b3c7-8c6d-4736-8b45-c20c0024dc99
+cc8f6a38-8962-4e35-9be3-659917f74419,Inspe II,Motorvrachtschip,pcshipbrokers,,85.9,9.5,1670.0,1923.0,,,,,,,,,,,,,,,,,103.0,122,False,
+cc958234-2d71-45ae-94da-5849cfca098b,Aspasia,Motorvrachtschip,pcshipbrokers,,85.87,10.0,1833.0,2008.0,44000.0,1278.0,Mitsubishi,45.0,460.0,42000.0,,welded,,2500.0,,True,,True,,,18.0,122,False,58eaa2ce-a0e6-4a37-9829-3948038474f3
+ccb465f4-c545-44d1-8a32-71909507942e,Drakar,Motorvrachtschip,gtsschepen,327500.0,73.0,8.2,1153.0,1963.0,47000.0,900.0,Wartsilla,19.0,300.0,19600.0,1.0,welded,5.15,1500.0,False,True,2020.0,True,4486.3,284.04,63.0,122,False,
+ccbcb3be-123f-4616-9053-cd9b273a26df,Narvik,Motorvrachtschip,gsk,,135.0,11.45,3935.166,2007.0,49500.0,1380.0,Caterpillar,70.0,530.0,,1.0,welded,,5000.0,True,True,2025.0,False,,,19.0,122,False,
+ccc88a03-2ede-4c0d-9fd3-e8c90940c50c,Deo Favente,Motorvrachtschip,pcshipbrokers,2649000.0,85.87,11.45,2315.0,2009.0,35650.0,1318.8,Caterpillar,47.5,725.0,35000.0,,welded,6.0,2700.0,,True,,True,30848.96,1144.28,17.0,122,False,
+ccdd35d8-d684-4fac-a83e-068526ee2f77,Duc in Altum,Motorvrachtschip,pcshipbrokers,,135.0,11.45,3909.0,2009.0,42295.0,,Mitsubishi,,,61000.0,,,6.9,5000.0,True,,,True,,,17.0,122,False,8d507775-f3e6-45d7-9d22-1c9151be1890
+cd3f2f8a-4f28-43c0-91ad-2df970599654,Chrida,,gsk,,84.35,9.5,1575.0,1988.0,,,,,,,,,,,,,,,,,38.0,122,False,414dd78f-f0e2-4ac5-a0ff-9d108e35e326
+cd7098fe-bdc4-4bbf-bc99-cb1ed95586a3,Baschtel,Duw/Sleepboot,gtsschepen,220000.0,34.5,7.37,,1939.0,58292.0,408.0,Mercedes,75.0,,21400.0,,,7.4,,,,,True,6376.81,,87.0,122,False,
+cd91d71c-817f-4414-b1b1-1d156e8ebb52,La majesty,Duwbak,gsk,,51.92,7.88,869.0,1930.0,,,,17.0,,,1.0,,4.5,1130.0,,True,,True,,,96.0,122,False,
+ce442d75-1408-43cb-b0a6-aa9f1a7b815f,Denver,Motorvrachtschip,gtsschepen,,82.0,8.28,1170.0,1961.0,36000.0,863.0,Mitshubishi,34.0,220.0,20000.0,1.0,welded,5.0,1450.0,,True,,,,,65.0,122,False,6301865a-2876-422b-a9df-807634058f00
+ce5e48cd-b20b-481e-baa4-82e07b1b271b,Dudaro,,gsk,,110.0,11.45,3200.0,2024.0,,,,,,,,,,,,,,,,,2.0,122,False,19790c06-346c-4996-ae62-af95021a9328
+ce935a2e-7b29-47a1-8340-557ef4e908b9,Casablanca,Motorvrachtschip,rensendriessen,1895000.0,110.0,12.0,3224.0,1981.0,,1065.0,Caterpillar,85.0,430.0,,,,,,,True,,True,17227.27,587.78,45.0,122,False,
+cf63ff62-bca6-4da0-a11e-74595de6bb23,Subito,Motorvrachtschip,pcshipbrokers,1195000.0,84.84,9.5,1720.0,1975.0,69500.0,1220.0,Caterpillar,60.0,400.0,30000.0,,welded,6.15,2150.0,,True,,True,14085.34,694.77,51.0,3,False,
+cf694a58-833c-4adb-a5fd-195be221f581,Challenger,Motorvrachtschip,pcshipbrokers,3385000.0,109.95,11.45,3397.0,2008.0,,,,,,,,,,,,,,,30786.72,996.47,18.0,59,False,
+cf6c44b0-85af-4945-9b07-6317a0f8345a,Ulla,Motorvrachtschip,gtsschepen,155000.0,79.99,8.27,1080.0,1955.0,,500.0,Deutz,24.0,,9800.0,1.0,,4.94,,False,,,True,1937.74,143.52,71.0,122,False,
+cf92ad7f-e353-40d6-a01d-c8a8cd3fcd96,Inspiratio,Motorvrachtschip,pcshipbrokers,695000.0,84.91,8.24,1238.0,1962.0,,,,,,,,,,,,,,,8185.14,561.39,64.0,122,False,4dc6bbef-9f36-4263-ad5a-45e9262f1bc1
+d085e654-fe25-43e7-b855-3bbf6bd23d9b,Edith,Duw/Sleepboot,gtsschepen,,23.5,6.0,,1943.0,,,,,,,,,,,,,,,,,83.0,122,False,4f4375a1-48ff-4968-b8c0-a97652001d40
+d177b94a-bd55-4edd-8309-3937482d5fe0,Storky,Duw/Sleepboot,gtsschepen,145000.0,19.62,4.53,15.0,1923.0,,280.0,Stork,15.0,,6000.0,,riveted,4.85,,,,2004.0,True,7390.42,9666.67,103.0,122,False,
+d1f319ea-3949-491f-9b27-864e71bb70cc,Laco 9,Duwbak,pcshipbrokers,125000.0,64.67,8.36,1195.0,1962.0,,,,,,,,,,,,,,False,1932.89,104.6,64.0,122,False,
+d2032bb3-00f8-4213-94a5-b990d00c72b0,Corma B,Motorvrachtschip,gtsschepen,480000.0,80.0,9.5,1482.0,1928.0,3200.0,500.0,Weichai,32.0,350.0,22000.0,2.0,mixed,4.5,2000.0,False,True,,True,6000.0,323.89,98.0,122,False,
+d2153d0b-568f-4caa-b9b3-a677af05f61b,Saratoga,Motorvrachtschip,gtsschepen,,80.05,8.26,1205.0,1957.0,,,,,,,,,,,,,,,,,69.0,122,False,
+d2844b47-2aec-4dfe-9a57-7bb0e7d7f0a5,Laguz ,Motorvrachtschip,pcshipbrokers,2550000.0,109.95,10.5,2250.0,1999.0,74000.0,1517.3,Caterpillar,65.0,,40000.0,,welded,5.8,3250.0,,,2008.0,True,23192.36,1133.33,27.0,122,False,
+d2d66ff6-1c46-4b9f-b6f2-5cb1fc00f52a,Caithlin,Duw/Sleepboot,gtsschepen,575000.0,24.34,6.2,27.0,1939.0,7000.0,1200.0,MTU,15.0,,11000.0,,mixed,6.2,,,,,True,23623.66,21296.3,87.0,122,False,
+d30e12d9-a527-4177-97ab-daeff944b45e,Alcor,Motorvrachtschip,pcshipbrokers,265000.0,62.68,7.04,625.0,1942.0,34000.0,600.0,Cummins,25.0,220.0,9000.0,,riveted,5.8,1025.0,,True,,True,4227.82,424.0,84.0,122,False,
+d37038c9-cc0d-4738-9fde-e909cb5f983b,2 Pontons: Geka 26/23,,gtsschepen,,36.0,18.2,1000.0,1973.0,,,,44.0,,6000.0,,welded,,,,,,True,,,53.0,94,False,
+d385684a-dee0-458e-b8b4-00115ae8387c,Michaelangelo,Motorvrachtschip,pcshipbrokers,3995000.0,135.0,11.45,3921.0,2008.0,58000.0,1521.0,Caterpillar,64.0,608.0,55000.0,,welded,6.2,5100.0,,True,,True,29592.59,1018.87,18.0,122,False,
+d3b18594-d272-47ae-abff-08bd692cf708,Spido ii,Motorvrachtschip,gsk,299000.0,55.33,6.46,430.0,1924.0,,450.0,Volvo,17.0,,,,,,,,,,,5403.94,695.35,102.0,122,False,
+d40b04d6-e1fe-4653-b007-37eb3564192a,Eclips,Motorvrachtschip,gsk,3550000.0,135.0,11.45,3504.0,2003.0,9904.0,960.0,2 x Mitsubishi ,120.0,600.0,,2.0,welded,,5200.0,True,True,,True,26296.3,1013.13,23.0,10,False,
+d467d6c4-784a-4042-92a4-331cce1a37a3,Monico,Beunschip,pcshipbrokers,,70.0,8.2,1086.0,1989.0,,,,,,,,,,,,,,,,,37.0,122,False,
+d4a57ace-c97b-4f45-bfc7-2c0503d62b5d,Lauwrens Sr,Motorvrachtschip,pcshipbrokers,1250000.0,84.88,9.5,1885.0,1962.0,39365.0,1200.0,Deutz,35.0,400.0,12000.0,,welded,5.2,2000.0,,True,2011.0,True,14726.67,663.13,64.0,122,False,
+d4a885a0-c379-4ab9-a496-b8736bed217a,Le Meribel,Motorvrachtschip,gtsschepen,,80.12,9.19,1300.0,1930.0,,,,,,,,,,,,,,,,,96.0,122,False,
+d720eb0a-ece0-4659-a544-969a2bd17e56,Radar,Motorvrachtschip,pcshipbrokers,340000.0,75.0,8.27,1059.0,1951.0,3850.0,850.0,Baudouin,18.0,240.0,15000.0,,welded,5.1,1550.0,,True,,True,4533.33,321.06,75.0,122,False,
+d75f3f8f-dc93-4437-8e46-b8e8217aa0cc,Aquilon,Tankschip,rensendriessen,2500000.0,110.0,11.45,2872.0,2006.0,31195.0,1001.0,Baudouin,100.0,,,,,,,,,,,22727.27,870.47,20.0,122,False,
+d7bc2523-0db6-4238-9060-fdd3db7eb6f6,СDD Saona,Motorvrachtschip,gtsschepen,,67.0,8.25,1034.0,1931.0,,,,,,,,,,,,,,,,,95.0,122,False,
+d8112b00-5c53-4abd-a8cc-58e95cfd5281,Thetis,Duw/Sleepboot,pcshipbrokers,,25.5,6.85,99.0,1974.0,,1238.6,B&W,69.0,,12000.0,,welded,,,,,,False,,,52.0,17,False,
+d81fe285-ba6b-4b5b-87fe-4a6a690ea6d0,Rottweiler,Koppelverband,gsk,80000.0,39.12,5.05,386.0,1957.0,,168.0,DAF ,27.5,,,,,4.4,450.0,,,,True,2044.99,207.25,69.0,122,False,
+d8496774-61bc-4269-bdba-9768bb8c5e58,Jericho,Motorvrachtschip,gtsschepen,875000.0,90.0,10.0,1916.0,1980.0,,630.0,Caterpillar,25.0,,28000.0,2.0,welded,5.75,2700.0,False,,2015.0,True,9722.22,456.68,46.0,122,False,8c21678b-c14f-432c-9c5b-a33a02a537df
+d8b3751b-c204-4f4f-91d0-97a1a540a30c,Buizerd,Duw/Sleepboot,gtsschepen,,23.69,6.12,20.0,1960.0,55000.0,1124.0,Deutz,25.0,100.0,20000.0,,mixed,6.0,,,True,,True,,,66.0,122,False,
+d8e704b5-1a58-4092-86fb-9cd0a60d75a5,Mobitrans I & II,Koppelverband,pcshipbrokers,,172.0,11.4,,2002.0,,,,,,,,,,,,,,,,,24.0,122,False,
+d91d121b-f90a-4116-9949-fdeaec9a7115,Orca,Motorvrachtschip,gsk,,95.0,9.5,1596.0,1965.0,,,,,,,,,,,,,,,,,61.0,122,False,
+d920c2d2-a344-42c8-8d5d-351e58b7bfc7,Ponton tg2,Duwbak,gsk,400000.0,46.5,16.0,,1994.0,,,,,,,,,,,,,,,8602.15,,32.0,122,False,
+d93f8e94-fb27-48b1-960a-7d13901be912,Bivio,Motorvrachtschip,gtsschepen,800000.0,80.07,9.0,1316.0,1972.0,33000.0,1013.0,Cummins,25.0,320.0,20000.0,1.0,welded,4.8,1900.0,True,True,,True,9991.26,607.9,54.0,122,False,
+d94f1fe8-ac58-4895-900e-d677f1715748,Nil Desperandum,Tankschip,pcshipbrokers,,84.65,8.2,1226.0,1979.0,,,,,,,,,,,,,,,,,47.0,122,False,
+d981ccd0-afa9-43fb-8c87-6158b0ebc170,Porthos,Motorvrachtschip,gsk,,84.77,9.6,1500.0,2011.0,21000.0,750.0,Volvo,65.0,,,1.0,welded,4.9,2000.0,,True,,,,,15.0,122,False,a26967b8-9981-4ec6-9400-49dbb87b32ea
+db03962d-27c3-4cf5-941b-116b7810b73d,Orlando,Motorvrachtschip,gsk,,80.0,8.2,1143.0,1958.0,,,,,,,,,,,,,,,,,68.0,122,False,a967e5bf-eb3a-4327-92c5-494f3e7a8ecc
+db095176-fa12-443f-99ad-a850f972c37a,Valé,Motorvrachtschip,gtsschepen,400000.0,69.92,7.25,887.0,1963.0,7270.0,811.0,Cummins,34.0,280.0,13000.0,2.0,welded,5.55,1300.0,False,True,,True,5720.82,450.96,63.0,122,False,34d43aba-236b-48d1-96e3-e33f3bc48979
+dbe88fec-03f8-4364-a698-c9a4f6ffdf25,Navata,,gsk,,85.93,9.48,1460.0,1971.0,,,,,,,,,,,,,,,,,55.0,38,False,6d619416-cfdc-4b99-aad2-95f678242fa4
+dc4d6460-58a0-4145-b707-d121b417dd11,Progresso,,gsk,,84.84,9.5,1800.0,2002.0,,,,,,,,,,,,,,,,,24.0,115,False,eb79f94e-5e37-44e8-8ae7-616d6cb7f734
+dc8c6f26-587f-4e69-a951-302f5cda3ade,Orchila,Motorvrachtschip,gtsschepen,,134.9,15.05,5082.0,2009.0,40816.0,1500.0,ABC,85.0,,52000.0,1.0,welded,8.5,7300.0,True,,,True,,,17.0,122,False,fe9f0215-c6d1-4810-8061-00a74ea147e2
+dcdc596d-854e-4988-b295-bd8a1a96f83f,RS Alinda,Motorvrachtschip,pcshipbrokers,269000.0,85.92,8.2,1282.0,1953.0,33100.0,648.0,Cummins,30.0,250.0,15000.0,,,,,,True,,True,3130.82,209.83,73.0,122,False,fd42a887-d217-42d0-95f5-49118ef51c55
+ddcc726b-524c-4b26-99aa-c2ab3a801cb3,Poseidon,Tankschip,rensendriessen,2850000.0,110.0,11.45,1686.0,2000.0,1914.0,1835.0,Caterpillar,,336.0,,,,,,,True,2023.0,True,25909.09,1690.39,26.0,122,False,
+de2ad1ca-8388-4a90-9b6a-3b9e5864cc78,Jasmin,Motorvrachtschip,pcshipbrokers,875000.0,85.0,9.5,1377.0,1960.0,20000.0,450.0,Volvo,65.0,450.0,35000.0,,,5.25,2000.0,,True,,True,10294.12,635.44,66.0,122,False,5e31703e-5aca-4b02-94e8-22326fa40cd0
+de2d132d-da5a-4ca8-834a-f4062ad6efc2,Elja,Motorvrachtschip,gtsschepen,,67.0,8.25,1027.0,1929.0,,,,,,,,,,,,,,,,,97.0,122,False,
+de35d892-88c1-4039-bf0d-93b82fa1b02b,Relationship IV,Tankschip,rensendriessen,,85.0,9.0,,1985.0,53000.0,881.0,Caterpillar,,260.0,32000.0,,,,,,True,2020.0,,,,41.0,10,False,
+de4e611d-c7c9-443d-bf34-c32f457e4b71,kvb Trias & Obelix,Koppelverband,gtsschepen,,73.0,8.2,1078.0,1962.0,,,,,,,,,,,,,,,,,64.0,122,False,
+de681015-e4d5-4d99-9be2-920c3d159dc5,Bpn-14,Duwbak,gsk,110000.0,32.5,8.19,436.0,1986.0,,,,,,,,,,,,,,True,3384.62,252.29,40.0,122,False,
+de8c286c-1145-4cd8-b887-b5f0b0ab0e7a,Cotrans 2,Beunschip,gtsschepen,375000.0,69.77,8.04,899.0,1965.0,33616.0,550.0,Volvo Penta,15.0,200.0,20000.0,2.0,welded,6.75,600.0,True,True,,True,5374.8,417.13,61.0,122,False,
+df1f3b11-d9da-42bf-a10f-f3f99c9b85b8,Loco,Duw/Sleepboot,gtsschepen,,19.1,4.38,86.0,1922.0,,,,,,,,,,,,,,,,,104.0,122,False,
+dfa9b1e1-abaa-46a5-839c-ef7a98b072ea,Romi,Woonschip,gsk,,35.85,7.3,,1988.0,,260.0,2 x Deutz,50.0,25.0,,,,5.0,,,True,,,,,38.0,122,False,
+dfaf25ad-6ae8-40fc-a4ce-0088d22c463f,Saga,Motorvrachtschip,pcshipbrokers,495000.0,79.82,8.2,1086.0,1961.0,54500.0,862.0,Mitsubishi,35.0,400.0,20000.0,,,4.4,1600.0,,True,,True,6201.45,455.8,65.0,122,False,0856a285-cda6-418a-8474-04022719f7db
+dfeeb1ef-6d19-43b0-ad05-8957d89bbe0b,Sobrina,Duw/Sleepboot,gsk,,20.4,5.31,144.0,1955.0,,609.0,Caterpillar,25.0,,,,welded,5.83,,,,,True,,,71.0,122,False,
+e0623407-ff80-4faf-87b6-7c0c5e912ece,Carco Grup 13,Motorvrachtschip,gtsschepen,650000.0,95.03,11.15,2470.0,1912.0,,1576.0,Caterpillar,,,,,,,,,,,True,6839.95,263.16,114.0,122,False,
+e0de3f24-b910-4f7c-9693-9835c1b07c62,Cygnus,Motorvrachtschip,pcshipbrokers,,84.68,8.6,1562.0,1981.0,,,,,,,,,,,,,,,,,45.0,122,False,
+e18e8ec7-a791-4077-a07e-60a9edf23946,Orchila,Motorvrachtschip,pcshipbrokers,,134.9,15.0,5082.0,2009.0,37000.0,1501.0,ABC,97.0,704.0,76000.0,,welded,7.75,7000.0,True,True,,True,,,17.0,122,False,fe9f0215-c6d1-4810-8061-00a74ea147e2
+e1bb7cc6-8dab-4983-b6ad-ab18d8ba6801,Sobrina,Duw/Sleepboot,pcshipbrokers,,20.4,5.31,26.0,1955.0,8000.0,630.0,Caterpillar,25.0,,,,welded,5.5,,,,,True,,,71.0,122,False,dfeeb1ef-6d19-43b0-ad05-8957d89bbe0b
+e2a7e9b9-b3e8-4811-b31a-793340320e8b,Edwin,Duw/Sleepboot,gtsschepen,,10.71,5.1,,1980.0,,,,,,,,,,,,,,,,,46.0,122,False,
+e2bbdb48-8c8a-4031-9754-8754b4939743,Kevalia,Motorvrachtschip,gsk,585000.0,80.0,8.2,1076.0,1958.0,7000.0,829.0,Yanmar,33.0,270.0,,1.0,,5.1,1600.0,,True,2024.0,True,7312.5,543.68,68.0,122,False,
+e3dda5cf-f2e8-4b7b-b71f-08ffc1685c74,Sinulia,Kraanschip,gtsschepen,,79.0,8.22,684.0,1908.0,,530.0,Doosan,24.0,,9.0,2.0,mixed,7.11,476.0,True,,2025.0,True,,,118.0,31,False,
+e3e8a9c9-04f9-44ed-bfe1-e0a86de39e05,Amavi,Beunschip,pcshipbrokers,265000.0,61.96,7.18,755.0,1966.0,,,,,,,,,,,,,,,4276.95,350.99,60.0,122,False,
+e4321226-8b97-4d0a-b827-907a4be66e52,Juliska,Motorvrachtschip,pcshipbrokers,2150000.0,85.92,10.55,1830.0,1998.0,43000.0,1179.0,MTU,65.0,440.0,40800.0,,welded,5.9,2100.0,True,True,,True,25023.28,1174.86,28.0,122,False,
+e456c697-eb6f-4b3a-b6ce-b51a2bb3834a,DESTINY,Motorvrachtschip,rensendriessen,,110.0,11.45,,,,,,,,,,,,,,,,,,,,66,False,
+e48da416-7994-4e45-a4a8-2c9396214609,Nesselande,,gsk,2395000.0,110.0,11.45,2846.0,1987.0,,,,,,,,,,,,,,,21772.73,841.53,39.0,122,False,
+e547f111-5de2-4c4c-8b6f-3fb5577b9ef6,Robijn,Duwbak,rensendriessen,750000.0,76.0,11.45,,1996.0,,,,,483.0,,,,,,,True,,True,9868.42,,30.0,122,False,
+e5c41427-fca4-4380-83b8-211c5d602d8a,Jacorni,Beunschip,pcshipbrokers,735000.0,80.1,9.0,1298.0,1961.0,37900.0,450.0,Volvo Penta,42.5,280.0,11000.0,,,4.45,,,True,2022.0,True,9176.03,566.26,65.0,122,False,
+e6d3bfb0-64c3-4cb4-ac32-f882858170c1,Cigno Minore,Motorvrachtschip,pcshipbrokers,,105.0,9.5,2193.0,2002.0,50947.0,1200.0,Mitsubishi,60.0,450.0,32000.0,,welded,6.0,,,True,,True,,,24.0,122,False,3df53807-4a60-49af-85a1-2b9eea9f515c
+e6ee846d-6218-467b-8d2a-91ffedef1887,Pia,Motorvrachtschip,gtsschepen,295000.0,79.49,9.5,1414.0,1925.0,,360.0,12V,13.5,200.0,9000.0,2.0,mixed,5.2,1950.0,,True,,True,3711.16,208.63,101.0,122,False,
+e70edef6-689b-412e-a61a-d7e766a7143e,SORRENTO,Motorvrachtschip,rensendriessen,2450000.0,110.0,11.45,,,,,,,,,,,,,,,,,22272.73,,,115,False,07e32890-cd77-431d-8e5c-d4d0faed8428
+e75183e6-a30f-47f1-accb-19059e3e3bd7,Skyfall,Motorvrachtschip,gsk,,84.7,8.15,1264.0,1950.0,21000.0,800.0,MTU,33.0,,,2.0,,6.5,1750.0,,True,,False,,,76.0,122,False,3633568a-ed94-4bfd-94a4-b64c765b7208
+e7bfd3ad-6a00-434d-8302-dc71efb7d7f4,Manoë,Motorvrachtschip,pcshipbrokers,950000.0,104.9,9.5,1832.0,1973.0,,,,,,,,,,,,,,,9056.24,518.56,53.0,122,False,
+e7dc7aa7-c7b0-4ca3-b511-f92e69c6f2a4,El Viajero ,Motorvrachtschip,pcshipbrokers,1600000.0,110.0,9.5,2209.0,1988.0,71300.0,,Caterpillar,60.0,,22000.0,,welded,5.5,2900.0,,,2018.0,True,14545.45,724.31,38.0,122,False,
+e7ec94aa-62a5-4022-9e86-c0205429e642,Sympharosa,Motorvrachtschip,gtsschepen,750000.0,72.8,7.04,803.0,1963.0,10800.0,653.0,ccr1,32.0,320.0,12000.0,1.0,welded,5.6,902.0,True,True,,True,10302.2,934.0,63.0,122,False,6108afd0-2588-48de-9fb2-3b7510e5442a
+e8902c03-3c5f-4893-917b-5c36b182d70d,Reality,Tankschip,rensendriessen,14300000.0,135.0,17.6,,2025.0,512.0,1622.0,Caterpillar,138.0,533.0,,,,,,,True,,,105925.93,,1.0,2,False,
+e8b97096-8e7a-4c23-b175-b44fbe2583ff,Aurora,Motorvrachtschip,pcshipbrokers,2695000.0,109.96,11.45,3009.0,2001.0,39900.0,1540.0,Mitsubishi,65.0,490.0,58000.0,,welded,5.95,3500.0,True,True,,True,24508.91,895.65,25.0,122,False,
+e922d890-b523-4adb-8b5c-46a009e3db3a,Johannes,Tankschip,pcshipbrokers,4995000.0,134.98,11.45,4135.0,2004.0,39800.0,1015.0,Caterpillar,637.5,599.6,26640.0,,welded,6.15,,,True,,True,37005.48,1207.98,22.0,122,False,86a7207f-e5a9-4558-8ab1-b13c30cd1473
+e9e715da-13a3-4434-a425-c76ba2ed9e17,Nadir,Motorvrachtschip,gsk,358000.0,79.96,8.2,1095.04,1956.0,,750.0,Deutz,31.0,320.0,,1.0,welded,5.05,1600.0,,True,2017.0,True,4477.24,326.93,70.0,1,False,
+e9e8b029-e883-4ab1-bade-5da3c846fee9,Vlieter,Duw/Sleepboot,gtsschepen,,16.16,4.44,,1952.0,,,,,,,,,,,,,,,,,74.0,122,False,
+ea1e6f67-a744-4377-ac89-0b1aa7d57fa7,Beneficio,Motorvrachtschip,pcshipbrokers,515000.0,81.5,7.76,1043.0,1956.0,,,,,,,,,,,,,,,6319.02,493.77,70.0,52,False,
+ea8042a6-325d-4432-bfca-d0e4f29f745f,Bona Spes,Motorvrachtschip,pcshipbrokers,160000.0,60.0,6.66,726.0,1961.0,,,,,,,,,,,,,,,2666.67,220.39,65.0,122,False,
+eb343399-876c-4a6f-93c5-bb964934e36f,Mercur,Motorvrachtschip,gtsschepen,,86.0,11.45,2275.0,2000.0,,865.0,Caterpillar,65.0,520.0,,1.0,welded,5.9,2345.0,,True,,True,,,26.0,122,False,b07e0cb6-32ff-421e-9d9e-78e6c6f3a96a
+eb395f17-691b-49f5-82b4-97efcb2ba861,Watna,Motorvrachtschip,rensendriessen,750000.0,85.9,11.0,1536.0,1963.0,14609.0,,Deutz,,,,,,,,,,,True,8731.08,488.28,63.0,101,False,
+eb79f94e-5e37-44e8-8ae7-616d6cb7f734,Progresso,Motorvrachtschip,pcshipbrokers,2050000.0,84.84,9.5,1799.0,2002.0,,,,,,,,,,,,,,,24163.13,1139.52,24.0,108,False,
+eb87318e-37e4-4501-aa7b-5d880ae9eb7a,Tiësto,Motorvrachtschip,gsk,,110.0,11.45,2826.0,2002.0,33700.0,1521.0,Caterpillar,70.0,535.0,,1.0,welded,5.9,3200.0,,True,2014.0,True,,,24.0,38,False,eca9ad0f-e0aa-4122-9df7-922f0d8640d1
+eb8cd86f-72af-4c1d-8ca7-084ef33810f7,PCS Pusher,Duw/Sleepboot,pcshipbrokers,,19.95,9.42,200.0,2025.0,,709.7,Scania,,,,,welded,4.92,,,,,True,,,1.0,122,False,
+ebbc5834-7430-46ac-9e3a-21e1491b63de,Good luck,,gsk,,81.21,8.23,1183.0,1965.0,,,,,,,,,,,,,,,,,61.0,122,False,
+ebd08ce0-bb76-49f6-a753-657301ea0b80,Integro,Motorvrachtschip,gsk,725000.0,80.0,9.5,1400.0,1968.0,35658.0,1160.0,MTU,,285.0,,1.0,,5.2,1484.0,,True,,,9062.5,517.86,58.0,45,False,90c10d8b-3bef-40e6-ac58-cdedc1bd70d2
+ebd0d3f8-1a70-443e-8857-1647b50bc0b4,Dei voluntas,Motorvrachtschip,gsk,2100000.0,109.82,11.4,3125.0,1995.0,,,,,,,,,,,,,,,19122.2,672.0,31.0,122,False,
+ebdb9134-6401-4152-b295-425a202626c0,Blue,,gsk,,73.0,8.18,1041.0,1964.0,,,,,,,,,,,,,,,,,62.0,122,False,
+ebdcbda2-772a-472c-a3be-e137f3d7f936,Osiris,Tankschip,galle,,109.97,11.4,2632.999,2023.0,,,,530.0,,,,,4.66,3015.0,,,,,,,3.0,2,False,
+eca9ad0f-e0aa-4122-9df7-922f0d8640d1,Tiësto,Motorvrachtschip,pcshipbrokers,2695000.0,110.0,11.45,2826.0,2002.0,,,,,,,,,,,,,,,24500.0,953.64,24.0,122,False,
+ecd5dd47-e0ce-493c-81cd-9067c8ebe9e2,TRANQUILO,Motorvrachtschip,rensendriessen,1300000.0,110.0,12.54,,,,,,,,,,,,,,,,,11818.18,,,115,False,546088b6-3f31-4aa4-a3a1-bb3ab3d3328d
+ed21f414-fa0d-4a51-bf9e-8275bddc3285,Riverquest,Duw/Sleepboot,gtsschepen,,18.6,5.2,16.0,1923.0,,800.0,Cummins,12.5,,9000.0,,,6.3,,,,,True,,,103.0,122,False,
+ed52a414-5b8f-4a81-8f10-61cfef9d6c0d,Denver,Motorvrachtschip,pcshipbrokers,650000.0,82.0,8.28,1170.0,1961.0,36000.0,863.0,Mitsubishi,34.0,220.0,20000.0,,,5.0,1450.0,,True,,False,7926.83,555.56,65.0,122,False,6301865a-2876-422b-a9df-807634058f00
+edcc18c8-997a-4e7f-bcfa-e830d721da27,Quo-Vadis,Motorvrachtschip,gtsschepen,185000.0,60.0,6.67,613.0,1960.0,26000.0,450.0,Scania,24.0,100.0,10000.0,2.0,mixed,5.3,1025.0,False,True,,True,3083.33,301.79,66.0,52,False,6dab4c2b-1090-4c8a-8e8a-d445b9baff13
+ede2f766-a7d7-49ec-9f50-858f4173b7d1,Fps rijn,,gsk,,135.0,14.2,5208.0,2008.0,,,,,,,,,,,,,,,,,18.0,122,False,f38bd339-eabd-4174-bd24-1f0ae6c58df5
+edff1eb4-bf35-46d5-bd21-9722548fba6c,Ambitie,Beunschip,pcshipbrokers,1400000.0,80.0,7.45,1503.0,2000.0,48000.0,640.0,Cummins,41.0,320.0,26000.0,,,5.5,,,True,,True,17500.0,931.47,26.0,122,False,
+eeeb8a4f-d4cb-45d2-888e-be1706151055,Montana,Koppelverband,gsk,2395000.0,109.85,11.45,2663.19,2001.0,25693.0,1521.0,Caterpillar,75.0,510.0,,1.0,welded,,3599.0,,True,,True,21802.46,899.3,25.0,3,False,
+ef23d346-513d-4fa4-9d45-5961f852521a,Thalia,Motorvrachtschip,gsk,,109.99,11.45,3212.0,2008.0,61800.0,1700.0,Mitsubishi,65.0,,,1.0,welded,6.1,3700.0,True,True,2022.0,True,,,18.0,122,False,
+ef43b9f2-f060-4e3b-a465-4ae3be2b4f61,Bremare,Beunschip,gtsschepen,175000.0,64.62,7.52,800.0,1946.0,,400.0,Volvo,40.0,214.0,8500.0,1.0,mixed,5.8,,True,True,,True,2708.14,218.75,80.0,122,False,2b729950-cb8a-48a2-8375-7d6fe570d0b3
+ef839454-38b1-4eeb-bfdb-c74f34b92de0,Viator,Motorvrachtschip,gtsschepen,975000.0,84.92,9.5,1536.0,1971.0,53000.0,916.0,Caterpillar,30.0,530.0,26000.0,1.0,welded,5.5,1900.0,True,True,,True,11481.39,634.77,55.0,122,False,
+efa90863-fb3d-43dd-b762-e8b70085810b,Amistade,Beunschip,pcshipbrokers,,85.9,9.5,1871.0,2000.0,68000.0,1014.0,Caterpillar,65.0,320.0,31000.0,,welded,5.9,,,True,2025.0,True,,,26.0,122,False,
+efeb94e7-65ae-472b-a24b-3203fecf1c08,Lindanja,Motorvrachtschip,gtsschepen,,80.0,9.5,1252.0,1929.0,,,,,,,,,,,,,,,,,97.0,122,False,
+f14471f1-497e-439c-9101-3d6a0e6ee604,Mask,Duwbak,gsk,,80.0,9.6,2315.0,1996.0,,,,30.0,550.0,,1.0,welded,,2500.0,True,True,,,,,30.0,122,False,
+f1695a27-2e7e-47dd-b523-dfe684a6a579,Watna,Motorvrachtschip,gsk,750000.0,85.9,11.0,1545.0,1963.0,,,Deutz 800 pk,45.0,,,2.0,welded,,2295.0,True,True,2018.0,True,8731.08,485.44,63.0,73,False,eb395f17-691b-49f5-82b4-97efcb2ba861
+f1e6d62d-5691-49c2-b6ad-80f3efc88898,Jordi,Motorvrachtschip,gsk,650000.0,74.96,8.2,1040.811,1955.0,,650.0,Scania,17.0,250.0,,2.0,welded,6.0,1600.0,,True,,,8671.29,624.51,71.0,122,False,
+f3166940-f832-48d1-b540-ae4519e46da5,Sento,Motorvrachtschip,rensendriessen,3550000.0,110.0,11.45,3082.0,2008.0,49250.0,1837.0,Caterpillar,44.0,575.0,72000.0,,,,,,True,,True,32272.73,1151.85,18.0,122,False,
+f348745d-1e2a-43de-95f4-7c5616b27fdd,Bas Anne,Beunschip,pcshipbrokers,699000.0,69.3,8.24,1135.0,1965.0,66400.0,,Caterpillar,35.0,320.0,8000.0,,,5.9,,,True,,True,10086.58,615.86,61.0,122,False,
+f38aca51-68ce-4fa4-8eb0-33f8f199c884,SALVADORA,Koppelverband,rensendriessen,,96.5,11.45,,,,,,,,,,,,,,,,,,,,108,False,
+f38bd339-eabd-4174-bd24-1f0ae6c58df5,FPS Rijn,Motorvrachtschip,rensendriessen,4500000.0,135.0,14.2,,2008.0,64420.0,1278.0,Mitsubishi,85.0,571.0,50000.0,,,,,,True,,True,33333.33,,18.0,122,False,
+f3b3c413-8fcf-44ad-b192-333b9d7c6fae,Sailing-Home,Motorvrachtschip,gtsschepen,325000.0,73.0,8.2,1127.0,1964.0,,750.0,Deutz,15.0,270.0,18000.0,2.0,welded,5.4,1600.0,False,True,2000.0,True,4452.05,288.38,62.0,122,False,c44ddb46-95e1-4914-8a81-70e96eea6591
+f43b6858-f039-4db6-b0f6-9e4599936fda,Candesso,,gsk,2250000.0,110.0,11.45,2915.0,2000.0,,,,,,,,,,,,,,,20454.55,771.87,26.0,122,False,2998f087-f281-4e31-83a4-e5061442ae36
+f4765296-daf8-4bda-a19b-86ddf7bf0caa,Folio 3650,Motorvrachtschip,gtsschepen,,,,,1980.0,,,,,,,,welded,,,,,,,,,46.0,122,False,
+f49ff23c-45df-4430-be49-0e24ca4619ec,Nimar,,gsk,,77.0,8.2,1100.0,1956.0,,,,,,,,,,,,,,,,,70.0,87,False,
+f4a00125-3c5f-4e9a-bae2-022650217c27,Zuidnatie 9,Motorvrachtschip,gtsschepen,1100000.0,109.71,11.97,2994.0,1957.0,48836.0,600.0,Cummins,40.0,360.0,25000.0,2.0,welded,6.6,,False,True,2023.0,True,10026.43,367.4,69.0,122,False,
+f4bc2420-99fe-4138-b84a-9c08a28aec3d,Relationship,Tankschip,rensendriessen,2300000.0,109.23,11.4,2706.0,1984.0,22451.0,1800.0,MTU,80.0,,34000.0,,,,,,,2020.0,True,21056.49,849.96,42.0,122,False,
+f4e16f04-0a43-4006-ad00-57af718eddf6,Hayley Rose,Motorvrachtschip,gtsschepen,235000.0,62.0,6.63,731.0,1963.0,33800.0,300.0,Caterpillar,22.0,320.0,6000.0,2.0,mixed,5.4,1100.0,False,True,,True,3790.32,321.48,63.0,122,False,
+f4edefbe-23b9-4f4f-bbe2-31bdc2ecbb0a,Petite Fleur,Motorvrachtschip,pcshipbrokers,1995000.0,110.0,10.5,2386.0,1988.0,57000.0,1520.0,Caterpillar,45.0,300.0,30000.0,,welded,6.2,3300.0,,True,,True,18136.36,836.13,38.0,122,False,93e4d534-b9c3-4e71-80fa-9fdedb45e443
+f51eebf8-5010-40e3-be9a-e38d15f7f5dd,Kyle,Duw/Sleepboot,gsk,750000.0,23.55,5.73,,1968.0,250.0,600.0,GM,60.0,,,,welded,,,,,2024.0,False,31847.13,,58.0,122,False,
+f5cb9e45-fb78-4a34-b80c-569f27e04d9d,Jurand,Duwbak,gsk,120000.0,35.9,8.9,642.0,1983.0,,,,,,,,,,,,,,True,3342.62,186.92,43.0,122,False,
+f674e385-306a-4fc3-994d-f94dbcc1796e,Szofi,Duwbak,pcshipbrokers,595000.0,76.4,11.35,1533.0,1977.0,,,,80.0,600.0,,,,,1710.0,,True,,True,7787.96,388.13,49.0,122,False,
+f677a59e-9281-4349-b8cd-7a7358fae0e7,Caritas I & Caritas II,Koppelverband,rensendriessen,4500000.0,94.87,11.38,,1993.0,,,Mitsubishi,,,,,,,,,,,True,47433.33,,33.0,122,False,
+f6c28a64-d6ce-418a-ad6c-663b29632ba8,Centaure,Motorvrachtschip,pcshipbrokers,885000.0,95.0,9.54,1627.0,1965.0,104000.0,1217.0,CAT,40.0,300.0,30000.0,,riveted,5.3,2400.0,,True,,True,9315.79,543.95,61.0,122,False,
+f70fc364-0358-460f-83e8-0649d07d2a81,Vivarium L,Motorvrachtschip,gtsschepen,520000.0,85.0,9.5,1353.0,1912.0,,580.0,MWM,23.0,340.0,24000.0,1.0,mixed,4.6,1550.0,True,True,,True,6117.65,384.33,114.0,122,False,
+f8477d81-c493-44ba-a71f-ad0931b28a4c,Leontine - s,Duw/Sleepboot,gsk,460000.0,22.97,5.66,,1939.0,,520.0,DAF,36.4,,,,,4.25,,,,,True,20026.12,,87.0,122,False,
+f84a12a5-7fa0-48e2-8eec-d2c86b80cf77,Risico,Motorvrachtschip,gsk,475000.0,67.29,7.25,898.0,1963.0,,540.0,Caterpilar,35.0,,,2.0,,5.5,,True,,2019.0,True,7059.0,528.95,63.0,122,False,
+f84aa307-300c-495a-8d42-7a9d1175f1cc,Furious,Motorvrachtschip,pcshipbrokers,80000.0,39.02,5.05,372.0,1958.0,,,,,,,,,,,,,,,2050.23,215.05,68.0,122,False,
+f84f2738-9ea0-4376-af84-232f87193da8,Scaldia,Duw/Sleepboot,gsk,335000.0,22.04,5.4,1.0,1947.0,27731.0,750.0,Volvo Penta,20.0,,,,,5.6,,,,2022.0,True,15199.64,335000.0,79.0,73,False,c206d6a0-29b2-4efa-8b34-0d4a5e2d895e
+f851d026-335e-4a62-aa1d-f9ef69a0acf8,Smaragd,Motorvrachtschip,gsk,400000.0,80.0,9.19,1398.0,1930.0,,750.0,Deutz ,35.0,400.0,,2.0,,5.5,2000.0,,True,,False,5000.0,286.12,96.0,122,False,
+f9148fa1-8674-41c6-8712-6f9a62cfbe3f,Onderneming,Duw/Sleepboot,pcshipbrokers,,14.95,4.9,,2000.0,,160.4,Daewoo,,,,,welded,,,,,,False,,,26.0,122,False,
+f95de05d-4e0f-4f10-9aa3-571dbfcd6cb1,Wijnanda,Motorvrachtschip,gsk,110000.0,55.06,6.48,515.52,1958.0,4756.0,405.0,Caterpiler,17.5,80.0,,1.0,welded,,850.0,,True,2022.0,False,1997.82,213.38,68.0,10,False,
+fa267f6b-e5f1-4825-b1f9-6d884ee43316,Nireas,Motorvrachtschip,gtsschepen,,55.09,7.2,675.0,,,,,,,,,,,,,,,,,,,1,False,
+fa36d197-0982-4f2d-9264-27f0eb1dd782,Viking Drakar,Tankschip,rensendriessen,,84.94,9.64,1507.0,2008.0,47451.0,1156.0,MTU,,,,,,,,,,2022.0,True,,,18.0,10,False,
+fa8dfb0c-6e40-4eb1-8539-a30141c5c934,Cheson,,gsk,,85.67,9.5,1388.0,1998.0,,,,,,,,,,,,,,,,,28.0,122,False,
+faa546d0-2c64-4024-80d3-3a44ad7fc072,Nesselande,Motorvrachtschip,pcshipbrokers,,110.0,11.4,2846.0,1987.0,,,,,,,,,,,,,,,,,39.0,122,False,e48da416-7994-4e45-a4a8-2c9396214609
+fad199fa-588a-431d-b3f6-89f9127b39a7,Asdeta,Motorvrachtschip,rensendriessen,3175000.0,110.0,11.45,3055.0,2008.0,49760.0,1839.0,Caterpillar,,572.0,55000.0,,,,,,True,,True,28863.64,1039.28,18.0,122,False,
+fc42f92b-3470-4d17-badb-bda0fdcd7ec7,Spes Nova,Motorvrachtschip,pcshipbrokers,120000.0,58.0,6.6,642.0,1961.0,,360.0,Detroit,,,,,riveted,5.45,,,,,True,2068.97,186.92,65.0,122,False,
+fc7d2621-4cd4-41b3-a660-85bdf802ef78,Risico,Beunschip,pcshipbrokers,325000.0,67.29,7.25,898.0,1963.0,,540.0,Caterpillar,35.0,180.0,24000.0,,,5.5,,,True,2019.0,True,4829.84,361.92,63.0,122,False,f84a12a5-7fa0-48e2-8eec-d2c86b80cf77
+fce0a358-5d8b-442d-bb46-608db7c0c16e,Aqua Mundo,Motorvrachtschip,rensendriessen,1400000.0,105.0,11.0,2346.0,1977.0,15451.0,,Mitsubishi,,,22000.0,,,,,,,,,13333.33,596.76,49.0,122,False,
+fd2996a9-b3d3-45db-979f-4c734c2ecfd9,Flottant,Tankschip,gtsschepen,700000.0,67.06,8.26,805.0,1954.0,9635.0,811.0,Cummins,19.0,300.0,12000.0,4.0,riveted,5.6,629.0,True,True,,True,10438.41,869.57,72.0,122,False,ba5f2f68-6b24-4175-84de-07825d30e92c
+fd3248b7-0362-44cf-8eec-0d2a008f1bbe,Excelsior,Motorvrachtschip,gsk,1790000.0,109.94,9.51,2306.0,1987.0,12000.0,1700.0,Mitsubishi,45.0,390.0,,2.0,welded,6.6,3100.0,,True,,False,16281.61,776.24,39.0,122,False,
+fd42a887-d217-42d0-95f5-49118ef51c55,Rs alinda,Motorvrachtschip,gsk,269000.0,85.92,8.2,1282.0,1953.0,33054.0,648.0,Cummins,30.0,250.0,,2.0,,6.3,,,True,,True,3130.82,209.83,73.0,122,False,
+fddd08c4-1132-4402-a4e5-4e70c79d5240,Santos,Tankschip,rensendriessen,6600000.0,110.0,11.45,2905.0,2020.0,6335.0,1800.0,Caterpillar,175.0,,,,,,,,,,True,60000.0,2271.94,6.0,66,False,
+fdfd437f-5656-4bf4-8365-cc37a74c02cf,Mojo,Motorvrachtschip,gtsschepen,159000.0,55.0,7.06,610.0,1959.0,,311.0,Scania,25.0,220.0,8800.0,1.0,mixed,4.8,925.0,False,True,2017.0,True,2890.91,260.66,67.0,122,False,
+fe9f0215-c6d1-4810-8061-00a74ea147e2,Orchila,Motorvrachtschip,rensendriessen,5500000.0,135.0,15.0,4847.0,2009.0,37000.0,1501.0,ABC,61.0,525.0,,,,,,,True,,True,40740.74,1134.72,17.0,122,False,
+ff473623-4257-4fac-9b5e-99589721957e,Anjo,Motorvrachtschip,gsk,,50.96,6.62,624.0,1965.0,20000.0,362.0,Caterpillar ,,325.0,,2.0,,5.85,900.0,,True,,True,,,61.0,122,False,
+ffb1e897-2998-48fd-a3f9-4b5f8fbdf9e0,Denver,Motorvrachtschip,galle,650000.0,82.0,8.28,1170.0,1961.0,,,,,,,1.0,,2.7,,,,,,7926.83,555.56,65.0,2,False,6301865a-2876-422b-a9df-807634058f00
+ffca32d3-1c75-46cb-aee7-35b9dd8d3e2e,Roma,,gsk,850000.0,80.0,9.0,1328.0,1964.0,,,,,,,,,,,,,,,10625.0,640.06,62.0,122,False,

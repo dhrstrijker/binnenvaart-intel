@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Binnenvaart Intel - Per-Type Price Analysis</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --blue: #2563eb;
+    --blue-light: #dbeafe;
+    --blue-dark: #1e40af;
+    --emerald: #059669;
+    --emerald-light: #d1fae5;
+    --red: #dc2626;
+    --red-light: #fee2e2;
+    --amber: #d97706;
+    --amber-light: #fef3c7;
+    --purple: #7c3aed;
+    --purple-light: #ede9fe;
+    --slate-50: #f8fafc;
+    --slate-100: #f1f5f9;
+    --slate-200: #e2e8f0;
+    --slate-300: #cbd5e1;
+    --slate-400: #94a3b8;
+    --slate-500: #64748b;
+    --slate-600: #475569;
+    --slate-700: #334155;
+    --slate-800: #1e293b;
+    --slate-900: #0f172a;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--slate-900);
+    color: var(--slate-800);
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  .slide {
+    display: none;
+    width: 100vw;
+    height: 100vh;
+    padding: 60px 80px;
+    background: white;
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow-y: auto;
+  }
+
+  .slide.active { display: flex; flex-direction: column; }
+
+  /* Title slide */
+  .slide.title-slide {
+    background: linear-gradient(135deg, var(--slate-900) 0%, var(--blue-dark) 100%);
+    color: white;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  .slide.title-slide h1 {
+    font-size: 3.2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .slide.title-slide .subtitle {
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: var(--slate-300);
+    margin-bottom: 40px;
+  }
+  .slide.title-slide .meta {
+    font-size: 0.95rem;
+    color: var(--slate-400);
+    line-height: 1.8;
+  }
+  .slide.title-slide .accent { color: var(--blue); font-weight: 600; }
+
+  /* Section divider */
+  .slide.section-slide {
+    background: var(--slate-50);
+    justify-content: center;
+    align-items: flex-start;
+    padding-left: 120px;
+  }
+  .slide.section-slide .section-number {
+    font-size: 5rem;
+    font-weight: 800;
+    color: var(--blue);
+    opacity: 0.2;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .slide.section-slide h2 {
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: var(--slate-900);
+    letter-spacing: -0.02em;
+  }
+  .slide.section-slide .section-desc {
+    font-size: 1.2rem;
+    color: var(--slate-500);
+    margin-top: 12px;
+    max-width: 600px;
+  }
+
+  /* Content slides */
+  .slide h2 {
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--slate-900);
+    margin-bottom: 32px;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  .slide h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--slate-700);
+    margin-bottom: 12px;
+    margin-top: 20px;
+  }
+  .slide p, .slide li {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--slate-600);
+  }
+  .slide ul { padding-left: 24px; margin-bottom: 16px; }
+  .slide li { margin-bottom: 8px; }
+  .slide strong { color: var(--slate-800); }
+
+  /* Grid layouts */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; flex: 1; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 28px; flex: 1; }
+  .grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; flex: 1; }
+
+  /* Stat cards */
+  .stat-card {
+    background: var(--slate-50);
+    border-radius: 16px;
+    padding: 28px 32px;
+    border: 1px solid var(--slate-200);
+  }
+  .stat-card.blue { background: var(--blue-light); border-color: #93c5fd; }
+  .stat-card.emerald { background: var(--emerald-light); border-color: #6ee7b7; }
+  .stat-card.red { background: var(--red-light); border-color: #fca5a5; }
+  .stat-card.amber { background: var(--amber-light); border-color: #fcd34d; }
+  .stat-card.purple { background: var(--purple-light); border-color: #c4b5fd; }
+
+  .stat-value {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: var(--slate-900);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-card.blue .stat-value { color: var(--blue-dark); }
+  .stat-card.emerald .stat-value { color: #065f46; }
+  .stat-card.red .stat-value { color: #991b1b; }
+  .stat-card.amber .stat-value { color: #92400e; }
+  .stat-card.purple .stat-value { color: #5b21b6; }
+
+  .stat-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--slate-500);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .stat-card.blue .stat-label { color: var(--blue); }
+  .stat-card.emerald .stat-label { color: var(--emerald); }
+  .stat-card.red .stat-label { color: var(--red); }
+  .stat-card.amber .stat-label { color: var(--amber); }
+  .stat-card.purple .stat-label { color: var(--purple); }
+
+  .stat-detail {
+    font-size: 0.85rem;
+    color: var(--slate-400);
+    margin-top: 4px;
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+  }
+  th {
+    text-align: left;
+    padding: 10px 14px;
+    background: var(--slate-100);
+    color: var(--slate-600);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--slate-200);
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--slate-100);
+    color: var(--slate-700);
+  }
+  tr:hover td { background: var(--slate-50); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 500; }
+  .highlight-row td { background: var(--blue-light); font-weight: 600; }
+  .positive { color: var(--emerald); }
+  .negative { color: var(--red); }
+  .muted { color: var(--slate-400); }
+
+  /* Comparison arrow */
+  .vs-block {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    padding: 32px;
+    background: var(--slate-50);
+    border-radius: 16px;
+    margin: 16px 0;
+  }
+  .vs-item {
+    text-align: center;
+    flex: 1;
+  }
+  .vs-item .vs-value {
+    font-size: 2.4rem;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+  .vs-item .vs-label {
+    font-size: 0.85rem;
+    color: var(--slate-500);
+    margin-top: 4px;
+  }
+  .vs-arrow {
+    font-size: 2rem;
+    color: var(--emerald);
+    font-weight: 700;
+  }
+
+  /* Badge */
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .badge.good { background: var(--emerald-light); color: #065f46; }
+  .badge.warn { background: var(--amber-light); color: #92400e; }
+  .badge.bad { background: var(--red-light); color: #991b1b; }
+  .badge.info { background: var(--blue-light); color: var(--blue-dark); }
+
+  /* Chart image */
+  .chart-img {
+    width: 100%;
+    max-height: 420px;
+    object-fit: contain;
+    border-radius: 12px;
+    border: 1px solid var(--slate-200);
+    background: white;
+  }
+  .chart-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Code block */
+  .code-block {
+    background: var(--slate-900);
+    color: #e2e8f0;
+    padding: 24px 28px;
+    border-radius: 12px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.82rem;
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .code-block .kw { color: #c084fc; }
+  .code-block .str { color: #86efac; }
+  .code-block .num { color: #fbbf24; text-align: left; font-weight: 400; }
+  .code-block .comment { color: #64748b; }
+  .code-block .type { color: #67e8f9; }
+
+  /* Callout */
+  .callout {
+    background: var(--blue-light);
+    border-left: 4px solid var(--blue);
+    padding: 16px 20px;
+    border-radius: 0 12px 12px 0;
+    margin: 16px 0;
+  }
+  .callout p { color: var(--blue-dark); font-size: 0.95rem; }
+  .callout.warn { background: var(--amber-light); border-color: var(--amber); }
+  .callout.warn p { color: #92400e; }
+  .callout.good { background: var(--emerald-light); border-color: var(--emerald); }
+  .callout.good p { color: #065f46; }
+
+  /* Navigation */
+  .nav-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: var(--slate-900);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    z-index: 100;
+  }
+  .nav-bar .page-info {
+    color: var(--slate-400);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .nav-bar .nav-buttons { display: flex; gap: 8px; }
+  .nav-btn {
+    background: var(--slate-700);
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  .nav-btn:hover { background: var(--blue); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .nav-btn:disabled:hover { background: var(--slate-700); }
+
+  /* Progress bar */
+  .progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: var(--blue);
+    transition: width 0.3s ease;
+    z-index: 100;
+  }
+
+  /* Utility */
+  .flex-1 { flex: 1; }
+  .mt-auto { margin-top: auto; }
+  .mb-8 { margin-bottom: 8px; }
+  .mb-16 { margin-bottom: 16px; }
+  .mb-24 { margin-bottom: 24px; }
+  .gap-16 { gap: 16px; }
+  .text-sm { font-size: 0.85rem; }
+  .text-center { text-align: center; }
+
+  /* Bar chart (CSS-only) */
+  .bar-chart { display: flex; flex-direction: column; gap: 10px; }
+  .bar-row { display: flex; align-items: center; gap: 12px; }
+  .bar-label { width: 140px; font-size: 0.85rem; color: var(--slate-600); text-align: right; font-weight: 500; }
+  .bar-track { flex: 1; height: 28px; background: var(--slate-100); border-radius: 6px; position: relative; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; padding-left: 10px; font-size: 0.78rem; font-weight: 600; color: white; transition: width 0.5s ease; }
+  .bar-fill.blue { background: var(--blue); }
+  .bar-fill.emerald { background: var(--emerald); }
+  .bar-fill.amber { background: var(--amber); }
+  .bar-fill.red { background: var(--red); }
+  .bar-fill.purple { background: var(--purple); }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress"></div>
+
+<!-- Slide 0: Title -->
+<div class="slide title-slide active" data-slide="0">
+  <h1>Per-Type Price Analysis</h1>
+  <div class="subtitle">Binnenvaart Intel Market Report v2</div>
+  <div class="meta">
+    February 2026<br>
+    756 vessel listings &middot; 5 broker sources &middot; 388 priced vessels<br><br>
+    <span class="accent">Why type matters:</span> a single pooled model masks critical pricing<br>
+    differences between vessel types
+  </div>
+</div>
+
+<!-- Slide 1: The Problem -->
+<div class="slide" data-slide="1">
+  <h2>The Problem: One Model Doesn't Fit All</h2>
+  <div class="grid-2" style="align-items: start;">
+    <div>
+      <h3>v1: Pooled Model</h3>
+      <p>The initial analysis pooled all vessel types together and found build_year (44%), length (31%), tonnage (17%) explain 83% of price.</p>
+      <br>
+      <p>But this <strong>masked critical type-level differences</strong>:</p>
+      <ul style="margin-top: 12px;">
+        <li>Tankers cost <strong>2.5x more per ton</strong> than Motorvrachtschip</li>
+        <li>Engine hours matter <strong>20x more</strong> for tankers</li>
+        <li>K-means clustered tankers with similarly-sized cargo vessels despite fundamentally different pricing</li>
+      </ul>
+
+      <div class="callout warn" style="margin-top: 24px;">
+        <p><strong>Result:</strong> 36% of vessels were misclassified in their deal score bucket</p>
+      </div>
+    </div>
+    <div>
+      <h3>Sample Sizes by Type</h3>
+      <table>
+        <tr><th>Type</th><th class="num">n (priced)</th><th>Model</th></tr>
+        <tr class="highlight-row"><td>Motorvrachtschip</td><td class="num">233</td><td>GBM (full)</td></tr>
+        <tr><td>Tankschip</td><td class="num">44</td><td>Linear</td></tr>
+        <tr><td>Beunschip</td><td class="num">23</td><td>Fallback</td></tr>
+        <tr><td>Duw/Sleepboot</td><td class="num">21</td><td>Fallback</td></tr>
+        <tr><td>Duwbak</td><td class="num">19</td><td>Linear</td></tr>
+        <tr><td>Koppelverband</td><td class="num">17</td><td>Fallback</td></tr>
+        <tr><td><span class="muted">Others (&le;3 each)</span></td><td class="num muted">11</td><td class="muted">Fallback</td></tr>
+      </table>
+      <p class="text-sm muted" style="margin-top: 12px;">60% of the dataset is Motorvrachtschip &mdash; the dominant type gets its own GBM</p>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 2: Section - Per-Type Regression -->
+<div class="slide section-slide" data-slide="2">
+  <div class="section-number">01</div>
+  <h2>Per-Type Regression</h2>
+  <div class="section-desc">Separate models reveal what pooled analysis missed</div>
+</div>
+
+<!-- Slide 3: The Big Win: Motorvrachtschip -->
+<div class="slide" data-slide="3">
+  <h2>Motorvrachtschip: R&sup2; jumps from 0.74 to 0.93</h2>
+  <div class="grid-2">
+    <div>
+      <div class="vs-block">
+        <div class="vs-item">
+          <div class="vs-value" style="color: var(--slate-400);">0.74</div>
+          <div class="vs-label">Pooled CV R&sup2;</div>
+        </div>
+        <div class="vs-arrow">&rarr;</div>
+        <div class="vs-item">
+          <div class="vs-value" style="color: var(--emerald);">0.93</div>
+          <div class="vs-label">Per-Type CV R&sup2;</div>
+        </div>
+      </div>
+
+      <div class="callout good">
+        <p><strong>+19 percentage points.</strong> Removing type noise is the single biggest model improvement.</p>
+      </div>
+
+      <p style="margin-top: 20px;">The per-type GBM (n=137, 5-fold CV) explains 93% of Motorvrachtschip price variance using just 5 features.</p>
+    </div>
+    <div>
+      <h3>Feature Importance Shift</h3>
+      <div class="bar-chart">
+        <div class="bar-row">
+          <div class="bar-label">build_year</div>
+          <div class="bar-track">
+            <div class="bar-fill blue" style="width: 36.3%;">36%</div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">tonnage</div>
+          <div class="bar-track">
+            <div class="bar-fill emerald" style="width: 35.7%;">36%</div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">length_m</div>
+          <div class="bar-track">
+            <div class="bar-fill amber" style="width: 25.6%;">26%</div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">engine_power</div>
+          <div class="bar-track">
+            <div class="bar-fill purple" style="width: 5%;">2%</div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">engine_hours</div>
+          <div class="bar-track">
+            <div class="bar-fill red" style="width: 3%;">1%</div>
+          </div>
+        </div>
+      </div>
+      <div class="callout" style="margin-top: 20px;">
+        <p><strong>Key insight:</strong> Tonnage jumps from 17% to 36% &mdash; <strong>2x more important</strong> when comparing within type. The pooled model suppressed it because different types have different tonnage-price relationships.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 4: What does R²=0.93 actually mean? -->
+<div class="slide" data-slide="4">
+  <h2>What Does R&sup2; = 0.93 Actually Mean?</h2>
+  <div class="grid-2" style="align-items: start;">
+    <div>
+      <p style="margin-bottom: 20px;"><strong>R&sup2; = 0.93 means the model explains 93% of why some vessels cost more than others.</strong> The remaining 7% is stuff the model can't see &mdash; condition, interior, renovations, seller urgency.</p>
+
+      <h3>Real Predictions (cross-validated)</h3>
+      <table>
+        <tr><th>Vessel</th><th class="num">Actual Price</th><th class="num">Model Predicts</th><th class="num">Off by</th></tr>
+        <tr>
+          <td>Petite fleur</td><td class="num">&euro;1,995,000</td>
+          <td class="num">&euro;1,995,793</td><td class="num positive"><strong>-0%</strong></td>
+        </tr>
+        <tr>
+          <td>Fenny II</td><td class="num">&euro;3,400,000</td>
+          <td class="num">&euro;3,418,092</td><td class="num positive"><strong>-1%</strong></td>
+        </tr>
+        <tr>
+          <td>Andromeda</td><td class="num">&euro;245,000</td>
+          <td class="num">&euro;220,594</td><td class="num">+10%</td>
+        </tr>
+        <tr>
+          <td>Inspiratio</td><td class="num">&euro;695,000</td>
+          <td class="num">&euro;626,242</td><td class="num">+10%</td>
+        </tr>
+        <tr>
+          <td>Vigilate</td><td class="num">&euro;3,750,000</td>
+          <td class="num">&euro;4,497,520</td><td class="num negative">-20%</td>
+        </tr>
+      </table>
+      <p class="text-sm muted" style="margin-top: 10px;">Each vessel predicted by a model that <em>never saw it</em> during training &mdash; that's what "cross-validated" means.</p>
+    </div>
+    <div>
+      <h3>Accuracy Comparison</h3>
+      <table style="margin-bottom: 24px;">
+        <tr><th></th><th class="num">Per-Type<br><span style="font-weight:400; font-size:0.75rem;">R&sup2;=0.93</span></th><th class="num">Pooled<br><span style="font-weight:400; font-size:0.75rem;">R&sup2;=0.74</span></th></tr>
+        <tr><td>Median error</td><td class="num positive"><strong>&euro;127K (20%)</strong></td><td class="num">&euro;241K (34%)</td></tr>
+        <tr><td>Within 10% of actual</td><td class="num positive"><strong>32%</strong></td><td class="num">21%</td></tr>
+        <tr><td>Within 20% of actual</td><td class="num positive"><strong>51%</strong></td><td class="num">37%</td></tr>
+        <tr><td>Within 30% of actual</td><td class="num positive"><strong>64%</strong></td><td class="num">48%</td></tr>
+      </table>
+
+      <div class="callout good">
+        <p><strong>In plain language:</strong> for half of all Motorvrachtschip, the per-type model predicts the asking price within 20%. The pooled model only manages that for 37%.</p>
+      </div>
+
+      <div class="callout" style="margin-top: 12px;">
+        <p><strong>Why "cross-validated" matters:</strong> each vessel is predicted by a model that never saw it in training. Like a test where the teacher hides the answer before grading. Without CV, the model could memorize prices and fake R&sup2;=0.99.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 5: All Models Compared -->
+<div class="slide" data-slide="5">
+  <h2>Per-Type Model Performance</h2>
+  <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+    <table>
+      <tr>
+        <th>Type</th>
+        <th>Model</th>
+        <th class="num">n</th>
+        <th class="num">CV R&sup2;</th>
+        <th class="num">Pooled R&sup2;</th>
+        <th class="num">Difference</th>
+        <th>Top Driver</th>
+        <th>Verdict</th>
+      </tr>
+      <tr class="highlight-row">
+        <td>Motorvrachtschip</td><td>GBM</td><td class="num">137</td>
+        <td class="num positive">0.926</td><td class="num">0.736</td>
+        <td class="num positive">+0.190</td><td>build_year</td>
+        <td><span class="badge good">Use per-type</span></td>
+      </tr>
+      <tr>
+        <td>Tankschip</td><td>Linear</td><td class="num">36</td>
+        <td class="num">0.526</td><td class="num">0.736</td>
+        <td class="num negative">-0.210</td><td>build_year</td>
+        <td><span class="badge warn">Borderline</span></td>
+      </tr>
+      <tr>
+        <td>Duwbak</td><td>Linear</td><td class="num">16</td>
+        <td class="num">0.398</td><td class="num">0.736</td>
+        <td class="num negative">-0.339</td><td>build_year</td>
+        <td><span class="badge warn">Optional</span></td>
+      </tr>
+      <tr>
+        <td>Koppelverband</td><td>Linear</td><td class="num">16</td>
+        <td class="num">0.280</td><td class="num">0.736</td>
+        <td class="num negative">-0.456</td><td>build_year</td>
+        <td><span class="badge bad">Use fallback</span></td>
+      </tr>
+      <tr>
+        <td>Beunschip</td><td>Linear</td><td class="num">23</td>
+        <td class="num negative">-7.62</td><td class="num">0.736</td>
+        <td class="num negative">-8.36</td><td>&mdash;</td>
+        <td><span class="badge bad">Use fallback</span></td>
+      </tr>
+      <tr>
+        <td>Duw/Sleepboot</td><td>Linear</td><td class="num">20</td>
+        <td class="num negative">-3.29</td><td class="num">0.736</td>
+        <td class="num negative">-4.03</td><td>&mdash;</td>
+        <td><span class="badge bad">Use fallback</span></td>
+      </tr>
+    </table>
+
+    <div class="callout" style="margin-top: 24px;">
+      <p><strong>Strategy:</strong> Use per-type models only where they outperform or meaningfully differ from pooled. Motorvrachtschip (R&sup2;=0.93) is a clear win. Tankschip (0.53) captures the tanker premium despite lower R&sup2;. Others fall back to the pooled model (R&sup2;=0.74).</p>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 6: Feature importance chart -->
+<div class="slide" data-slide="6">
+  <h2>Feature Importance: Side-by-Side Across Types</h2>
+  <div class="chart-container">
+    <img src="charts/per_type_feature_importance.png" class="chart-img" alt="Per-type feature importance">
+  </div>
+</div>
+
+<!-- Slide 7: Section - Tanker Premium -->
+<div class="slide section-slide" data-slide="7">
+  <div class="section-number">02</div>
+  <h2>The Tanker Premium</h2>
+  <div class="section-desc">Same size, same age &mdash; but 2.5x more per ton</div>
+</div>
+
+<!-- Slide 8: Cross-type comparison -->
+<div class="slide" data-slide="8">
+  <h2>Pricing Differs Dramatically Across Types</h2>
+  <div class="grid-2">
+    <div>
+      <table>
+        <tr><th>Type</th><th class="num">n</th><th class="num">Med. Price</th><th class="num">EUR/ton</th><th class="num">EUR/m</th></tr>
+        <tr>
+          <td>Motorvrachtschip</td><td class="num">233</td>
+          <td class="num">&euro;695K</td><td class="num">516</td><td class="num">8,588</td>
+        </tr>
+        <tr style="background: var(--amber-light);">
+          <td><strong>Tankschip</strong></td><td class="num">44</td>
+          <td class="num"><strong>&euro;2.5M</strong></td><td class="num"><strong>1,273</strong></td><td class="num"><strong>25,747</strong></td>
+        </tr>
+        <tr>
+          <td>Beunschip</td><td class="num">23</td>
+          <td class="num">&euro;449K</td><td class="num">541</td><td class="num">6,896</td>
+        </tr>
+        <tr>
+          <td>Duw/Sleepboot</td><td class="num">21</td>
+          <td class="num">&euro;335K</td><td class="num">10,733</td><td class="num">18,553</td>
+        </tr>
+        <tr>
+          <td>Duwbak</td><td class="num">19</td>
+          <td class="num">&euro;440K</td><td class="num">205</td><td class="num">7,652</td>
+        </tr>
+        <tr>
+          <td>Koppelverband</td><td class="num">17</td>
+          <td class="num">&euro;3.5M</td><td class="num">917</td><td class="num">26,289</td>
+        </tr>
+      </table>
+
+      <div style="margin-top: 24px;">
+        <h3>Tanker Length Premium: 2.2x</h3>
+        <p>Per the linear model, each meter of tanker length adds <strong>&euro;12,762</strong> vs <strong>&euro;5,680</strong> for Motorvrachtschip. A 100m tanker commands ~&euro;710K more than a 100m cargo vessel from the length term alone.</p>
+      </div>
+    </div>
+    <div>
+      <div class="stat-card amber" style="margin-bottom: 20px;">
+        <div class="stat-value">2.5x</div>
+        <div class="stat-label">Tanker Premium per Ton</div>
+        <div class="stat-detail">&euro;1,273/ton vs &euro;516/ton for cargo</div>
+      </div>
+      <div class="stat-card purple" style="margin-bottom: 20px;">
+        <div class="stat-value">3.0x</div>
+        <div class="stat-label">Tanker Premium per Meter</div>
+        <div class="stat-detail">&euro;25,747/m vs &euro;8,588/m for cargo</div>
+      </div>
+      <div class="stat-card" style="margin-bottom: 20px;">
+        <div class="stat-value" style="font-size: 2rem;">Lowest: Duwbak</div>
+        <div class="stat-label">&euro;205 per ton</div>
+        <div class="stat-detail">Simple unpowered barges &mdash; value is in dimensions</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 9: Type comparison chart -->
+<div class="slide" data-slide="9">
+  <h2>Cross-Type Price Metrics</h2>
+  <div class="chart-container">
+    <img src="charts/type_comparison.png" class="chart-img" alt="Type comparison">
+  </div>
+</div>
+
+<!-- Slide 10: Section - Engine Hours -->
+<div class="slide section-slide" data-slide="10">
+  <div class="section-number">03</div>
+  <h2>Engine Hours by Type</h2>
+  <div class="section-desc">A weak signal for cargo, a critical signal for tankers</div>
+</div>
+
+<!-- Slide 11: Engine hours findings -->
+<div class="slide" data-slide="11">
+  <h2>Engine Hours: 20x Stronger Effect on Tankers</h2>
+  <div class="grid-2">
+    <div>
+      <div class="stat-card blue" style="margin-bottom: 24px;">
+        <div class="stat-label">Motorvrachtschip (n=147)</div>
+        <div class="stat-value" style="font-size: 2.2rem;">-&euro;7,272</div>
+        <div class="stat-detail">per 10,000 engine hours &mdash; just ~1% of median price</div>
+      </div>
+      <p>Engine hours remain a <strong>weak signal</strong> for cargo vessels after controlling for size and age. Only 0.6% of feature importance in the per-type GBM. Engines are regularly overhauled, making hours less meaningful.</p>
+    </div>
+    <div>
+      <div class="stat-card red" style="margin-bottom: 24px;">
+        <div class="stat-label">Tankschip (n=17)</div>
+        <div class="stat-value" style="font-size: 2.2rem;">-&euro;142,762</div>
+        <div class="stat-detail">per 10,000 engine hours &mdash; ~5.7% of median price</div>
+      </div>
+      <p>For tankers, engine hours matter <strong>20x more</strong>. This makes sense:</p>
+      <ul style="margin-top: 8px;">
+        <li>Hazardous cargo makes engine reliability safety-critical</li>
+        <li>Stricter inspection/certification requirements</li>
+        <li>Higher overhaul costs for tanker engines</li>
+        <li>Low-hour tankers are easier to recertify</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout warn" style="margin-top: auto;">
+    <p><strong>Caveat:</strong> n=17 for the Tankschip analysis. The direction is robust but the exact magnitude has high uncertainty.</p>
+  </div>
+</div>
+
+<!-- Slide 12: Engine hours chart -->
+<div class="slide" data-slide="12">
+  <h2>Engine Hours vs Price: Motorvrachtschip vs Tankschip</h2>
+  <div class="chart-container">
+    <img src="charts/engine_hours_by_type.png" class="chart-img" alt="Engine hours by type">
+  </div>
+</div>
+
+<!-- Slide 13: Section - Segmentation -->
+<div class="slide section-slide" data-slide="13">
+  <div class="section-number">04</div>
+  <h2>Motorvrachtschip Segments</h2>
+  <div class="section-desc">Within-type clustering for the dominant market</div>
+</div>
+
+<!-- Slide 14: Motorvrachtschip segments -->
+<div class="slide" data-slide="14">
+  <h2>Three Sub-Segments Within Motorvrachtschip</h2>
+  <div class="grid-3">
+    <div class="stat-card blue">
+      <div class="stat-label">Modern Large Cargo</div>
+      <div class="stat-value" style="font-size: 1.8rem;">44 vessels</div>
+      <div style="margin-top: 16px; font-size: 0.9rem; color: var(--slate-600); line-height: 1.8;">
+        Avg price: <strong>&euro;3.1M</strong><br>
+        Avg length: <strong>117m</strong><br>
+        Avg tonnage: <strong>3,242t</strong><br>
+        Avg age: <strong>25 years</strong><br>
+        Avg engine hours: <strong>53,841</strong>
+      </div>
+      <p class="text-sm" style="margin-top: 12px; color: var(--blue);">Post-2000 builds, 100-135m. The premium tier.</p>
+    </div>
+    <div class="stat-card emerald">
+      <div class="stat-label">Established Fleet</div>
+      <div class="stat-value" style="font-size: 1.8rem;">52 vessels</div>
+      <div style="margin-top: 16px; font-size: 0.9rem; color: var(--slate-600); line-height: 1.8;">
+        Avg price: <strong>&euro;1.3M</strong><br>
+        Avg length: <strong>97m</strong><br>
+        Avg tonnage: <strong>2,007t</strong><br>
+        Avg age: <strong>49 years</strong><br>
+        Avg engine hours: <strong>38,859</strong>
+      </div>
+      <p class="text-sm" style="margin-top: 12px; color: var(--emerald);">1970s-90s builds. Workhorse mid-market.</p>
+    </div>
+    <div class="stat-card amber">
+      <div class="stat-label">Classic Rhine Freighters</div>
+      <div class="stat-value" style="font-size: 1.8rem;">130 vessels</div>
+      <div style="margin-top: 16px; font-size: 0.9rem; color: var(--slate-600); line-height: 1.8;">
+        Avg price: <strong>&euro;424K</strong><br>
+        Avg length: <strong>72m</strong><br>
+        Avg tonnage: <strong>1,029t</strong><br>
+        Avg age: <strong>70 years</strong><br>
+        Avg engine hours: <strong>27,995</strong>
+      </div>
+      <p class="text-sm" style="margin-top: 12px; color: var(--amber);">Pre-1970 builds. Largest segment (57%).</p>
+    </div>
+  </div>
+  <div class="callout" style="margin-top: auto;">
+    <p><strong>Why within-type beats all-type:</strong> The v1 segmentation (k=5 on all types) mixed tankers with cargo vessels in the same clusters. Within-type segments produce groups with shared pricing dynamics.</p>
+  </div>
+</div>
+
+<!-- Slide 15: Segments chart -->
+<div class="slide" data-slide="15">
+  <h2>Motorvrachtschip Segments: Length &amp; Tonnage vs Price</h2>
+  <div class="chart-container">
+    <img src="charts/motorvrachtschip_segments.png" class="chart-img" alt="Motorvrachtschip segments">
+  </div>
+</div>
+
+<!-- Slide 16: Section - Deal Score -->
+<div class="slide section-slide" data-slide="16">
+  <div class="section-number">05</div>
+  <h2>Type-Aware Deal Score</h2>
+  <div class="section-desc">Per-type coefficients reclassify 36% of vessels</div>
+</div>
+
+<!-- Slide 17: Deal score formula -->
+<div class="slide" data-slide="17">
+  <h2>Deal Score: Per-Type Coefficients</h2>
+  <div class="grid-2">
+    <div>
+      <table>
+        <tr><th>Type</th><th class="num">length_m</th><th class="num">tonnage</th><th class="num">build_year</th><th class="num">CV R&sup2;</th></tr>
+        <tr class="highlight-row">
+          <td>Motorvrachtschip</td>
+          <td class="num">5,680</td><td class="num">698</td><td class="num">16,382</td><td class="num">0.86</td>
+        </tr>
+        <tr>
+          <td>Tankschip</td>
+          <td class="num">12,762</td><td class="num">546</td><td class="num">26,317</td><td class="num">0.53</td>
+        </tr>
+        <tr>
+          <td>Duwbak</td>
+          <td class="num">10,534</td><td class="num">57</td><td class="num">11,943</td><td class="num">0.40</td>
+        </tr>
+        <tr>
+          <td style="color: var(--slate-400);">_fallback</td>
+          <td class="num muted">8,391</td><td class="num muted">482</td><td class="num muted">23,318</td><td class="num muted">0.74</td>
+        </tr>
+      </table>
+
+      <h3 style="margin-top: 28px;">Key Differences</h3>
+      <ul>
+        <li><strong>Tanker length:</strong> &euro;12,762/m vs &euro;5,680/m for cargo (2.2x)</li>
+        <li><strong>Tonnage for Duwbak:</strong> nearly zero (&euro;57) vs &euro;698 for cargo</li>
+        <li><strong>Build year:</strong> &euro;26K/yr for tankers vs &euro;16K/yr for cargo</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Reclassification: 36% of Vessels</h3>
+      <div class="stat-card red" style="margin-bottom: 16px;">
+        <div class="stat-value">115 / 323</div>
+        <div class="stat-label">Change Deal Bucket</div>
+      </div>
+      <table style="font-size: 0.85rem;">
+        <tr><th>From (pooled)</th><th>To (type)</th><th class="num">Count</th></tr>
+        <tr><td>Good deal</td><td>Fair</td><td class="num">47</td></tr>
+        <tr><td>Overpriced</td><td>Fair</td><td class="num">26</td></tr>
+        <tr><td>Fair</td><td>Overpriced</td><td class="num">19</td></tr>
+        <tr><td>Good deal</td><td>Overpriced</td><td class="num">15</td></tr>
+        <tr><td>Fair</td><td>Good deal</td><td class="num">8</td></tr>
+      </table>
+      <p class="text-sm" style="margin-top: 12px; color: var(--slate-500);">Biggest impact: tankers scored as "overpriced" against cargo norms are actually "fair" within tanker norms.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 18: TypeScript implementation -->
+<div class="slide" data-slide="18">
+  <h2>TypeScript Implementation</h2>
+  <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+    <div class="code-block"><span class="kw">const</span> <span class="type">TYPE_COEFFICIENTS</span>: Record&lt;<span class="type">string</span>, <span class="type">TypeCoefficients</span>&gt; = {
+  <span class="str">'Motorvrachtschip'</span>: { length: <span class="num">5680.45</span>,  tonnage: <span class="num">697.91</span>,  build_year: <span class="num">16382.36</span>,  intercept: <span class="num">-32785231.98</span> },
+  <span class="str">'Tankschip'</span>:        { length: <span class="num">12761.84</span>, tonnage: <span class="num">545.76</span>,  build_year: <span class="num">26316.55</span>,  intercept: <span class="num">-52005837.38</span> },
+  <span class="str">'Duwbak'</span>:           { length: <span class="num">10534.15</span>, tonnage: <span class="num">57.28</span>,   build_year: <span class="num">11943.15</span>,  intercept: <span class="num">-24016119.95</span> },
+  <span class="str">'_fallback'</span>:        { length: <span class="num">8390.53</span>,  tonnage: <span class="num">481.93</span>,  build_year: <span class="num">23317.80</span>,  intercept: <span class="num">-46208569.38</span> },
+};
+
+<span class="kw">function</span> <span class="type">expectedPrice</span>(type: <span class="type">string</span>, length_m: <span class="type">number</span>, tonnage: <span class="type">number</span> | <span class="type">null</span>, build_year: <span class="type">number</span>): <span class="type">number</span> {
+  <span class="kw">const</span> coefs = TYPE_COEFFICIENTS[type] ?? TYPE_COEFFICIENTS[<span class="str">'_fallback'</span>];
+  <span class="kw">let</span> price = coefs.length * length_m + coefs.build_year * build_year + coefs.intercept;
+  <span class="kw">if</span> (tonnage != <span class="kw">null</span>) price += coefs.tonnage * tonnage;
+  <span class="kw">return</span> Math.max(<span class="num">0</span>, price);
+}
+
+<span class="kw">function</span> <span class="type">dealScore</span>(type: <span class="type">string</span>, actual: <span class="type">number</span>, length_m: <span class="type">number</span>, tonnage: <span class="type">number</span> | <span class="type">null</span>, build_year: <span class="type">number</span>): <span class="type">number</span> {
+  <span class="kw">const</span> expected = expectedPrice(type, length_m, tonnage, build_year);
+  <span class="kw">if</span> (expected &lt;= <span class="num">0</span>) <span class="kw">return</span> <span class="num">0</span>;
+  <span class="kw">return</span> Math.round(((expected - actual) / expected) * <span class="num">100</span>);  <span class="comment">// positive = underpriced</span>
+}</div>
+    <div class="callout good" style="margin-top: 20px;">
+      <p><strong>Drop-in replacement</strong> for the current <code>dealScore.ts</code>. Falls back to pooled model for types without per-type coefficients.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 19: Section - Recommendations -->
+<div class="slide section-slide" data-slide="19">
+  <div class="section-number">06</div>
+  <h2>Recommendations</h2>
+  <div class="section-desc">What to implement in the frontend</div>
+</div>
+
+<!-- Slide 20: Recommendations -->
+<div class="slide" data-slide="20">
+  <h2>Frontend Recommendations</h2>
+  <div class="grid-2" style="align-items: start;">
+    <div>
+      <h3>Deal Scoring</h3>
+      <div class="stat-card blue" style="margin-bottom: 16px; padding: 20px 24px;">
+        <p style="font-size: 0.92rem; color: var(--slate-700); line-height: 1.6;">
+          <strong>Use type-aware coefficients</strong> for Motorvrachtschip and Tankschip. Pooled fallback for all other types. The MVS model (R&sup2;=0.93) is highly reliable.
+        </p>
+      </div>
+
+      <h3>Engine Hours Display</h3>
+      <div class="stat-card" style="margin-bottom: 16px; padding: 20px 24px;">
+        <p style="font-size: 0.92rem; color: var(--slate-700); line-height: 1.6;">
+          <strong>Motorvrachtschip:</strong> Show hours, low weight. "Lage draaiuren" badge at &lt;30th percentile.<br>
+          <strong>Tankschip:</strong> Highlight prominently. -&euro;143K/10K hours is ~6% of value.<br>
+          <strong>Others:</strong> Show if available, no badge.
+        </p>
+      </div>
+    </div>
+    <div>
+      <h3>Market Segments</h3>
+      <div class="stat-card emerald" style="margin-bottom: 16px; padding: 20px 24px;">
+        <p style="font-size: 0.92rem; color: var(--slate-700); line-height: 1.6;">
+          Use 3-segment Motorvrachtschip badges:<br>
+          <span class="badge info">Modern Large Cargo</span>
+          <span class="badge good">Established Fleet</span>
+          <span class="badge warn">Classic Rhine Freighter</span>
+        </p>
+      </div>
+
+      <h3>Price Metrics on Cards</h3>
+      <div class="stat-card" style="padding: 20px 24px;">
+        <p style="font-size: 0.92rem; color: var(--slate-700); line-height: 1.6;">
+          <strong>Cargo types</strong> (MVS, Tankschip, Beunschip): Show <strong>EUR/ton</strong><br>
+          <strong>Barges/tugs</strong> (Duwbak, Koppelverband, Duw/Sleepboot): Show <strong>EUR/meter</strong>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 20: Summary -->
+<div class="slide" data-slide="21" style="background: linear-gradient(135deg, var(--slate-900) 0%, var(--blue-dark) 100%); color: white; justify-content: center; padding: 60px 100px;">
+  <h2 style="color: white; font-size: 2.4rem; margin-bottom: 48px;">Key Takeaways</h2>
+  <div class="grid-2" style="gap: 32px;">
+    <div style="display:flex; flex-direction:column; gap:24px;">
+      <div style="display:flex; gap:16px; align-items:flex-start;">
+        <div style="background:var(--blue); color:white; width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;">1</div>
+        <div>
+          <div style="font-weight:600; font-size:1.1rem; margin-bottom:4px;">Per-type models win big</div>
+          <div style="color:var(--slate-400); font-size:0.92rem;">Motorvrachtschip R&sup2; jumps from 0.74 to 0.93. Tonnage importance doubles within type.</div>
+        </div>
+      </div>
+      <div style="display:flex; gap:16px; align-items:flex-start;">
+        <div style="background:var(--amber); color:white; width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;">2</div>
+        <div>
+          <div style="font-weight:600; font-size:1.1rem; margin-bottom:4px;">Tanker premium is 2.5x per ton</div>
+          <div style="color:var(--slate-400); font-size:0.92rem;">Type-blind pricing systematically misprices tankers. Per-meter value is 3x higher.</div>
+        </div>
+      </div>
+      <div style="display:flex; gap:16px; align-items:flex-start;">
+        <div style="background:var(--red); color:white; width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;">3</div>
+        <div>
+          <div style="font-weight:600; font-size:1.1rem; margin-bottom:4px;">Engine hours: 20x more for tankers</div>
+          <div style="color:var(--slate-400); font-size:0.92rem;">-&euro;143K vs -&euro;7K per 10K hours. Safety-critical cargo makes engine condition matter.</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:24px;">
+      <div style="display:flex; gap:16px; align-items:flex-start;">
+        <div style="background:var(--emerald); color:white; width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;">4</div>
+        <div>
+          <div style="font-weight:600; font-size:1.1rem; margin-bottom:4px;">36% of deal scores reclassified</div>
+          <div style="color:var(--slate-400); font-size:0.92rem;">115 of 323 vessels change bucket. Tankers go from "overpriced" to "fair" within their norms.</div>
+        </div>
+      </div>
+      <div style="display:flex; gap:16px; align-items:flex-start;">
+        <div style="background:var(--purple); color:white; width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;">5</div>
+        <div>
+          <div style="font-weight:600; font-size:1.1rem; margin-bottom:4px;">3 clear Motorvrachtschip segments</div>
+          <div style="color:var(--slate-400); font-size:0.92rem;">Modern Large (&euro;3.1M), Established Fleet (&euro;1.3M), Classic Rhine Freighters (&euro;424K).</div>
+        </div>
+      </div>
+      <div style="display:flex; gap:16px; align-items:flex-start;">
+        <div style="background:var(--slate-600); color:white; width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;">6</div>
+        <div>
+          <div style="font-weight:600; font-size:1.1rem; margin-bottom:4px;">Drop-in TypeScript formula ready</div>
+          <div style="color:var(--slate-400); font-size:0.92rem;">Per-type coefficients with pooled fallback. Replace current dealScore.ts.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Navigation -->
+<div class="nav-bar">
+  <div class="page-info">
+    <span id="slideNum">1</span> / <span id="totalSlides">21</span>
+  </div>
+  <div class="nav-buttons">
+    <button class="nav-btn" id="prevBtn" onclick="navigate(-1)">&larr; Previous</button>
+    <button class="nav-btn" id="nextBtn" onclick="navigate(1)">Next &rarr;</button>
+  </div>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let current = 0;
+
+  function showSlide(n) {
+    slides[current].classList.remove('active');
+    current = Math.max(0, Math.min(n, slides.length - 1));
+    slides[current].classList.add('active');
+    document.getElementById('slideNum').textContent = current + 1;
+    document.getElementById('totalSlides').textContent = slides.length;
+    document.getElementById('prevBtn').disabled = current === 0;
+    document.getElementById('nextBtn').disabled = current === slides.length - 1;
+    document.getElementById('progress').style.width =
+      ((current + 1) / slides.length * 100) + '%';
+  }
+
+  function navigate(dir) { showSlide(current + dir); }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+      e.preventDefault(); navigate(1);
+    }
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp' || e.key === 'Backspace') {
+      e.preventDefault(); navigate(-1);
+    }
+    if (e.key === 'Home') { e.preventDefault(); showSlide(0); }
+    if (e.key === 'End') { e.preventDefault(); showSlide(slides.length - 1); }
+  });
+
+  showSlide(0);
+</script>
+
+</body>
+</html>
