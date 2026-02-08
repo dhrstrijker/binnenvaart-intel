@@ -135,8 +135,7 @@ export default function Filters({
 
   const hasAnyAdvanced = advancedCount > 0;
 
-  // Auto-open advanced panel when advanced filters are active
-  const showAdvanced = advancedOpen || hasAnyAdvanced;
+  const showAdvanced = advancedOpen;
 
   /* ── Shared select styling ───────────────────────────────── */
 

@@ -49,6 +49,13 @@ def parse_dimensions(specs_text: str):
     try:
         length = float(match.group(1).replace(",", "."))
         width = float(match.group(2).replace(",", "."))
+        # Sanity check: no inland vessel is wider than 25m or longer than 200m
+        if width > 25:
+            logger.warning("Implausible width %.2fm, discarding", width)
+            width = None
+        if length and length > 200:
+            logger.warning("Implausible length %.2fm, discarding", length)
+            length = None
         return length, width
     except ValueError:
         return None, None

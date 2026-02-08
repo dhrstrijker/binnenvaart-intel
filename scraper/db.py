@@ -127,6 +127,23 @@ def mark_removed(source: str, run_start: str) -> int:
     return count
 
 
+def _sanitize_vessel(vessel: dict) -> None:
+    """Discard implausible values that would pollute the database."""
+    # Build year: must be a realistic year for a vessel
+    by = vessel.get("build_year")
+    if by is not None and (by < 1800 or by > datetime.now().year + 1):
+        logger.warning("%s: implausible build_year %s, discarding", vessel.get("name"), by)
+        vessel["build_year"] = None
+
+    # Dimensions: no inland vessel is wider than 25m or longer than 200m
+    if vessel.get("width_m") is not None and vessel["width_m"] > 25:
+        logger.warning("%s: implausible width %.2fm, discarding", vessel.get("name"), vessel["width_m"])
+        vessel["width_m"] = None
+    if vessel.get("length_m") is not None and vessel["length_m"] > 200:
+        logger.warning("%s: implausible length %.2fm, discarding", vessel.get("name"), vessel["length_m"])
+        vessel["length_m"] = None
+
+
 def upsert_vessel(vessel: dict) -> str:
     """Upsert a vessel record and track price changes.
 
@@ -140,6 +157,8 @@ def upsert_vessel(vessel: dict) -> str:
     # Normalize type before any DB operations
     if "type" in vessel:
         vessel["type"] = normalize_type(vessel["type"])
+
+    _sanitize_vessel(vessel)
 
     is_sold = vessel.pop("is_sold", False)
 
