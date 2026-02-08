@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useSubscription } from "@/lib/useSubscription";
 import { useLocalFavorites } from "@/lib/useLocalFavorites";
 import { useAuthModal } from "@/lib/AuthModalContext";
-import { Vessel, WatchlistEntry } from "@/lib/supabase";
+import { Vessel, WatchlistEntry, VESSEL_LIST_COLUMNS } from "@/lib/supabase";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import VesselCard from "@/components/VesselCard";
@@ -43,22 +43,25 @@ export default function FavorietenPage() {
       }
 
       const vesselIds = favs.map((f) => f.vessel_id);
-      const { data: vesselData } = await supabase
-        .from("vessels")
-        .select("*")
-        .in("id", vesselIds);
 
-      setVessels(vesselData ?? []);
+      // Fetch vessels and watchlist in parallel (not waterfall)
+      const [vesselRes, watchlistRes] = await Promise.all([
+        supabase
+          .from("vessels")
+          .select(VESSEL_LIST_COLUMNS)
+          .in("id", vesselIds),
+        supabase
+          .from("watchlist")
+          .select("id, user_id, vessel_id, added_at, notify_price_change, notify_status_change")
+          .eq("user_id", user!.id)
+          .in("vessel_id", vesselIds),
+      ]);
 
-      const { data: watchlistData } = await supabase
-        .from("watchlist")
-        .select("*")
-        .eq("user_id", user!.id)
-        .in("vessel_id", vesselIds);
+      setVessels(vesselRes.data ?? []);
 
-      if (watchlistData) {
+      if (watchlistRes.data) {
         const map: Record<string, WatchlistEntry> = {};
-        for (const w of watchlistData) {
+        for (const w of watchlistRes.data) {
           map[w.vessel_id] = w as WatchlistEntry;
         }
         setWatchlistMap(map);
@@ -77,7 +80,7 @@ export default function FavorietenPage() {
       const supabase = createClient();
       const { data: vesselData } = await supabase
         .from("vessels")
-        .select("*")
+        .select(VESSEL_LIST_COLUMNS)
         .in("id", localFavorites);
 
       setVessels(vesselData ?? []);

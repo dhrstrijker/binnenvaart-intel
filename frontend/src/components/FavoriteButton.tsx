@@ -9,15 +9,23 @@ interface FavoriteButtonProps {
   vesselId: string;
   user: User | null;
   className?: string;
+  /** Pre-fetched favorite status from batch query. Skips per-card fetch when provided. */
+  initialIsFavorite?: boolean;
 }
 
-export default function FavoriteButton({ vesselId, user, className }: FavoriteButtonProps) {
-  const [isFavorite, setIsFavorite] = useState(false);
+export default function FavoriteButton({ vesselId, user, className, initialIsFavorite }: FavoriteButtonProps) {
+  const [isFavorite, setIsFavorite] = useState(initialIsFavorite ?? false);
   const [loading, setLoading] = useState(false);
   const { isLocalFav, addLocal, removeLocal, migrateToSupabase } = useLocalFavorites();
 
-  // Check Supabase favorite status for logged-in users
+  // Sync with batch-provided value when it changes
   useEffect(() => {
+    if (initialIsFavorite !== undefined) setIsFavorite(initialIsFavorite);
+  }, [initialIsFavorite]);
+
+  // Fallback: check Supabase per-card only when no batch data provided (e.g. detail page)
+  useEffect(() => {
+    if (initialIsFavorite !== undefined) return;
     if (!user) return;
     const supabase = createClient();
     supabase
@@ -29,7 +37,7 @@ export default function FavoriteButton({ vesselId, user, className }: FavoriteBu
       .then(({ data }) => {
         if (data) setIsFavorite(true);
       });
-  }, [user, vesselId]);
+  }, [user, vesselId, initialIsFavorite]);
 
   // Migrate local favorites to Supabase when user logs in
   useEffect(() => {

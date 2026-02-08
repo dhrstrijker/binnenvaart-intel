@@ -62,7 +62,7 @@ export default function Dashboard() {
   const { openAuthModal } = useAuthModal();
 
   // Data fetching
-  const { vessels, priceHistoryMap, freeTierTrends, loading, error, user, isPremium } = useVesselData();
+  const { vessels, priceHistoryMap, freeTierTrends, favoriteIds, watchlistIds, loading, error, user, isPremium } = useVesselData();
 
   // Filtering & sorting
   const filtered = useVesselFiltering(vessels, filters);
@@ -269,6 +269,8 @@ export default function Dashboard() {
                 freeTierTrend={freeTierTrends[vessel.id] ?? null}
                 dealScore={dealScores.get(vessel.id)}
                 estimatedRange={estimatedRanges.get(vessel.id) ?? null}
+                isFavorite={favoriteIds.has(vessel.id)}
+                isWatched={watchlistIds.has(vessel.id)}
               />
             ))}
           </div>

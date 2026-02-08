@@ -39,9 +39,11 @@ interface VesselCardProps {
   freeTierTrend?: 'up' | 'down' | null;
   dealScore?: DealScore;
   estimatedRange?: PriceRange | null;
+  isFavorite?: boolean;
+  isWatched?: boolean;
 }
 
-export default function VesselCard({ vessel, priceHistory = [], isPremium = false, user = null, freeTierTrend = null, dealScore, estimatedRange }: VesselCardProps) {
+export default function VesselCard({ vessel, priceHistory = [], isPremium = false, user = null, freeTierTrend = null, dealScore, estimatedRange, isFavorite, isWatched }: VesselCardProps) {
   const [imgError, setImgError] = React.useState(false);
   const trend = getPriceTrend(priceHistory);
   const effectiveTrend = trend ?? freeTierTrend ?? null;
@@ -214,8 +216,8 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
             {isPremium && <MiniSparkline history={priceHistory} />}
           </div>
           <div className="flex items-center gap-1">
-            <FavoriteButton vesselId={vessel.id} user={user} />
-            <WatchlistButton vesselId={vessel.id} user={user} />
+            <FavoriteButton vesselId={vessel.id} user={user} initialIsFavorite={isFavorite} />
+            <WatchlistButton vesselId={vessel.id} user={user} initialIsWatched={isWatched} />
             <span className="flex items-center gap-1 text-xs font-medium text-cyan-600 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
               Details
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

@@ -10,14 +10,23 @@ interface WatchlistButtonProps {
   user: User | null;
   className?: string;
   onToggle?: (vesselId: string, isWatched: boolean) => void;
+  /** Pre-fetched watchlist status from batch query. Skips per-card fetch when provided. */
+  initialIsWatched?: boolean;
 }
 
-export default function WatchlistButton({ vesselId, user, className, onToggle }: WatchlistButtonProps) {
-  const [isWatched, setIsWatched] = useState(false);
+export default function WatchlistButton({ vesselId, user, className, onToggle, initialIsWatched }: WatchlistButtonProps) {
+  const [isWatched, setIsWatched] = useState(initialIsWatched ?? false);
   const [loading, setLoading] = useState(false);
   const { openNotificationModal } = useNotificationModal();
 
+  // Sync with batch-provided value when it changes
   useEffect(() => {
+    if (initialIsWatched !== undefined) setIsWatched(initialIsWatched);
+  }, [initialIsWatched]);
+
+  // Fallback: check Supabase per-card only when no batch data provided (e.g. detail page)
+  useEffect(() => {
+    if (initialIsWatched !== undefined) return;
     if (!user) return;
     const supabase = createClient();
     supabase
@@ -29,7 +38,7 @@ export default function WatchlistButton({ vesselId, user, className, onToggle }:
       .then(({ data }) => {
         if (data) setIsWatched(true);
       });
-  }, [user, vesselId]);
+  }, [user, vesselId, initialIsWatched]);
 
   const doToggle = useCallback(
     async (currentUser: User) => {
