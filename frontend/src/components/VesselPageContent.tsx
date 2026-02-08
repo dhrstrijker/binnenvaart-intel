@@ -11,8 +11,6 @@ import FavoriteButton from "./FavoriteButton";
 import WatchlistButton from "./WatchlistButton";
 import BrokerCard from "./BrokerCard";
 import ImageGallery from "./ImageGallery";
-import PriceExplanation from "./PriceExplanation";
-import ConditionSignals from "./ConditionSignals";
 import DealScoreBadge from "./DealScoreBadge";
 import { useSubscription } from "@/lib/useSubscription";
 import { predictPriceRange, computeDaysOnMarket, formatDaysOnMarket } from "@/lib/vesselPricing";
@@ -277,6 +275,35 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
                 {freeTrend === 'down' ? "Prijs gedaald" : "Prijs gestegen"}
               </p>
             )}
+
+            {/* Price range bar */}
+            {vessel.price !== null && (() => {
+              const range = predictPriceRange(vessel);
+              if (!range) return null;
+              const pct = Math.max(0, Math.min(100, ((vessel.price - range.low) / (range.high - range.low)) * 100));
+              const scores = computeDealScores([vessel]);
+              const score = scores.get(vessel.id);
+              return (
+                <div className="mt-3 border-t border-slate-100 pt-3">
+                  <div className="flex items-center justify-between text-xs text-slate-400">
+                    <span>{formatPrice(range.low)}</span>
+                    <span className="text-slate-500 font-medium">Marktrange</span>
+                    <span>{formatPrice(range.high)}</span>
+                  </div>
+                  <div className="relative mt-1.5 h-2 rounded-full bg-gradient-to-r from-emerald-200 via-slate-200 to-amber-200">
+                    <div
+                      className="absolute top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-slate-800 ring-2 ring-white shadow"
+                      style={{ left: `calc(${pct}% - 8px)` }}
+                    />
+                  </div>
+                  {score && (
+                    <p className={`mt-1.5 text-xs font-semibold ${score.pctDiff > 0 ? "text-emerald-600" : score.pctDiff < -15 ? "text-amber-600" : "text-slate-500"}`}>
+                      {score.label}
+                    </p>
+                  )}
+                </div>
+              );
+            })()}
           </div>
 
           {/* Specs table */}
@@ -296,12 +323,6 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
 
           {/* BrokerCard */}
           <BrokerCard vessel={vessel} />
-
-          {/* Price explanation */}
-          <PriceExplanation vessel={vessel} />
-
-          {/* Condition signals */}
-          <ConditionSignals vessel={vessel} />
 
         </div>
       </div>
