@@ -46,10 +46,10 @@ export default function AuthNudgeToast({ onDismiss }: AuthNudgeToastProps) {
         </div>
         <div className="min-w-0">
           <p className="text-sm font-medium text-slate-800">
-            Favorieten bewaren?
+            Favorieten &amp; meldingen
           </p>
           <p className="mt-0.5 text-xs text-slate-500">
-            Maak een account aan om je favorieten op te slaan en meldingen te ontvangen.
+            Log in om je favorieten op te slaan en prijsmeldingen te ontvangen.
           </p>
           <button
             onClick={() => { openAuthModal(); handleDismiss(); }}

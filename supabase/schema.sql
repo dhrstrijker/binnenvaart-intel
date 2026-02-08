@@ -286,7 +286,10 @@ BEGIN
   IF _email IS NOT NULL THEN
     INSERT INTO notification_subscribers (email, user_id, verified_at, active)
     VALUES (_email, NEW.user_id, NOW(), true)
-    ON CONFLICT (email) DO NOTHING;
+    ON CONFLICT (email) DO UPDATE SET
+      user_id = EXCLUDED.user_id,
+      verified_at = NOW(),
+      active = true;
   END IF;
   RETURN NEW;
 END;
