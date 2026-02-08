@@ -225,6 +225,26 @@ def _fetch_detail(detail_url: str) -> dict:
     return result
 
 
+def _enrich_from_details(vessel: dict, specs: dict) -> None:
+    """Fill in missing tonnage and build_year from detail page specs."""
+    if not vessel.get("tonnage"):
+        tonnage_keys = [
+            k for k in specs if "tonnenmaat" in k
+        ]
+        tonnage_values = []
+        for k in tonnage_keys:
+            t = parse_tonnage(specs[k])
+            if t:
+                tonnage_values.append(t)
+        if tonnage_values:
+            vessel["tonnage"] = max(tonnage_values)
+
+    if not vessel.get("build_year"):
+        raw_year = specs.get("algemene gegevens - bouwjaar")
+        if raw_year:
+            vessel["build_year"] = parse_build_year(raw_year)
+
+
 def scrape() -> dict:
     """Scrape GTS Schepen and upsert vessels. Returns a summary dict."""
     stats = {"inserted": 0, "price_changed": 0, "unchanged": 0, "error": 0, "total": 0}
@@ -257,6 +277,11 @@ def scrape() -> dict:
                 detail = _fetch_detail(vessel["url"])
                 vessel["raw_details"] = detail["raw_details"]
                 vessel["image_urls"] = detail["image_urls"]
+
+                # Fill in missing fields from detail page specs
+                if detail["raw_details"]:
+                    _enrich_from_details(vessel, detail["raw_details"])
+
                 logger.info(
                     "  %s — type: %s, specs: %d",
                     vessel["name"], vessel["type"],

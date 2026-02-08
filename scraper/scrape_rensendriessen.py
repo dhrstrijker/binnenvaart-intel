@@ -74,6 +74,15 @@ def parse_vessel(ship: dict) -> dict:
         if k != "images" and not k.startswith("bin_")
     }
 
+    # Extract max tonnage from draft-specific fields
+    tonnage_fields = [
+        "tonnage_1_50", "tonnage_2_00", "tonnage_2_50",
+        "tonnage_2_60", "tonnage_2_80", "tonnage_3_00m", "tonnage_3_50m",
+        "tonnage_max",
+    ]
+    tonnage_values = [ship.get(f) for f in tonnage_fields if ship.get(f)]
+    tonnage = max(tonnage_values) if tonnage_values else None
+
     return {
         "source": "rensendriessen",
         "source_id": str(ship_id),
@@ -81,6 +90,7 @@ def parse_vessel(ship: dict) -> dict:
         "type": ship.get("ship_type"),
         "length_m": parse_dimension(ship.get("ship_length")),
         "width_m": parse_dimension(ship.get("ship_width")),
+        "tonnage": tonnage,
         "build_year": ship.get("build_year"),
         "price": price,
         "url": f"https://rensendriessen.com/aanbod/{ship_id}",
