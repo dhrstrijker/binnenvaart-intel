@@ -104,7 +104,7 @@ export default async function VesselPage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
       />
 
-      <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6">
+      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
         {/* Breadcrumb */}
         <nav aria-label="Breadcrumb" className="mb-6">
           <ol className="flex items-center gap-1.5 text-sm text-slate-500">

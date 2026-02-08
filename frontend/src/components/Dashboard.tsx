@@ -8,8 +8,10 @@ import { useLocalFavorites } from "@/lib/useLocalFavorites";
 import { useAuthNudge } from "@/lib/useAuthNudge";
 import { useAuthModal } from "@/lib/AuthModalContext";
 import VesselCard from "./VesselCard";
+import SkeletonCard from "./SkeletonCard";
 import AuthNudgeToast from "./AuthNudgeToast";
 import Filters, { FilterState } from "./Filters";
+import { computeDealScores } from "@/lib/dealScore";
 
 const INITIAL_FILTERS: FilterState = {
   search: "",
@@ -53,6 +55,7 @@ function getInitialFilters(): FilterState {
 export default function Dashboard() {
   const [vessels, setVessels] = useState<Vessel[]>([]);
   const [priceHistoryMap, setPriceHistoryMap] = useState<Record<string, PriceHistory[]>>({});
+  const [freeTierTrends, setFreeTierTrends] = useState<Record<string, 'up' | 'down'>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterState>(getInitialFilters);
@@ -104,6 +107,26 @@ export default function Dashboard() {
           }
         } else {
           setPriceHistoryMap({});
+        }
+
+        // Free-tier trends from activity_log (anon has 2-day RLS window)
+        if (!user || !isPremium) {
+          const { data: activityData } = await supabase
+            .from("activity_log")
+            .select("vessel_id, old_price, new_price")
+            .eq("event_type", "price_changed")
+            .order("recorded_at", { ascending: false });
+
+          if (activityData) {
+            const trendMap: Record<string, 'up' | 'down'> = {};
+            for (const entry of activityData) {
+              if (!trendMap[entry.vessel_id] && entry.old_price != null && entry.new_price != null) {
+                if (entry.new_price > entry.old_price) trendMap[entry.vessel_id] = 'up';
+                else if (entry.new_price < entry.old_price) trendMap[entry.vessel_id] = 'down';
+              }
+            }
+            setFreeTierTrends(trendMap);
+          }
         }
       } catch {
         setError("Er is een fout opgetreden bij het laden van de gegevens.");
@@ -234,6 +257,8 @@ export default function Dashboard() {
     return result;
   }, [vessels, filters]);
 
+  const dealScores = useMemo(() => computeDealScores(vessels), [vessels]);
+
   // Reset visible count when filters change
   useEffect(() => {
     setVisibleCount(24);
@@ -349,9 +374,10 @@ export default function Dashboard() {
 
       {/* Loading state */}
       {loading && (
-        <div className="mt-12 flex flex-col items-center justify-center gap-3 py-16">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-cyan-500" />
-          <p className="text-sm text-slate-500">Schepen laden...</p>
+        <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {Array.from({ length: 9 }).map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
         </div>
       )}
 
@@ -374,9 +400,21 @@ export default function Dashboard() {
           <h3 className="text-lg font-semibold text-slate-600">
             Geen schepen gevonden
           </h3>
-          <p className="text-sm text-slate-400">
-            Pas je filters aan of probeer een andere zoekopdracht.
-          </p>
+          <ul className="mt-1 space-y-0.5 text-sm text-slate-400">
+            {filters.type && <li>Probeer een ander scheepstype</li>}
+            {(filters.minPrice || filters.maxPrice) && <li>Pas de prijsrange aan</li>}
+            {filters.search && <li>Probeer een andere zoekterm</li>}
+            {(filters.minLength || filters.maxLength || filters.minTonnage || filters.maxTonnage) && <li>Verruim de afmetingen</li>}
+            {!filters.type && !filters.minPrice && !filters.maxPrice && !filters.search && !filters.minLength && !filters.maxLength && !filters.minTonnage && !filters.maxTonnage && (
+              <li>Probeer minder filters tegelijk</li>
+            )}
+          </ul>
+          <button
+            onClick={() => setFilters(INITIAL_FILTERS)}
+            className="mt-4 rounded-lg bg-cyan-600 px-4 py-2 text-sm font-semibold text-white hover:bg-cyan-700 transition"
+          >
+            Wis alle filters
+          </button>
         </div>
       )}
 
@@ -391,6 +429,8 @@ export default function Dashboard() {
                 priceHistory={priceHistoryMap[vessel.id] ?? []}
                 isPremium={isPremium}
                 user={user}
+                freeTierTrend={freeTierTrends[vessel.id] ?? null}
+                dealScore={dealScores.get(vessel.id)}
               />
             ))}
           </div>

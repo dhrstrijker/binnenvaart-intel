@@ -69,6 +69,29 @@ function findPresetIndex(presets: Preset[], minVal: string, maxVal: string): num
   return presets.findIndex((p) => p.min === minVal && p.max === maxVal);
 }
 
+function customRangeLabel(min: string, max: string, unit: string, formatter?: (v: number) => string): string {
+  const fmt = formatter ?? ((v: number) => `${v}${unit}`);
+  const hasMin = min !== "";
+  const hasMax = max !== "";
+  if (hasMin && hasMax) return `${fmt(Number(min))} – ${fmt(Number(max))}`;
+  if (hasMin) return `${fmt(Number(min))}+`;
+  if (hasMax) return `Tot ${fmt(Number(max))}`;
+  return "Aangepast"; // fallback, shouldn't happen
+}
+
+function formatPriceShort(value: number): string {
+  if (value >= 1_000_000) {
+    const millions = value / 1_000_000;
+    // Use comma as decimal separator for Dutch locale
+    const formatted = millions % 1 === 0 ? `${millions}` : `${millions.toFixed(1).replace(".", ",")}`;
+    return `€${formatted}M`;
+  }
+  if (value >= 1_000) {
+    return `€${Math.round(value / 1_000)}k`;
+  }
+  return `€${value}`;
+}
+
 /* ── Chevron SVG (shared) ─────────────────────────────────── */
 
 function ChevronDown({ className }: { className?: string }) {
@@ -191,7 +214,9 @@ export default function Filters({
               className={selectClass(lengthIdx > 0 || (lengthIdx < 0 && !!(filters.minLength || filters.maxLength)))}
             >
               {lengthIdx < 0 && (
-                <option value="custom" disabled>Aangepast</option>
+                <option value="custom" disabled>
+                  {customRangeLabel(filters.minLength, filters.maxLength, "m")}
+                </option>
               )}
               {LENGTH_PRESETS.map((p, i) => (
                 <option key={i} value={String(i)}>{p.label}</option>
@@ -212,7 +237,9 @@ export default function Filters({
               className={selectClass(priceIdx > 0 || (priceIdx < 0 && !!(filters.minPrice || filters.maxPrice)))}
             >
               {priceIdx < 0 && (
-                <option value="custom" disabled>Aangepast</option>
+                <option value="custom" disabled>
+                  {customRangeLabel(filters.minPrice, filters.maxPrice, "", formatPriceShort)}
+                </option>
               )}
               {PRICE_PRESETS.map((p, i) => (
                 <option key={i} value={String(i)}>{p.label}</option>
@@ -233,7 +260,9 @@ export default function Filters({
               className={selectClass(tonnageIdx > 0 || (tonnageIdx < 0 && !!(filters.minTonnage || filters.maxTonnage)))}
             >
               {tonnageIdx < 0 && (
-                <option value="custom" disabled>Aangepast</option>
+                <option value="custom" disabled>
+                  {customRangeLabel(filters.minTonnage, filters.maxTonnage, "t")}
+                </option>
               )}
               {TONNAGE_PRESETS.map((p, i) => (
                 <option key={i} value={String(i)}>{p.label}</option>
