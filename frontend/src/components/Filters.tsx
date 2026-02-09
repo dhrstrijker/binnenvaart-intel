@@ -151,7 +151,7 @@ export default function Filters({
   return (
     <div className="space-y-2">
       {/* Backdrop for modal-style popovers */}
-      {(activePopover === "price" || activePopover === "length") && (
+      {(activePopover === "price" || activePopover === "length" || activePopover === "filters") && (
         <div
           className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[1px]"
           onClick={() => setActivePopover(null)}
@@ -163,7 +163,7 @@ export default function Filters({
         <div className="flex flex-wrap items-center gap-3 rounded-2xl bg-white px-4 py-3 shadow-md ring-1 ring-gray-100">
 
           {/* ── Type pills ── */}
-          <div className="flex items-center gap-1 rounded-xl bg-slate-100 p-1">
+          <div className="flex min-w-0 items-center gap-1 overflow-x-auto rounded-xl bg-slate-100 p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <TypePill active={!filters.type} onClick={() => update({ type: "" })}>
               Alle
             </TypePill>
@@ -285,17 +285,6 @@ export default function Filters({
               )}
             </button>
 
-            {activePopover === "filters" && (
-              <FiltersDropdown
-                filters={filters}
-                update={update}
-                user={user}
-                onSaveAsSearch={onSaveAsSearch}
-                onAuthPrompt={onAuthPrompt}
-                extraFilterCount={extraFilterCount}
-                onClose={() => setActivePopover(null)}
-              />
-            )}
           </div>
 
           {/* ── Spacer ── */}
@@ -333,6 +322,19 @@ export default function Filters({
             formatLabel={(v) => `${v}m`}
             formatDisplay={(v) => `${v}m`}
             onApply={(min, max) => update({ minLength: min, maxLength: max })}
+            onClose={() => setActivePopover(null)}
+          />
+        )}
+
+        {/* ═══ Filters popover ═══ */}
+        {activePopover === "filters" && (
+          <FiltersDropdown
+            filters={filters}
+            update={update}
+            user={user}
+            onSaveAsSearch={onSaveAsSearch}
+            onAuthPrompt={onAuthPrompt}
+            extraFilterCount={extraFilterCount}
             onClose={() => setActivePopover(null)}
           />
         )}
@@ -635,7 +637,7 @@ function FiltersDropdown({
   }
 
   return (
-    <div className="absolute right-0 top-full z-30 mt-2 w-80 rounded-2xl border border-slate-200 bg-white p-5 shadow-xl">
+    <div className="absolute left-1/2 top-full z-50 mt-3 w-80 max-w-[calc(100vw-2rem)] -translate-x-1/2 rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl">
       {/* Search */}
       <div className="mb-4">
         <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-400">
