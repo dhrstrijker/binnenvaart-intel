@@ -108,7 +108,7 @@ export default function WatchlistButton({ vesselId, user, className, onToggle, i
     <button
       onClick={toggle}
       disabled={loading}
-      className={className ?? "flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:text-amber-500 disabled:opacity-50"}
+      className={className ?? `flex h-8 w-8 items-center justify-center rounded-full transition-colors disabled:opacity-50 ${isWatched ? "text-amber-500 hover:text-amber-600" : "text-slate-400 hover:text-amber-500"}`}
       title={!user ? "Meldingen instellen" : isWatched ? "Prijsmelding uitschakelen" : "Prijsmelding inschakelen"}
     >
       {isWatched ? (
