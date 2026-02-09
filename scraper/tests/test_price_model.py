@@ -3,6 +3,7 @@
 import math
 import sys
 import os
+from datetime import datetime, timezone
 
 # Add scraper directory to path so imports work
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -43,7 +44,7 @@ class TestGetFeatures:
         assert f["length_m"] == 80
         assert f["width_m"] == 9.5
         assert f["tonnage"] == 1200
-        assert f["age"] == 2026 - 1990
+        assert f["age"] == datetime.now(timezone.utc).year - 1990
 
     def test_missing_length(self):
         v = _vessel(length_m=None)

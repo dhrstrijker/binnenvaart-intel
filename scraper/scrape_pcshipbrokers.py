@@ -8,65 +8,11 @@ from bs4 import BeautifulSoup
 
 from db import upsert_vessel
 from http_utils import fetch_with_retry as _fetch_with_retry
+from parsing import parse_price, parse_dimensions, parse_build_year, parse_tonnage
 
 logger = logging.getLogger(__name__)
 
 LISTING_URL = "https://pcshipbrokers.com/scheepsaanbod"
-
-
-def parse_price(text: str):
-    """Parse price like '€ 1.795.000,-' or 'EUR 1.795.000,-' to float."""
-    if not text:
-        return None
-    text = text.strip()
-    if "verkocht" in text.lower() or "n.o.t.k" in text.lower():
-        return None
-    cleaned = (
-        text.replace("€", "").replace("EUR", "").replace(" ", "")
-        .replace(".", "").replace(",-", "").strip()
-    )
-    if not cleaned:
-        return None
-    try:
-        return float(cleaned)
-    except ValueError:
-        return None
-
-
-def parse_dimensions(text: str):
-    """Parse dimensions like '100,00 m x 11,40 m' to (length, width)."""
-    if not text:
-        return None, None
-    match = re.search(r"([\d.,]+)\s*m?\s*x\s*([\d.,]+)", text)
-    if not match:
-        return None, None
-    try:
-        length = float(match.group(1).replace(",", "."))
-        width = float(match.group(2).replace(",", "."))
-        return length, width
-    except ValueError:
-        return None, None
-
-
-def parse_tonnage(text: str):
-    """Parse tonnage like '3.152 ton' to float."""
-    if not text:
-        return None
-    cleaned = text.lower().replace("ton", "").replace(".", "").strip()
-    if not cleaned:
-        return None
-    try:
-        return float(cleaned)
-    except ValueError:
-        return None
-
-
-def parse_build_year(text: str):
-    """Parse build year from 'Bouwjaar 1973' to int."""
-    if not text:
-        return None
-    match = re.search(r"(\d{4})", text)
-    return int(match.group(1)) if match else None
 
 
 def _parse_listing(html: str) -> list[dict]:

@@ -6,44 +6,11 @@ from bs4 import BeautifulSoup
 
 from db import upsert_vessel
 from http_utils import fetch_with_retry as _fetch_with_retry
+from parsing import parse_price, parse_dimensions
 
 logger = logging.getLogger(__name__)
 
 URL = "https://gallemakelaars.nl/scheepsaanbod"
-
-
-def parse_price(text: str):
-    """Parse Galle price format like '€ 5.450.000,-' to float, or None."""
-    if not text or "aanvraag" in text.lower():
-        return None
-    cleaned = text.replace("€", "").replace(" ", "").replace(".", "").replace(",-", "")
-    cleaned = cleaned.strip()
-    if not cleaned:
-        return None
-    try:
-        return float(cleaned)
-    except ValueError:
-        return None
-
-
-def parse_dimensions(specs_text: str):
-    """Extract length and width from specs text like '110.00 x 11.45 m'."""
-    match = re.search(r"([\d.,]+)\s*x\s*([\d.,]+)", specs_text)
-    if not match:
-        return None, None
-    try:
-        length = float(match.group(1).replace(",", "."))
-        width = float(match.group(2).replace(",", "."))
-        # Sanity check: no inland vessel is wider than 25m or longer than 200m
-        if width > 25:
-            logger.warning("Implausible width %.2fm, discarding", width)
-            width = None
-        if length and length > 200:
-            logger.warning("Implausible length %.2fm, discarding", length)
-            length = None
-        return length, width
-    except ValueError:
-        return None, None
 
 
 def extract_image_url(card) -> str | None:

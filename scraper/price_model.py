@@ -9,6 +9,7 @@ Predictions are stored directly in the vessels DB table.
 
 import logging
 import math
+from datetime import datetime, timezone
 
 from db import supabase
 
@@ -45,7 +46,7 @@ def _get_features(vessel: dict) -> dict | None:
         return None
 
     build_year = vessel.get("build_year")
-    age = (2026 - build_year) if build_year else None
+    age = (datetime.now(timezone.utc).year - build_year) if build_year else None
 
     signals = vessel.get("condition_signals") or {}
     engine_hp = signals.get("engine_hp")

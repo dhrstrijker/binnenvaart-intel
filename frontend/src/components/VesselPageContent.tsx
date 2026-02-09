@@ -10,13 +10,16 @@ import VesselCard from "./VesselCard";
 import MarineTrafficMap from "./MarineTrafficMap";
 import FavoriteButton from "./FavoriteButton";
 import WatchlistButton from "./WatchlistButton";
-import BrokerCard from "./BrokerCard";
+import StickyBrokerCTA from "./StickyBrokerCTA";
+import TechnicalSpecs from "./TechnicalSpecs";
 import ImageGallery from "./ImageGallery";
 import DealScoreBadge from "./DealScoreBadge";
+import { MiniSparkline } from "./PriceHistoryChart";
 import { useSubscription } from "@/lib/useSubscription";
 import { predictPriceRange, computeDaysOnMarket, formatDaysOnMarket, shouldSuppressPrediction, getConfidenceLevel } from "@/lib/vesselPricing";
 import { computeDealScores } from "@/lib/dealScore";
 import { formatPrice, formatDate } from "@/lib/formatting";
+import { hasRichData } from "@/lib/rawDetails";
 
 interface VesselPageContentProps {
   vessel: Vessel;
@@ -28,6 +31,7 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
   const [history, setHistory] = useState<PriceHistory[]>([]);
   const [shareOpen, setShareOpen] = useState(false);
   const [freeTrend, setFreeTrend] = useState<'up' | 'down' | null>(null);
+  const [priceExpanded, setPriceExpanded] = useState(false);
 
   useEffect(() => {
     if (subLoading || !user || !isPremium) return;
@@ -107,6 +111,7 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
   };
 
   const multiSource = vessel.linked_sources && vessel.linked_sources.length >= 2;
+  const showTechnical = hasRichData(vessel.raw_details);
 
   const specRows = [
     { label: "Type", value: vessel.type },
@@ -124,7 +129,7 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
   ].filter((r) => r.value);
 
   return (
-    <article>
+    <article className="pb-20 lg:pb-0">
       {/* Sold banner */}
       {vessel.status === "sold" && (
         <div className="mb-4 rounded-xl bg-amber-50 px-4 py-3 ring-1 ring-amber-200">
@@ -142,42 +147,42 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
         </div>
       )}
 
-      {/* Main 2-column grid — starts immediately, no hero */}
-      <div className="lg:grid lg:grid-cols-[1fr_360px] lg:gap-8">
-        {/* Left: Image gallery with action buttons overlay */}
-        <ImageGallery imageUrl={vessel.image_url}>
-          <FavoriteButton
-            vesselId={vessel.id}
-            user={user}
-            className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/90 text-slate-500 shadow-sm backdrop-blur-sm transition-colors hover:text-red-500 disabled:opacity-50"
-          />
-          <WatchlistButton
-            vesselId={vessel.id}
-            user={user}
-            className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/90 text-slate-500 shadow-sm backdrop-blur-sm transition-colors hover:text-amber-500 disabled:opacity-50"
-          />
-          <div className="relative">
-            <button
-              type="button"
-              onClick={handleShare}
-              className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/90 text-slate-500 shadow-sm backdrop-blur-sm transition-colors hover:text-cyan-600"
-              title="Deel dit schip"
-            >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-              </svg>
-            </button>
-            {shareOpen && (
-              <span className="absolute -bottom-8 right-0 whitespace-nowrap rounded-md bg-slate-900 px-2 py-1 text-xs font-medium text-white">
-                Link gekopieerd!
-              </span>
-            )}
-          </div>
-        </ImageGallery>
+      {/* Main 2-column grid */}
+      <div className="lg:grid lg:grid-cols-[1fr_340px] lg:gap-8">
+        {/* ══ Left column ══ */}
+        <div className="min-w-0 space-y-6">
+          {/* Image gallery with action buttons */}
+          <ImageGallery imageUrl={vessel.image_url}>
+            <FavoriteButton
+              vesselId={vessel.id}
+              user={user}
+              className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/90 text-slate-500 shadow-sm backdrop-blur-sm transition-colors hover:text-red-500 disabled:opacity-50"
+            />
+            <WatchlistButton
+              vesselId={vessel.id}
+              user={user}
+              className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/90 text-slate-500 shadow-sm backdrop-blur-sm transition-colors hover:text-amber-500 disabled:opacity-50"
+            />
+            <div className="relative">
+              <button
+                type="button"
+                onClick={handleShare}
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/90 text-slate-500 shadow-sm backdrop-blur-sm transition-colors hover:text-cyan-600"
+                title="Deel dit schip"
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                </svg>
+              </button>
+              {shareOpen && (
+                <span className="absolute -bottom-8 right-0 whitespace-nowrap rounded-md bg-slate-900 px-2 py-1 text-xs font-medium text-white">
+                  Link gekopieerd!
+                </span>
+              )}
+            </div>
+          </ImageGallery>
 
-        {/* Right: Info panel */}
-        <div className="mt-6 lg:mt-0 lg:sticky lg:top-6 lg:self-start space-y-5">
-          {/* Vessel name + source */}
+          {/* Vessel name + source + badges */}
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-2xl font-bold text-slate-900">{vessel.name}</h1>
@@ -214,53 +219,90 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
             })()}
           </div>
 
-          {/* Price block */}
-          <div className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
-            <p className="text-xs font-medium text-slate-500">Vraagprijs</p>
-            {vessel.price !== null ? (
-              <p className="text-3xl font-extrabold text-slate-900">
-                {formatPrice(vessel.price)}
-              </p>
-            ) : (() => {
-              const range = predictPriceRange(vessel);
-              return range ? (
-                <p className="text-2xl font-extrabold text-slate-400 italic" title="Geschatte prijsrange">
-                  {formatPrice(range.low)} – {formatPrice(range.high)}
-                </p>
-              ) : (
-                <p className="text-3xl font-extrabold text-slate-900">Prijs op aanvraag</p>
-              );
-            })()}
-            {isPremium && priceChange !== null && priceChange !== 0 && priceChangePercent !== null && (
-              <p
-                className={`mt-1 text-xs font-semibold ${
-                  priceChange < 0 ? "text-emerald-600" : "text-red-500"
-                }`}
-              >
-                {priceChange < 0 ? "" : "+"}
-                {priceChangePercent.toFixed(1)}% ({formatPrice(priceChange)})
-              </p>
-            )}
-            {!isPremium && freeTrend !== null && (
-              <p
-                className={`mt-1 flex items-center gap-1 text-xs font-semibold ${
-                  freeTrend === 'down' ? "text-emerald-600" : "text-red-500"
-                }`}
-              >
-                {freeTrend === 'down' ? (
-                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                  </svg>
-                ) : (
-                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                  </svg>
-                )}
-                {freeTrend === 'down' ? "Prijs gedaald" : "Prijs gestegen"}
-              </p>
-            )}
+          {/* Key specs grid */}
+          {specRows.length > 0 && (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {specRows.map((row) => (
+                <div key={row.label} className="rounded-xl bg-slate-50 px-3 py-3 ring-1 ring-slate-100">
+                  <p className="text-xs font-medium text-slate-400">{row.label}</p>
+                  <p className="mt-0.5 text-sm font-semibold text-slate-800">{row.value}</p>
+                </div>
+              ))}
+            </div>
+          )}
 
-            {/* Price range bar — hidden for suppressed vessels */}
+          {/* Technical specs — conditional on data */}
+          {showTechnical && <TechnicalSpecs vessel={vessel} />}
+
+          {/* Compact price summary + collapsible full history */}
+          <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-slate-500">Vraagprijs</p>
+                <div className="flex items-center gap-2">
+                  {vessel.price !== null ? (
+                    <span className="text-2xl font-extrabold text-slate-900">
+                      {formatPrice(vessel.price)}
+                    </span>
+                  ) : (() => {
+                    const range = predictPriceRange(vessel);
+                    return range ? (
+                      <span className="text-xl font-extrabold text-slate-400 italic" title="Geschatte prijsrange">
+                        {formatPrice(range.low)} – {formatPrice(range.high)}
+                      </span>
+                    ) : (
+                      <span className="text-2xl font-extrabold text-slate-900">Prijs op aanvraag</span>
+                    );
+                  })()}
+                  {/* Inline sparkline for premium */}
+                  {isPremium && history.length >= 2 && <MiniSparkline history={history} />}
+                </div>
+                {/* Price change summary */}
+                {isPremium && priceChange !== null && priceChange !== 0 && priceChangePercent !== null && (
+                  <p
+                    className={`mt-0.5 text-xs font-semibold ${
+                      priceChange < 0 ? "text-emerald-600" : "text-red-500"
+                    }`}
+                  >
+                    {priceChange < 0 ? "" : "+"}
+                    {priceChangePercent.toFixed(1)}% ({formatPrice(priceChange)}) sinds eerste waarneming
+                  </p>
+                )}
+                {!isPremium && freeTrend !== null && (
+                  <p
+                    className={`mt-0.5 flex items-center gap-1 text-xs font-semibold ${
+                      freeTrend === 'down' ? "text-emerald-600" : "text-red-500"
+                    }`}
+                  >
+                    {freeTrend === 'down' ? (
+                      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                      </svg>
+                    ) : (
+                      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                      </svg>
+                    )}
+                    {freeTrend === 'down' ? "Prijs gedaald" : "Prijs gestegen"}
+                  </p>
+                )}
+              </div>
+
+              {/* Expand/collapse price history */}
+              {isPremium && history.length >= 2 && (
+                <button
+                  onClick={() => setPriceExpanded((v) => !v)}
+                  className="flex items-center gap-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50"
+                >
+                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+                  </svg>
+                  {priceExpanded ? "Verberg" : "Prijsverloop"}
+                </button>
+              )}
+            </div>
+
+            {/* Price range bar */}
             {vessel.price !== null && !shouldSuppressPrediction(vessel) && (() => {
               const range = predictPriceRange(vessel);
               if (!range) return null;
@@ -313,90 +355,85 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
                 </div>
               );
             })()}
+
+            {/* Collapsible price history chart */}
+            <div
+              className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                priceExpanded ? "max-h-[600px] opacity-100 mt-4" : "max-h-0 opacity-0"
+              }`}
+            >
+              <PremiumGate isPremium={isPremium}>
+                {history.length >= 2 ? (
+                  <div>
+                    <div className="rounded-xl border border-slate-100 bg-slate-50 p-3" style={{ height: 180 }}>
+                      <PriceHistoryChart history={history} width={580} height={160} />
+                    </div>
+                    <div className="mt-4 max-h-52 overflow-y-auto rounded-xl border border-slate-100">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-slate-100 bg-slate-50 text-left text-xs text-slate-500">
+                            <th className="px-3 py-2 font-medium">Datum</th>
+                            <th className="px-3 py-2 font-medium text-right">Prijs</th>
+                            <th className="px-3 py-2 font-medium text-right">Verschil</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {history.map((h, i) => {
+                            const diff = i > 0 ? h.price - history[i - 1].price : null;
+                            return (
+                              <tr key={h.id} className="border-b border-slate-50 last:border-b-0">
+                                <td className="px-3 py-2 text-slate-600">{formatDate(h.recorded_at)}</td>
+                                <td className="px-3 py-2 text-right font-medium text-slate-900">
+                                  {formatPrice(h.price)}
+                                </td>
+                                <td className="px-3 py-2 text-right font-medium">
+                                  {diff === null ? (
+                                    <span className="text-slate-400">&mdash;</span>
+                                  ) : diff === 0 ? (
+                                    <span className="text-slate-400">0</span>
+                                  ) : (
+                                    <span className={diff < 0 ? "text-emerald-600" : "text-red-500"}>
+                                      {diff < 0 ? "" : "+"}
+                                      {formatPrice(diff)}
+                                    </span>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm text-slate-400">Nog geen prijswijzigingen geregistreerd.</p>
+                )}
+              </PremiumGate>
+            </div>
+
+            {/* Non-premium: upsell when collapsed */}
+            {!isPremium && !priceExpanded && (
+              <div className="mt-3 border-t border-slate-100 pt-3">
+                <PremiumGate isPremium={false}><></></PremiumGate>
+              </div>
+            )}
           </div>
 
-          {/* Specs table */}
-          {specRows.length > 0 && (
-            <div className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
-              <h2 className="text-sm font-semibold text-slate-900 mb-3">Specificaties</h2>
-              <dl className="space-y-2">
-                {specRows.map((row) => (
-                  <div key={row.label} className="flex justify-between text-sm">
-                    <dt className="text-slate-500">{row.label}</dt>
-                    <dd className="font-medium text-slate-900">{row.value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-          )}
+          {/* Map */}
+          <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+            <h2 className="text-sm font-semibold text-slate-900">Live positie</h2>
+            <MarineTrafficMap className="mt-3 h-[400px] rounded-xl" />
+          </div>
+        </div>
 
-          {/* BrokerCard */}
-          <BrokerCard vessel={vessel} />
-
+        {/* ══ Right column ══ */}
+        <div className="mt-6 lg:mt-0 space-y-5">
+          {/* Sticky Broker CTA — replaces old BrokerCard */}
+          <StickyBrokerCTA vessel={vessel} />
         </div>
       </div>
 
-      {/* Full-width sections below the grid */}
-
-      {/* Price history */}
-      <div className="mt-8 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
-        <h2 className="text-sm font-semibold text-slate-900">Prijsgeschiedenis</h2>
-        <div className="mt-3">
-          <PremiumGate isPremium={isPremium}>
-            {history.length >= 2 ? (
-              <div>
-                <div className="rounded-xl border border-slate-100 bg-slate-50 p-3" style={{ height: 180 }}>
-                  <PriceHistoryChart history={history} width={580} height={160} />
-                </div>
-                <div className="mt-4 max-h-52 overflow-y-auto rounded-xl border border-slate-100">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-slate-100 bg-slate-50 text-left text-xs text-slate-500">
-                        <th className="px-3 py-2 font-medium">Datum</th>
-                        <th className="px-3 py-2 font-medium text-right">Prijs</th>
-                        <th className="px-3 py-2 font-medium text-right">Verschil</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {history.map((h, i) => {
-                        const diff = i > 0 ? h.price - history[i - 1].price : null;
-                        return (
-                          <tr key={h.id} className="border-b border-slate-50 last:border-b-0">
-                            <td className="px-3 py-2 text-slate-600">{formatDate(h.recorded_at)}</td>
-                            <td className="px-3 py-2 text-right font-medium text-slate-900">
-                              {formatPrice(h.price)}
-                            </td>
-                            <td className="px-3 py-2 text-right font-medium">
-                              {diff === null ? (
-                                <span className="text-slate-400">&mdash;</span>
-                              ) : diff === 0 ? (
-                                <span className="text-slate-400">0</span>
-                              ) : (
-                                <span className={diff < 0 ? "text-emerald-600" : "text-red-500"}>
-                                  {diff < 0 ? "" : "+"}
-                                  {formatPrice(diff)}
-                                </span>
-                              )}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            ) : (
-              <p className="text-sm text-slate-400">Nog geen prijswijzigingen geregistreerd.</p>
-            )}
-          </PremiumGate>
-        </div>
-      </div>
-
-      {/* Map */}
-      <div className="mt-6 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
-        <h2 className="text-sm font-semibold text-slate-900">Live positie</h2>
-        <MarineTrafficMap className="mt-3 h-[400px] rounded-xl" />
-      </div>
+      {/* Full-width sections below */}
 
       {/* Back link */}
       <div className="mt-8 border-t border-slate-200 pt-6">

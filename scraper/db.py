@@ -144,6 +144,94 @@ def _sanitize_vessel(vessel: dict) -> None:
         vessel["length_m"] = None
 
 
+def _insert_new_vessel(vessel: dict, now: str, is_sold: bool) -> str:
+    """Insert a new vessel and record its initial price. Returns 'inserted'."""
+    vessel["scraped_at"] = now
+    vessel["status"] = "sold" if is_sold else "active"
+    row = supabase.table("vessels").insert(vessel).execute()
+    vessel_id = row.data[0]["id"]
+
+    if vessel.get("price") is not None:
+        supabase.table("price_history").insert(
+            {"vessel_id": vessel_id, "price": vessel["price"], "recorded_at": now}
+        ).execute()
+
+    event = "sold" if is_sold else "inserted"
+    _changes.append({"kind": event, "vessel": vessel, "old_price": None, "new_price": vessel.get("price")})
+    _log_activity(
+        vessel_id=vessel_id, event_type=event,
+        vessel_name=vessel.get("name", ""), vessel_source=vessel["source"],
+        new_price=vessel.get("price"),
+    )
+    return "inserted"
+
+
+def _handle_sold_transition(
+    vessel: dict, vessel_id: str, old_price: float | None, new_price: float | None,
+) -> None:
+    """Record a sold transition in changes and activity log."""
+    _changes.append({"kind": "sold", "vessel": vessel, "old_price": old_price, "new_price": new_price})
+    _log_activity(
+        vessel_id=vessel_id, event_type="sold",
+        vessel_name=vessel.get("name", ""), vessel_source=vessel["source"],
+        old_price=old_price,
+    )
+
+
+def _update_existing_vessel(
+    vessel: dict, vessel_id: str, old_price: float | None,
+    old_status: str, is_sold: bool, now: str,
+) -> str:
+    """Update an existing vessel, detect price changes and sold transitions.
+
+    Returns 'price_changed' or 'unchanged'.
+    """
+    new_price = vessel.get("price")
+    new_status = "sold" if is_sold else "active"
+
+    # Always sync enrichment fields when provided
+    enrichment = {}
+    for field in ("type", "build_year", "tonnage", "raw_details", "image_urls"):
+        if vessel.get(field) is not None:
+            enrichment[field] = vessel[field]
+
+    became_sold = is_sold and old_status != "sold"
+
+    if old_price != new_price:
+        update_data = {"price": new_price, "scraped_at": now, "updated_at": now, "status": new_status}
+        update_data.update(enrichment)
+        supabase.table("vessels").update(update_data).eq("id", vessel_id).execute()
+
+        if new_price is not None:
+            supabase.table("price_history").insert(
+                {"vessel_id": vessel_id, "price": new_price, "recorded_at": now}
+            ).execute()
+
+        _changes.append({
+            "kind": "price_changed", "vessel": vessel,
+            "old_price": old_price, "new_price": new_price,
+        })
+        _log_activity(
+            vessel_id=vessel_id, event_type="price_changed",
+            vessel_name=vessel.get("name", ""), vessel_source=vessel["source"],
+            old_price=old_price, new_price=new_price,
+        )
+
+        if became_sold:
+            _handle_sold_transition(vessel, vessel_id, old_price, new_price)
+
+        return "price_changed"
+
+    update_data = {"scraped_at": now, "status": new_status}
+    update_data.update(enrichment)
+    supabase.table("vessels").update(update_data).eq("id", vessel_id).execute()
+
+    if became_sold:
+        _handle_sold_transition(vessel, vessel_id, old_price, new_price)
+
+    return "unchanged"
+
+
 def upsert_vessel(vessel: dict) -> str:
     """Upsert a vessel record and track price changes.
 
@@ -154,7 +242,6 @@ def upsert_vessel(vessel: dict) -> str:
     source_id = vessel["source_id"]
     now = datetime.now(timezone.utc).isoformat()
 
-    # Normalize type before any DB operations
     if "type" in vessel:
         vessel["type"] = normalize_type(vessel["type"])
 
@@ -176,107 +263,15 @@ def upsert_vessel(vessel: dict) -> str:
 
     try:
         if not existing.data:
-            vessel["scraped_at"] = now
-            vessel["status"] = "sold" if is_sold else "active"
-            row = supabase.table("vessels").insert(vessel).execute()
-            vessel_id = row.data[0]["id"]
-
-            if vessel.get("price") is not None:
-                supabase.table("price_history").insert(
-                    {
-                        "vessel_id": vessel_id,
-                        "price": vessel["price"],
-                        "recorded_at": now,
-                    }
-                ).execute()
-
-            event = "sold" if is_sold else "inserted"
-            _changes.append({"kind": event, "vessel": vessel, "old_price": None, "new_price": vessel.get("price")})
-            _log_activity(
-                vessel_id=vessel_id,
-                event_type=event,
-                vessel_name=vessel.get("name", ""),
-                vessel_source=source,
-                new_price=vessel.get("price"),
-            )
-            return "inserted"
+            return _insert_new_vessel(vessel, now, is_sold)
 
         vessel_id = existing.data[0]["id"]
         old_price = existing.data[0]["price"]
         old_status = existing.data[0].get("status", "active")
-        new_price = vessel.get("price")
-        new_status = "sold" if is_sold else "active"
 
-        # Always sync enrichment fields when provided
-        enrichment = {}
-        for field in ("type", "build_year", "tonnage", "raw_details", "image_urls"):
-            if vessel.get(field) is not None:
-                enrichment[field] = vessel[field]
-
-        # Detect sold transition (active/removed → sold)
-        became_sold = is_sold and old_status != "sold"
-
-        if old_price != new_price:
-            update_data = {"price": new_price, "scraped_at": now, "updated_at": now, "status": new_status}
-            update_data.update(enrichment)
-            supabase.table("vessels").update(update_data).eq(
-                "id", vessel_id
-            ).execute()
-
-            if new_price is not None:
-                supabase.table("price_history").insert(
-                    {
-                        "vessel_id": vessel_id,
-                        "price": new_price,
-                        "recorded_at": now,
-                    }
-                ).execute()
-
-            _changes.append({
-                "kind": "price_changed",
-                "vessel": vessel,
-                "old_price": old_price,
-                "new_price": new_price,
-            })
-            _log_activity(
-                vessel_id=vessel_id,
-                event_type="price_changed",
-                vessel_name=vessel.get("name", ""),
-                vessel_source=source,
-                old_price=old_price,
-                new_price=new_price,
-            )
-
-            if became_sold:
-                _changes.append({"kind": "sold", "vessel": vessel, "old_price": old_price, "new_price": new_price})
-                _log_activity(
-                    vessel_id=vessel_id,
-                    event_type="sold",
-                    vessel_name=vessel.get("name", ""),
-                    vessel_source=source,
-                    old_price=old_price,
-                )
-
-            return "price_changed"
-
-        update_data = {"scraped_at": now, "status": new_status}
-        update_data.update(enrichment)
-        supabase.table("vessels").update(update_data).eq(
-            "id", vessel_id
-        ).execute()
-
-        if became_sold:
-            _changes.append({"kind": "sold", "vessel": vessel, "old_price": old_price, "new_price": new_price})
-            _log_activity(
-                vessel_id=vessel_id,
-                event_type="sold",
-                vessel_name=vessel.get("name", ""),
-                vessel_source=source,
-                old_price=old_price,
-            )
-
-        return "unchanged"
-
+        return _update_existing_vessel(
+            vessel, vessel_id, old_price, old_status, is_sold, now,
+        )
     except Exception:
         logger.exception("Failed to upsert vessel %s/%s", source, source_id)
         return "error"
