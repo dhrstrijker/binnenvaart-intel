@@ -29,7 +29,8 @@ export function useVesselData(): VesselData {
 
   useEffect(() => {
     async function fetchData() {
-      setLoading(true);
+      // Only show skeleton on first load; keep stale data visible on refetch
+      if (vessels.length === 0) setLoading(true);
       try {
         const supabase = createClient();
 
