@@ -1,5 +1,6 @@
 import logging
 import re
+import time
 
 import requests
 from bs4 import BeautifulSoup
@@ -164,6 +165,7 @@ def _fetch_detail(detail_url: str) -> dict:
     """Fetch a detail page and extract all specs + images."""
     result = {"raw_details": None, "image_urls": None}
     try:
+        time.sleep(0.3)  # throttle to be polite to server
         resp = _fetch_with_retry(requests.get, detail_url)
     except requests.RequestException:
         logger.warning("Could not fetch detail page: %s", detail_url)
