@@ -3,23 +3,23 @@
 import React, { useEffect, useState } from "react";
 import { Vessel, PriceHistory } from "@/lib/supabase";
 import { createClient } from "@/lib/supabase/client";
-import { sourceLabel } from "@/lib/sources";
 import PriceHistoryChart from "./PriceHistoryChart";
 import PremiumGate from "./PremiumGate";
 import VesselCard from "./VesselCard";
 import MarineTrafficMap from "./MarineTrafficMap";
 import FavoriteButton from "./FavoriteButton";
 import WatchlistButton from "./WatchlistButton";
+import StickyVesselInfo from "./StickyVesselInfo";
 import StickyBrokerCTA from "./StickyBrokerCTA";
 import TechnicalSpecs from "./TechnicalSpecs";
 import ImageGallery from "./ImageGallery";
 import DealScoreBadge from "./DealScoreBadge";
 import { MiniSparkline } from "./PriceHistoryChart";
 import { useSubscription } from "@/lib/useSubscription";
-import { predictPriceRange, computeDaysOnMarket, formatDaysOnMarket, shouldSuppressPrediction, getConfidenceLevel } from "@/lib/vesselPricing";
+import { predictPriceRange, shouldSuppressPrediction, getConfidenceLevel } from "@/lib/vesselPricing";
 import { computeDealScores } from "@/lib/dealScore";
 import { formatPrice, formatDate } from "@/lib/formatting";
-import { hasRichData } from "@/lib/rawDetails";
+import { hasRichData, extractRecentRenewals } from "@/lib/rawDetails";
 
 interface VesselPageContentProps {
   vessel: Vessel;
@@ -110,23 +110,8 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
     }
   };
 
-  const multiSource = vessel.linked_sources && vessel.linked_sources.length >= 2;
   const showTechnical = hasRichData(vessel.raw_details);
-
-  const specRows = [
-    { label: "Type", value: vessel.type },
-    {
-      label: "Afmetingen",
-      value:
-        vessel.length_m && vessel.width_m
-          ? `${vessel.length_m} x ${vessel.width_m} m`
-          : vessel.length_m
-            ? `${vessel.length_m} m`
-            : null,
-    },
-    { label: "Tonnage", value: vessel.tonnage ? `${vessel.tonnage}t` : null },
-    { label: "Bouwjaar", value: vessel.build_year },
-  ].filter((r) => r.value);
+  const renewals = extractRecentRenewals(vessel.raw_details);
 
   return (
     <article className="pb-20 lg:pb-0">
@@ -182,52 +167,16 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
             </div>
           </ImageGallery>
 
-          {/* Vessel name + source + badges */}
-          <div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-2xl font-bold text-slate-900">{vessel.name}</h1>
-              {multiSource && (
-                <span className="rounded-md bg-indigo-100 px-2 py-0.5 text-xs font-semibold text-indigo-800">
-                  {vessel.linked_sources!.length} bronnen
-                </span>
-              )}
-            </div>
-            <p className="mt-1 text-sm text-slate-500">
-              {sourceLabel(vessel.source)} &middot; Eerste keer gezien{" "}
-              {formatDate(vessel.first_seen_at)}
-            </p>
-            {(() => {
-              const scores = computeDealScores([vessel]);
-              const score = scores.get(vessel.id);
-              const days = computeDaysOnMarket(vessel.first_seen_at);
-              const daysLabel = formatDaysOnMarket(days);
-              const isActive = vessel.status !== "removed" && vessel.status !== "sold";
-              if (!score && !isActive) return null;
-              return (
-                <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                  {score && <DealScoreBadge score={score} />}
-                  {isActive && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-slate-50 px-2 py-0.5 text-xs text-slate-500 ring-1 ring-slate-200">
-                      <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      {daysLabel}
-                    </span>
-                  )}
-                </div>
-              );
-            })()}
-          </div>
-
-          {/* Key specs grid */}
-          {specRows.length > 0 && (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {specRows.map((row) => (
-                <div key={row.label} className="rounded-xl bg-slate-50 px-3 py-3 ring-1 ring-slate-100">
-                  <p className="text-xs font-medium text-slate-400">{row.label}</p>
-                  <p className="mt-0.5 text-sm font-semibold text-slate-800">{row.value}</p>
-                </div>
-              ))}
+          {/* Recent renewals callout */}
+          {renewals && (
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50/50 p-4 shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <svg className="h-5 w-5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z" />
+                </svg>
+                <h3 className="text-sm font-semibold text-emerald-800">Recente vernieuwingen</h3>
+              </div>
+              <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{renewals}</p>
             </div>
           )}
 
@@ -427,9 +376,11 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
         </div>
 
         {/* ══ Right column ══ */}
-        <div className="mt-6 lg:mt-0 space-y-5">
-          {/* Sticky Broker CTA — replaces old BrokerCard */}
-          <StickyBrokerCTA vessel={vessel} />
+        <div className="mt-6 lg:mt-0">
+          <div className="sticky top-6 space-y-4">
+            <StickyVesselInfo vessel={vessel} />
+            <StickyBrokerCTA vessel={vessel} />
+          </div>
         </div>
       </div>
 

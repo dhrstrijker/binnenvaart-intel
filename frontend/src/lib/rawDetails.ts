@@ -17,6 +17,7 @@ export interface EngineInfo {
   kw: number | null;
   year: number | null;
   hours: number | null;
+  revision: string | null;
   position: "main" | "generator" | "thruster" | "gearbox";
 }
 
@@ -39,6 +40,10 @@ export interface NavigationEquipment {
 export interface Certificates {
   adn: string | null;
   classification: string | null;
+  ship_attestation: string | null;
+  push_certificate: string | null;
+  green_award: string | null;
+  zone: string | null;
   other: string[];
 }
 
@@ -51,6 +56,48 @@ export interface HoldInfo {
   count: number | null;
   height_m: number | null;
   floor: string | null;
+  volume_m3: number | null;
+  teu: number | null;
+  hatches_type: string | null;
+  hatches_count: number | null;
+  wall_type: string | null;
+  floor_thickness: string | null;
+  ceiling_height: number | null;
+}
+
+export interface HullInfo {
+  build_yard: string | null;
+  finishing_yard: string | null;
+  depth: number | null;
+  creep_height: string | null;
+  construction_type: string | null;
+}
+
+export interface PropellerInfo {
+  screw: string | null;
+  nozzle: string | null;
+  steering: string | null;
+  bow_thruster_details: string | null;
+}
+
+export interface TanksInfo {
+  fuel: string | null;
+  fuel_front: string | null;
+  drinking_water: string | null;
+  drinking_water_front: string | null;
+  lubricating_oil: string | null;
+}
+
+export interface DeckEquipment {
+  car_crane: string | null;
+  anchor_winch_front: string | null;
+  anchor_winch_back: string | null;
+  spud_poles: string | null;
+}
+
+export interface WheelhouseInfo {
+  type: string | null;
+  airco: string | null;
 }
 
 /* ── Helpers ───────────────────────────────────────────────── */
@@ -127,6 +174,7 @@ export function extractEngines(raw: Raw): EngineInfo[] {
           kw: num(raw[`${prefix}_kw`]),
           year: yearFrom(raw[`${prefix}_year`] ?? raw[`${prefix}_build_year`]),
           hours: hoursFrom(raw[`${prefix}_hours`]),
+          revision: str(raw[`${prefix}_revision`]),
           position: "main",
         });
       }
@@ -150,36 +198,62 @@ export function extractEngines(raw: Raw): EngineInfo[] {
             kw: num(raw[`${prefix}_kw`] ?? raw[`${prefix}_kva`]),
             year: yearFrom(raw[`${prefix}_year`]),
             hours: hoursFrom(raw[`${prefix}_hours`]),
+            revision: str(raw[`${prefix}_revision`]),
             position: "generator",
           });
         }
       }
     }
 
-    // Bow thruster
-    const thruster = str(raw["bow_thruster_1"] ?? raw["bow_thruster_type"] ?? raw["bow_thruster"]);
-    if (thruster) {
-      engines.push({
-        name: thruster,
-        hp: num(raw["bow_thruster_1_hp"] ?? raw["bow_thruster_hp"]),
-        kw: num(raw["bow_thruster_1_kw"] ?? raw["bow_thruster_kw"]),
-        year: null,
-        hours: null,
-        position: "thruster",
-      });
+    // Thrusters (thruster_1, thruster_2, ... or bow_thruster_1, ...)
+    const thrusterKeys = findAll(raw, "thruster");
+    const thrusterSeen = new Set<string>();
+    for (const [k] of thrusterKeys) {
+      const m = k.match(/(?:bow_)?thruster_?(\d+)?(?:_|$)/i);
+      if (m) {
+        const idx = m[1] ?? "1";
+        if (thrusterSeen.has(idx)) continue;
+        thrusterSeen.add(idx);
+        // Try both "thruster_N" and "bow_thruster_N" prefixes
+        const prefix = raw[`thruster_${idx}`] !== undefined ? `thruster_${idx}` : `bow_thruster_${idx}`;
+        const name = str(raw[prefix] ?? raw[`${prefix}_type`]);
+        if (name) {
+          engines.push({
+            name,
+            hp: num(raw[`${prefix}_hp`] ?? raw[`${prefix}_pk`]),
+            kw: num(raw[`${prefix}_kw`]),
+            year: yearFrom(raw[`${prefix}_year`]),
+            hours: hoursFrom(raw[`${prefix}_hours`]),
+            revision: str(raw[`${prefix}_revision`]),
+            position: "thruster",
+          });
+        }
+      }
     }
 
-    // Gearbox
-    const gearbox = str(raw["gearbox_type"] ?? raw["gearbox_1"] ?? raw["gearbox"]);
-    if (gearbox) {
-      engines.push({
-        name: gearbox,
-        hp: null,
-        kw: null,
-        year: null,
-        hours: null,
-        position: "gearbox",
-      });
+    // Gearboxes (gearbox_1, gearbox_2, ...)
+    const gearboxKeys = findAll(raw, "gearbox");
+    const gearboxSeen = new Set<string>();
+    for (const [k] of gearboxKeys) {
+      const m = k.match(/gearbox_?(\d+)?(?:_|$)/i);
+      if (m) {
+        const idx = m[1] ?? "1";
+        if (gearboxSeen.has(idx)) continue;
+        gearboxSeen.add(idx);
+        const prefix = `gearbox_${idx}`;
+        const name = str(raw[prefix] ?? raw[`${prefix}_type`] ?? raw["gearbox_type"]);
+        if (name) {
+          engines.push({
+            name,
+            hp: num(raw[`${prefix}_hp`]),
+            kw: null,
+            year: yearFrom(raw[`${prefix}_year`]),
+            hours: hoursFrom(raw[`${prefix}_hours`]),
+            revision: str(raw[`${prefix}_revision`]),
+            position: "gearbox",
+          });
+        }
+      }
     }
 
     return engines;
@@ -193,8 +267,13 @@ export function extractEngines(raw: Raw): EngineInfo[] {
     const year = yearFrom(findVal(raw, ["motor > bouwjaar", "motor gegevens - bouwjaar motor"]));
     const hours = hoursFrom(findVal(raw, ["motor > draaiuren", "motor gegevens - draaiuren", "draaiuren"]));
 
+    // GTS revision info
+    const revision = str(findVal(raw, ["machinekamer - jaar revisie", "jaar revisie"]));
+    const revHours = str(findVal(raw, ["draaiuren na revisie"]));
+    const revStr = revision ? (revHours ? `${revision} (${revHours} uur na revisie)` : revision) : null;
+
     if (name || hp) {
-      engines.push({ name, hp, kw: null, year, hours, position: "main" });
+      engines.push({ name, hp, kw: null, year, hours, revision: revStr, position: "main" });
     }
   }
 
@@ -203,7 +282,7 @@ export function extractEngines(raw: Raw): EngineInfo[] {
     const name = str(raw["motortype"] ?? raw["motor"] ?? raw["engine"]);
     const hp = num(raw["pk"] ?? raw["hp"] ?? raw["vermogen"]);
     if (name || hp) {
-      engines.push({ name, hp, kw: null, year: null, hours: null, position: "main" });
+      engines.push({ name, hp, kw: null, year: null, hours: null, revision: null, position: "main" });
     }
   }
 
@@ -325,17 +404,27 @@ export function extractCertificates(raw: Raw): Certificates | null {
   if (!raw) return null;
 
   const adn = str(findVal(raw, ["adn", "adn certificaat", "adn-certificaat"]));
-  const classification = str(findVal(raw, ["classificatie", "classification", "klasse", "scheepsattest", "certificaat van onderzoek"]));
+  const classification = str(findVal(raw, ["classificatie", "classification", "klasse"]));
+  const ship_attestation = str(findVal(raw, [
+    "certificate_shipsattest", "scheepsattest", "certificaat van onderzoek",
+    "algemene gegevens - certificaat van onderzoek", "communautair binnenvaart certificaat",
+  ]));
+  const push_certificate = str(findVal(raw, [
+    "duwcertificaat", "push_certificate", "aanvullend certificaat",
+  ]));
+  const green_award = str(findVal(raw, ["green award", "green_award"]));
+  const zone = str(findVal(raw, ["zone 1", "zone 1 & 2", "zone 2"]));
 
+  const known = new Set([adn, classification, ship_attestation, push_certificate, green_award, zone].filter(Boolean));
   const other: string[] = [];
   const certEntries = findAll(raw, "certificat");
   for (const [, v] of certEntries) {
     const s = str(v);
-    if (s && s !== adn && s !== classification) other.push(s);
+    if (s && !known.has(s)) other.push(s);
   }
 
-  if (!adn && !classification && other.length === 0) return null;
-  return { adn, classification, other };
+  if (!adn && !classification && !ship_attestation && !push_certificate && !green_award && !zone && other.length === 0) return null;
+  return { adn, classification, ship_attestation, push_certificate, green_award, zone, other };
 }
 
 export function extractAccommodation(raw: Raw): Accommodation | null {
@@ -366,9 +455,164 @@ export function extractHolds(raw: Raw): HoldInfo | null {
   const count = num(findVal(raw, ["aantal ruimen", "ruimen", "holds", "number_of_holds", "laadruimen"]));
   const height = num(findVal(raw, ["ruimhoogte", "hold_height", "hoogte ruim"]));
   const floor = str(findVal(raw, ["buikdenning", "floor", "vloer ruim", "buikdenning - materiaal"]));
+  const volume_m3 = num(findVal(raw, [
+    "content_ship_space_capacity", "ruiminhoud", "totale ruiminhoud",
+    "middenschip - totale ruiminhoud", "ruimen > ruiminhoud",
+  ]));
+  const teu = num(findVal(raw, [
+    "total_teu", "teu", "teu's", "containers (teu)", "ruimen > containers",
+  ]));
+  const hatches_type = str(findVal(raw, [
+    "luiken", "luiken > type", "middenschip - luiken", "hatches",
+  ]));
+  const hatches_count = num(findVal(raw, [
+    "aantal luiken", "luiken > aantal", "hatches_count",
+  ]));
+  const wall_type = str(findVal(raw, [
+    "wanden", "middenschip - wanden", "wall_type",
+  ]));
+  const floor_thickness = str(findVal(raw, [
+    "dikte vloer", "middenschip - dikte vloer", "vloerdikte",
+  ]));
+  const ceiling_height = num(findVal(raw, [
+    "hoogte den", "dennenboomhoogte", "middenschip - dennenboomhoogte",
+    "breedte tussen den", "ceiling_height",
+  ]));
 
-  if (count === null && height === null && !floor) return null;
-  return { count, height_m: height, floor };
+  const hasData = count !== null || height !== null || floor || volume_m3 !== null ||
+    teu !== null || hatches_type || hatches_count !== null || wall_type ||
+    floor_thickness || ceiling_height !== null;
+
+  if (!hasData) return null;
+  return { count, height_m: height, floor, volume_m3, teu, hatches_type, hatches_count, wall_type, floor_thickness, ceiling_height };
+}
+
+export function extractHull(raw: Raw): HullInfo | null {
+  if (!raw) return null;
+
+  const build_yard = str(findVal(raw, [
+    "build_yard", "bouwwerf", "scheepswerf",
+    "algemene gegevens - bouwwerf",
+  ]));
+  const finishing_yard = str(findVal(raw, [
+    "finishing_yard", "afbouwwerf",
+  ]));
+  const depth = num(findVal(raw, [
+    "ship_depth", "diepgang", "afmetingen > diepgang",
+    "algemene gegevens - diepgang",
+  ]));
+  const creep_height = str(findVal(raw, [
+    "creep_height_without_ballast", "kruiplijnhoogte", "kruiphoogte zonder ballast",
+    "algemene gegevens - kruiplijnhoogte",
+  ]));
+  const construction_type = str(findVal(raw, [
+    "construction_type", "bouw huid schip", "gelast-geklonken",
+    "algemene gegevens - gelast", "scheepshuid",
+  ]));
+
+  if (!build_yard && !finishing_yard && depth === null && !creep_height && !construction_type) return null;
+  return { build_yard, finishing_yard, depth, creep_height, construction_type };
+}
+
+export function extractPropeller(raw: Raw): PropellerInfo | null {
+  if (!raw) return null;
+
+  const screw = str(findVal(raw, [
+    "other_screw", "schroef", "schroefgrootte",
+    "machinekamer - schroefgrootte",
+  ]));
+  const nozzle = str(findVal(raw, [
+    "straalbuis", "nozzle",
+    "machinekamer - straalbuis",
+  ]));
+  const steering = str(findVal(raw, [
+    "machines_steering", "stuurwerk", "stuurwerkinstallatie",
+    "overige - stuurwerk", "stuurwerkinstallatie > stuurwerk",
+  ]));
+  const bow_thruster_details = str(findVal(raw, [
+    "boegschroef", "boegschroef (systeem", "boegschroefmotor",
+  ]));
+
+  if (!screw && !nozzle && !steering && !bow_thruster_details) return null;
+  return { screw, nozzle, steering, bow_thruster_details };
+}
+
+export function extractTanks(raw: Raw): TanksInfo | null {
+  if (!raw) return null;
+
+  const fuel = str(findVal(raw, [
+    "fuel", "brandstof", "gasolietank achter",
+    "machinekamer - gasolietank achter",
+  ]));
+  const fuel_front = str(findVal(raw, [
+    "fuel_frontship", "gasolietank voor",
+    "voormachinekamer - gasolietank voor",
+  ]));
+  const drinking_water = str(findVal(raw, [
+    "drinking_water", "drinkwater", "watertank achter",
+    "machinekamer - watertank achter",
+  ]));
+  const drinking_water_front = str(findVal(raw, [
+    "drinking_water_frontship", "watertank voor",
+    "voormachinekamer - watertank voor",
+  ]));
+  const lubricating_oil = str(findVal(raw, [
+    "lubricating_oil", "smeerolie",
+  ]));
+
+  if (!fuel && !fuel_front && !drinking_water && !drinking_water_front && !lubricating_oil) return null;
+  return { fuel, fuel_front, drinking_water, drinking_water_front, lubricating_oil };
+}
+
+export function extractDeckEquipment(raw: Raw): DeckEquipment | null {
+  if (!raw) return null;
+
+  const car_crane = str(findVal(raw, [
+    "other_car_crane", "autokraan", "overige - autokraan",
+  ]));
+  const anchor_winch_front = str(findVal(raw, [
+    "other_windlass_frontship", "ankerlier voor", "ankerlieren",
+    "overige - ankerlieren",
+  ]));
+  const anchor_winch_back = str(findVal(raw, [
+    "other_windlass_backship", "ankerlier achter",
+  ]));
+  const spud_poles = str(findVal(raw, [
+    "spudpaal", "spud_pole", "overige - spudpaal",
+  ]));
+
+  if (!car_crane && !anchor_winch_front && !anchor_winch_back && !spud_poles) return null;
+  return { car_crane, anchor_winch_front, anchor_winch_back, spud_poles };
+}
+
+export function extractWheelhouse(raw: Raw): WheelhouseInfo | null {
+  if (!raw) return null;
+
+  const type = str(findVal(raw, [
+    "wheel_house", "stuurhuis", "type stuurhut",
+    "stuurhut - type stuurhut",
+  ]));
+  const airco = str(findVal(raw, [
+    "airco", "stuurhut - airco",
+  ]));
+
+  if (!type && !airco) return null;
+  return { type, airco };
+}
+
+export function extractRecentRenewals(raw: Raw): string | null {
+  if (!raw) return null;
+
+  // PC Shipbrokers: "recente vernieuwingen"
+  const renewals = str(findVal(raw, ["recente vernieuwingen"]));
+  if (renewals) return renewals;
+
+  // GTS: "toelichting" or "bijzonderheden"
+  const remarks = str(findVal(raw, [
+    "algemene gegevens - toelichting", "toelichting",
+    "algemene gegevens - bijzonderheden", "bijzonderheden",
+  ]));
+  return remarks;
 }
 
 /** Quick check: does this vessel have enough raw_details to show rich sections? */
@@ -380,6 +624,11 @@ export function hasRichData(raw: Raw): boolean {
     extractNavigation(raw) !== null ||
     extractCertificates(raw) !== null ||
     extractAccommodation(raw) !== null ||
-    extractHolds(raw) !== null
+    extractHolds(raw) !== null ||
+    extractHull(raw) !== null ||
+    extractPropeller(raw) !== null ||
+    extractTanks(raw) !== null ||
+    extractDeckEquipment(raw) !== null ||
+    extractWheelhouse(raw) !== null
   );
 }
