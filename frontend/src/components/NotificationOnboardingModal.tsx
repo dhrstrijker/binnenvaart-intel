@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useEscapeKey } from "@/lib/useEscapeKey";
+import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
 
 type Step =
   | "initial"
@@ -30,22 +32,8 @@ export default function NotificationOnboardingModal({
   const overlayRef = useRef<HTMLDivElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
-  // Close on Escape
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
-
-  // Prevent body scroll
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, []);
+  useEscapeKey(onClose);
+  useBodyScrollLock();
 
   // Focus password field when login step appears
   useEffect(() => {

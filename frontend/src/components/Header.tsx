@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import NavisioLogo from "./NavisioLogo";
 import NavLink from "./NavLink";
 import { useAuthModal } from "@/lib/AuthModalContext";
+import { useOutsideClick } from "@/lib/useOutsideClick";
 import type { User } from "@supabase/supabase-js";
 
 export default function Header() {
@@ -30,28 +31,11 @@ export default function Header() {
     return () => subscription.unsubscribe();
   }, []);
 
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
-      }
-    }
-    if (menuOpen) document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [menuOpen]);
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+  const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
 
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (
-        mobileNavRef.current && !mobileNavRef.current.contains(e.target as Node) &&
-        mobileToggleRef.current && !mobileToggleRef.current.contains(e.target as Node)
-      ) {
-        setMobileNavOpen(false);
-      }
-    }
-    if (mobileNavOpen) document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [mobileNavOpen]);
+  useOutsideClick(menuRef, closeMenu, menuOpen);
+  useOutsideClick(mobileNavRef, closeMobileNav, mobileNavOpen);
 
   async function handleSignOut() {
     const supabase = createClient();

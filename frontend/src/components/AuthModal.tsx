@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useEscapeKey } from "@/lib/useEscapeKey";
+import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
 
 interface AuthModalProps {
   message?: string;
@@ -19,22 +21,8 @@ export default function AuthModal({ message, onSuccess, onClose }: AuthModalProp
   const [registerSuccess, setRegisterSuccess] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
 
-  // Close on Escape key
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
-
-  // Prevent body scroll when modal is open
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, []);
+  useEscapeKey(onClose);
+  useBodyScrollLock();
 
   // Listen for auth state changes (handles OAuth redirect + email login)
   useEffect(() => {

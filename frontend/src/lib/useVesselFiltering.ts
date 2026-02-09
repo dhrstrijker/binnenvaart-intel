@@ -4,6 +4,17 @@ import { useMemo } from "react";
 import type { Vessel } from "@/lib/supabase";
 import type { FilterState } from "@/components/Filters";
 
+function applyRange(
+  result: Vessel[],
+  min: string,
+  max: string,
+  get: (v: Vessel) => number | null,
+): Vessel[] {
+  if (min) { const n = Number(min); result = result.filter(v => get(v) !== null && get(v)! >= n); }
+  if (max) { const n = Number(max); result = result.filter(v => get(v) !== null && get(v)! <= n); }
+  return result;
+}
+
 export function useVesselFiltering(vessels: Vessel[], filters: FilterState): Vessel[] {
   return useMemo(() => {
     let result = [...vessels];
@@ -28,52 +39,17 @@ export function useVesselFiltering(vessels: Vessel[], filters: FilterState): Ves
       );
     }
 
-    if (filters.minPrice) {
-      const min = Number(filters.minPrice);
-      result = result.filter((v) => v.price !== null && v.price >= min);
-    }
-
-    if (filters.maxPrice) {
-      const max = Number(filters.maxPrice);
-      result = result.filter((v) => v.price !== null && v.price <= max);
-    }
-
-    if (filters.minLength) {
-      const min = Number(filters.minLength);
-      result = result.filter((v) => v.length_m !== null && v.length_m >= min);
-    }
-
-    if (filters.maxLength) {
-      const max = Number(filters.maxLength);
-      result = result.filter((v) => v.length_m !== null && v.length_m <= max);
-    }
-
-    if (filters.minTonnage) {
-      const min = Number(filters.minTonnage);
-      result = result.filter((v) => v.tonnage !== null && v.tonnage >= min);
-    }
-
-    if (filters.maxTonnage) {
-      const max = Number(filters.maxTonnage);
-      result = result.filter((v) => v.tonnage !== null && v.tonnage <= max);
-    }
-
-    if (filters.minBuildYear) {
-      const min = Number(filters.minBuildYear);
-      result = result.filter((v) => v.build_year !== null && v.build_year >= min);
-    }
-
-    if (filters.maxBuildYear) {
-      const max = Number(filters.maxBuildYear);
-      result = result.filter((v) => v.build_year !== null && v.build_year <= max);
-    }
+    result = applyRange(result, filters.minPrice, filters.maxPrice, v => v.price);
+    result = applyRange(result, filters.minLength, filters.maxLength, v => v.length_m);
+    result = applyRange(result, filters.minTonnage, filters.maxTonnage, v => v.tonnage);
+    result = applyRange(result, filters.minBuildYear, filters.maxBuildYear, v => v.build_year);
 
     switch (filters.sort) {
       case "price_asc":
         result.sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity));
         break;
       case "price_desc":
-        result.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
+        result.sort((a, b) => (b.price ?? -Infinity) - (a.price ?? -Infinity));
         break;
       case "name":
         result.sort((a, b) => a.name.localeCompare(b.name));

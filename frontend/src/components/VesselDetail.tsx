@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import Image from "next/image";
 import { Vessel, PriceHistory } from "@/lib/supabase";
 import { sourceLabel, safeUrl } from "@/lib/sources";
 import PriceHistoryChart from "./PriceHistoryChart";
 import PremiumGate from "./PremiumGate";
 import { formatPrice, formatDate } from "@/lib/formatting";
+import { useEscapeKey } from "@/lib/useEscapeKey";
+import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
 
 interface VesselDetailProps {
   vessel: Vessel;
@@ -18,22 +20,8 @@ interface VesselDetailProps {
 export default function VesselDetail({ vessel, history, isPremium = false, onClose }: VesselDetailProps) {
   const [imgError, setImgError] = React.useState(false);
 
-  // Close on Escape key
-  useEffect(() => {
-    function handleKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
-  }, [onClose]);
-
-  // Prevent body scroll while modal is open
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, []);
+  useEscapeKey(onClose);
+  useBodyScrollLock();
 
   const priceChange =
     history.length >= 2
