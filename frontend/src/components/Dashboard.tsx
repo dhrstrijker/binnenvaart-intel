@@ -110,7 +110,7 @@ export default function Dashboard() {
     if (filters.showRemoved) params.set("showRemoved", "true");
     const qs = params.toString();
     const url = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
-    window.history.replaceState(null, "", url);
+    window.history.replaceState(window.history.state, "", url);
   }, [filters]);
 
   // Capture scroll target on mount
