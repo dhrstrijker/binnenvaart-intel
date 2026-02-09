@@ -49,14 +49,20 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
   const effectiveTrend = trend ?? freeTierTrend ?? null;
 
   return (
-    <Link
+    <div
       id={`vessel-${vessel.id}`}
-      href={`/schepen/${vessel.id}`}
-      onClick={() => sessionStorage.setItem("scrollToVessel", vessel.id)}
-      className={`group block overflow-hidden rounded-xl bg-white shadow-md ring-1 ring-gray-100 transition-all duration-200 hover:shadow-xl hover:ring-cyan-200 hover:-translate-y-0.5 cursor-pointer${vessel.status === "removed" || vessel.status === "sold" ? " opacity-60" : ""}`}
+      className={`group relative overflow-hidden rounded-xl bg-white shadow-md ring-1 ring-gray-100 transition-all duration-200 hover:shadow-xl hover:ring-cyan-200 hover:-translate-y-0.5${vessel.status === "removed" || vessel.status === "sold" ? " opacity-60" : ""}`}
     >
+      {/* Overlay link — covers entire card */}
+      <Link
+        href={`/schepen/${vessel.id}`}
+        onClick={() => sessionStorage.setItem("scrollToVessel", vessel.id)}
+        className="absolute inset-0 z-0"
+        aria-label={`${vessel.name} — ${vessel.price !== null ? formatPrice(vessel.price) : "Prijs op aanvraag"}`}
+      />
+
       {/* Image */}
-      <div className="relative aspect-[16/10] w-full bg-slate-100 overflow-hidden">
+      <div className="relative z-10 pointer-events-none aspect-[16/10] w-full bg-slate-100 overflow-hidden">
         {vessel.image_url && !imgError ? (
           <Image
             src={vessel.image_url}
@@ -120,7 +126,7 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
       </div>
 
       {/* Content */}
-      <div className="p-4">
+      <div className="relative z-10 pointer-events-none p-4">
         <h2 className="truncate text-lg font-bold text-slate-900 group-hover:text-cyan-700 transition-colors">
           {vessel.name}
         </h2>
@@ -215,7 +221,7 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
             )}
             {isPremium && <MiniSparkline history={priceHistory} />}
           </div>
-          <div className="flex items-center gap-1">
+          <div className="pointer-events-auto flex items-center gap-1">
             <FavoriteButton vesselId={vessel.id} user={user} initialIsFavorite={isFavorite} />
             <WatchlistButton vesselId={vessel.id} user={user} initialIsWatched={isWatched} />
             <span className="flex items-center gap-1 text-xs font-medium text-cyan-600 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
@@ -227,6 +233,6 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }

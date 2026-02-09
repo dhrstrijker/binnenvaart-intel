@@ -113,15 +113,27 @@ export default function Dashboard() {
     window.history.replaceState(window.history.state, "", url);
   }, [filters]);
 
+  // Restore filters on browser back/forward
+  useEffect(() => {
+    function handlePopState() {
+      setFilters(getInitialFilters());
+    }
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
   // Capture scroll target on mount
   useEffect(() => {
     scrollTargetRef.current = sessionStorage.getItem("scrollToVessel");
     sessionStorage.removeItem("scrollToVessel");
   }, []);
 
-  // Reset visible count when filters change
+  // Reset visible count and scroll to top when filters change
   useEffect(() => {
     setVisibleCount(24);
+    if (!scrollTargetRef.current) {
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
   }, [filters, setVisibleCount]);
 
   // Scroll to vessel after data loads
