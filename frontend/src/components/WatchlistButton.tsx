@@ -90,8 +90,14 @@ export default function WatchlistButton({ vesselId, user, className, onToggle, i
 
       if (!user) {
         openNotificationModal({
-          vesselId,
-          onSuccess: () => {
+          contextType: "vessel",
+          onSuccess: async (authUser) => {
+            // Add to watchlist after auth
+            const supabase = createClient();
+            await fetch("/api/notifications/subscribe-auth", { method: "POST" });
+            await supabase
+              .from("watchlist")
+              .insert({ user_id: authUser.id, vessel_id: vesselId });
             setIsWatched(true);
             onToggle?.(vesselId, true);
           },

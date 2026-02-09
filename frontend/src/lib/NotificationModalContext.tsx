@@ -2,10 +2,12 @@
 
 import React, { createContext, useContext, useState, useCallback } from "react";
 import NotificationOnboardingModal from "@/components/NotificationOnboardingModal";
+import type { NotificationModalContextType } from "@/components/NotificationOnboardingModal";
+import type { User } from "@supabase/supabase-js";
 
 interface NotificationModalOptions {
-  vesselId: string;
-  onSuccess?: () => void;
+  contextType: NotificationModalContextType;
+  onSuccess?: (user: User) => void;
 }
 
 interface NotificationModalContextValue {
@@ -29,7 +31,7 @@ export function NotificationModalProvider({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [options, setOptions] = useState<NotificationModalOptions>({
-    vesselId: "",
+    contextType: "vessel",
   });
 
   const openNotificationModal = useCallback(
@@ -42,11 +44,11 @@ export function NotificationModalProvider({
 
   const closeNotificationModal = useCallback(() => {
     setIsOpen(false);
-    setOptions({ vesselId: "" });
+    setOptions({ contextType: "vessel" });
   }, []);
 
-  const handleSuccess = useCallback(() => {
-    options.onSuccess?.();
+  const handleSuccess = useCallback((user: User) => {
+    options.onSuccess?.(user);
     closeNotificationModal();
   }, [options, closeNotificationModal]);
 
@@ -57,7 +59,7 @@ export function NotificationModalProvider({
       {children}
       {isOpen && (
         <NotificationOnboardingModal
-          vesselId={options.vesselId}
+          contextType={options.contextType}
           onSuccess={handleSuccess}
           onClose={closeNotificationModal}
         />

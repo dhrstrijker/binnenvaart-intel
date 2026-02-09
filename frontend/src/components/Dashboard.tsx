@@ -1,19 +1,21 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import { useVesselData } from "@/lib/useVesselData";
 import { useVesselFiltering } from "@/lib/useVesselFiltering";
 import { useInfiniteScroll } from "@/lib/useInfiniteScroll";
 import { useLocalFavorites } from "@/lib/useLocalFavorites";
 import { useAuthNudge } from "@/lib/useAuthNudge";
-import { useAuthModal } from "@/lib/AuthModalContext";
+import { useNotificationModal } from "@/lib/NotificationModalContext";
+import { useToast } from "@/lib/ToastContext";
+import { useSavedSearches } from "@/lib/useSavedSearches";
 import VesselCard from "./VesselCard";
 import SkeletonCard from "./SkeletonCard";
 import AuthNudgeToast from "./AuthNudgeToast";
 import Filters, { FilterState } from "./Filters";
 import { computeDealScores } from "@/lib/dealScore";
 import { predictPriceRange, PriceRange } from "@/lib/vesselPricing";
+import type { SavedSearchFilters } from "@/lib/savedSearchTypes";
 
 const INITIAL_FILTERS: FilterState = {
   search: "",
@@ -53,16 +55,36 @@ function getInitialFilters(): FilterState {
   };
 }
 
+/** Convert FilterState to SavedSearchFilters (strip sort/showRemoved) */
+function toSavedSearchFilters(f: FilterState): SavedSearchFilters {
+  const result: SavedSearchFilters = {};
+  if (f.search) result.search = f.search;
+  if (f.type) result.type = f.type;
+  if (f.source) result.source = f.source;
+  if (f.minPrice) result.minPrice = f.minPrice;
+  if (f.maxPrice) result.maxPrice = f.maxPrice;
+  if (f.minLength) result.minLength = f.minLength;
+  if (f.maxLength) result.maxLength = f.maxLength;
+  if (f.minTonnage) result.minTonnage = f.minTonnage;
+  if (f.maxTonnage) result.maxTonnage = f.maxTonnage;
+  if (f.minBuildYear) result.minBuildYear = f.minBuildYear;
+  if (f.maxBuildYear) result.maxBuildYear = f.maxBuildYear;
+  return result;
+}
+
 export default function Dashboard() {
   const [filters, setFilters] = useState<FilterState>(getInitialFilters);
   const scrollTargetRef = useRef<string | null>(null);
-  const router = useRouter();
   const { localFavorites } = useLocalFavorites();
   const { shouldShowNudge, dismissNudge } = useAuthNudge(localFavorites.length);
-  const { openAuthModal } = useAuthModal();
+  const { openNotificationModal } = useNotificationModal();
+  const { showToast } = useToast();
 
   // Data fetching
   const { vessels, priceHistoryMap, freeTierTrends, favoriteIds, watchlistIds, loading, error, user, isPremium } = useVesselData();
+
+  // Saved searches hook
+  const { saveSearch } = useSavedSearches(user, isPremium);
 
   // Filtering & sorting
   const filtered = useVesselFiltering(vessels, filters);
@@ -161,21 +183,64 @@ export default function Dashboard() {
     });
   }, [loading, filtered, visibleCount, setVisibleCount]);
 
-  const handleSaveAsSearch = useCallback((f: FilterState) => {
-    const params = new URLSearchParams({ prefill: "1" });
-    if (f.search) params.set("search", f.search);
-    if (f.type) params.set("type", f.type);
-    if (f.source) params.set("source", f.source);
-    if (f.minPrice) params.set("minPrice", f.minPrice);
-    if (f.maxPrice) params.set("maxPrice", f.maxPrice);
-    if (f.minLength) params.set("minLength", f.minLength);
-    if (f.maxLength) params.set("maxLength", f.maxLength);
-    if (f.minTonnage) params.set("minTonnage", f.minTonnage);
-    if (f.maxTonnage) params.set("maxTonnage", f.maxTonnage);
-    if (f.minBuildYear) params.set("minBuildYear", f.minBuildYear);
-    if (f.maxBuildYear) params.set("maxBuildYear", f.maxBuildYear);
-    router.push(`/zoekopdrachten?${params.toString()}`);
-  }, [router]);
+  // Auto-save pending search after OAuth redirect
+  useEffect(() => {
+    if (!user) return;
+    const pending = sessionStorage.getItem("pendingSaveSearch");
+    if (!pending) return;
+    sessionStorage.removeItem("pendingSaveSearch");
+    try {
+      const pendingFilters = JSON.parse(pending) as SavedSearchFilters;
+      saveSearch(pendingFilters, user.id).then(({ success, error: err }) => {
+        if (success) {
+          showToast({ message: "Zoekopdracht is geactiveerd", type: "success" });
+        } else if (err) {
+          showToast({ message: err, type: "error" });
+        }
+      });
+    } catch {
+      // invalid JSON, ignore
+    }
+  }, [user, saveSearch, showToast]);
+
+  const handleSaveSearch = useCallback(
+    async (f: FilterState) => {
+      const searchFilters = toSavedSearchFilters(f);
+
+      if (user) {
+        const { success, error: err } = await saveSearch(searchFilters, user.id);
+        if (success) {
+          showToast({ message: "Zoekopdracht is geactiveerd", type: "success" });
+        } else if (err) {
+          showToast({ message: err, type: "error" });
+        }
+      } else {
+        // Store filters for after auth
+        sessionStorage.setItem("pendingSaveSearch", JSON.stringify(searchFilters));
+        openNotificationModal({
+          contextType: "search",
+          onSuccess: async (authUser) => {
+            const stored = sessionStorage.getItem("pendingSaveSearch");
+            if (stored) {
+              sessionStorage.removeItem("pendingSaveSearch");
+              try {
+                const pendingFilters = JSON.parse(stored) as SavedSearchFilters;
+                const { success, error: err } = await saveSearch(pendingFilters, authUser.id);
+                if (success) {
+                  showToast({ message: "Zoekopdracht is geactiveerd", type: "success" });
+                } else if (err) {
+                  showToast({ message: err, type: "error" });
+                }
+              } catch {
+                // ignore
+              }
+            }
+          },
+        });
+      }
+    },
+    [user, saveSearch, showToast, openNotificationModal]
+  );
 
   const visibleVessels = filtered.slice(0, visibleCount);
 
@@ -215,9 +280,7 @@ export default function Dashboard() {
           onFilterChange={setFilters}
           availableTypes={availableTypes}
           vesselCount={filtered.length}
-          user={user}
-          onSaveAsSearch={handleSaveAsSearch}
-          onAuthPrompt={() => openAuthModal()}
+          onSaveAsSearch={handleSaveSearch}
         />
       </div>
 

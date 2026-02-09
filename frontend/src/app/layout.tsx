@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { AuthModalProvider } from "@/lib/AuthModalContext";
 import { NotificationModalProvider } from "@/lib/NotificationModalContext";
 import { LocalFavoritesProvider } from "@/lib/useLocalFavorites";
+import { ToastProvider } from "@/lib/ToastContext";
 import "./globals.css";
 
 const inter = Inter({
@@ -49,7 +50,9 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans antialiased`}>
         <LocalFavoritesProvider>
           <AuthModalProvider>
-            <NotificationModalProvider>{children}</NotificationModalProvider>
+            <NotificationModalProvider>
+              <ToastProvider>{children}</ToastProvider>
+            </NotificationModalProvider>
           </AuthModalProvider>
         </LocalFavoritesProvider>
       </body>

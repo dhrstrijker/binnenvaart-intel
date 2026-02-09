@@ -1,14 +1,11 @@
 import React, { useRef, useEffect } from "react";
-import type { User } from "@supabase/supabase-js";
 import type { FilterState } from "@/components/Filters";
 import { SOURCES } from "@/lib/filterConfig";
 
 interface FiltersDropdownProps {
   filters: FilterState;
   update: (partial: Partial<FilterState>) => void;
-  user?: User | null;
   onSaveAsSearch?: (filters: FilterState) => void;
-  onAuthPrompt?: () => void;
   extraFilterCount: number;
   onClose: () => void;
 }
@@ -16,9 +13,7 @@ interface FiltersDropdownProps {
 export default function FiltersDropdown({
   filters,
   update,
-  user,
   onSaveAsSearch,
-  onAuthPrompt,
   extraFilterCount,
   onClose,
 }: FiltersDropdownProps) {
@@ -186,8 +181,7 @@ export default function FiltersDropdown({
           <button
             type="button"
             onClick={() => {
-              if (user) onSaveAsSearch(filters);
-              else if (onAuthPrompt) onAuthPrompt();
+              onSaveAsSearch(filters);
               onClose();
             }}
             className="flex items-center gap-1.5 rounded-lg bg-cyan-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-700"

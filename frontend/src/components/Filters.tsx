@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useRef, useCallback, useMemo } from "react";
-import type { User } from "@supabase/supabase-js";
 import { useOutsideClick } from "@/lib/useOutsideClick";
 import { useEscapeKey } from "@/lib/useEscapeKey";
 import { formatPriceShort } from "@/lib/formatting";
@@ -41,9 +40,7 @@ interface FiltersProps {
   onFilterChange: (filters: FilterState) => void;
   availableTypes: string[];
   vesselCount: number;
-  user?: User | null;
   onSaveAsSearch?: (filters: FilterState) => void;
-  onAuthPrompt?: () => void;
 }
 
 export default function Filters({
@@ -51,9 +48,7 @@ export default function Filters({
   onFilterChange,
   availableTypes,
   vesselCount,
-  user,
   onSaveAsSearch,
-  onAuthPrompt,
 }: FiltersProps) {
   const [activePopover, setActivePopover] = useState<"meer" | "price" | "length" | "filters" | null>(null);
   const barRef = useRef<HTMLDivElement>(null);
@@ -279,10 +274,7 @@ export default function Filters({
           {hasAnyFilter && onSaveAsSearch && (
             <button
               type="button"
-              onClick={() => {
-                if (user) onSaveAsSearch(filters);
-                else if (onAuthPrompt) onAuthPrompt();
-              }}
+              onClick={() => onSaveAsSearch(filters)}
               className="flex items-center gap-1.5 rounded-xl bg-cyan-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-700"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -328,9 +320,7 @@ export default function Filters({
           <FiltersDropdown
             filters={filters}
             update={update}
-            user={user}
             onSaveAsSearch={onSaveAsSearch}
-            onAuthPrompt={onAuthPrompt}
             extraFilterCount={extraFilterCount}
             onClose={closePopover}
           />

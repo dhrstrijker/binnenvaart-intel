@@ -210,9 +210,9 @@ CREATE INDEX idx_notification_history_sent_at ON notification_history(sent_at);
 CREATE TABLE saved_searches (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES auth.users(id) NOT NULL,
-  name TEXT NOT NULL,
+  name TEXT DEFAULT NULL,
   filters JSONB DEFAULT '{}'::jsonb,
-  frequency TEXT NOT NULL DEFAULT 'daily' CHECK (frequency IN ('immediate', 'daily', 'weekly')),
+  frequency TEXT NOT NULL DEFAULT 'immediate' CHECK (frequency IN ('immediate', 'daily', 'weekly')),
   active BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()

@@ -1,17 +1,17 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import NavisioLogo from "./NavisioLogo";
 import NavLink from "./NavLink";
+import NotificationsDropdown from "./NotificationsDropdown";
 import { useAuthModal } from "@/lib/AuthModalContext";
 import { useOutsideClick } from "@/lib/useOutsideClick";
-import type { User } from "@supabase/supabase-js";
+import { useSubscription } from "@/lib/useSubscription";
 
 export default function Header() {
-  const [user, setUser] = useState<User | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -19,17 +19,7 @@ export default function Header() {
   const mobileToggleRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
   const { openAuthModal } = useAuthModal();
-
-  useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+  const { user, isPremium } = useSubscription();
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
   const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
@@ -66,8 +56,10 @@ export default function Header() {
           <nav className="flex items-center gap-2">
             <NavLink href="/">Dashboard</NavLink>
             <NavLink href="/favorieten">Favorieten</NavLink>
-            {user && <NavLink href="/zoekopdrachten">Zoekopdrachten</NavLink>}
           </nav>
+
+          {/* Notifications dropdown */}
+          <NotificationsDropdown user={user} isPremium={isPremium} />
 
           <div className="hidden items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 sm:flex">
             <span className="relative flex h-2 w-2">
@@ -155,8 +147,11 @@ export default function Header() {
           <nav className="flex flex-col gap-1 px-4 py-3">
             <NavLink href="/" onClick={() => setMobileNavOpen(false)}>Dashboard</NavLink>
             <NavLink href="/favorieten" onClick={() => setMobileNavOpen(false)}>Favorieten</NavLink>
-            {user && <NavLink href="/zoekopdrachten" onClick={() => setMobileNavOpen(false)}>Zoekopdrachten</NavLink>}
           </nav>
+          {/* Mobile notifications */}
+          <div className="border-t border-white/10 px-4 py-3">
+            <NotificationsDropdown user={user} isPremium={isPremium} />
+          </div>
           <div className="border-t border-white/10 px-4 py-3">
             {user ? (
               <div className="flex flex-col gap-2">

@@ -19,7 +19,7 @@ export interface SavedSearchFilters {
 export interface SavedSearch {
   id: string;
   user_id: string;
-  name: string;
+  name: string | null;
   filters: SavedSearchFilters;
   frequency: "immediate" | "daily" | "weekly";
   active: boolean;
@@ -27,12 +27,6 @@ export interface SavedSearch {
 }
 
 export const MAX_FREE_SEARCHES = 2;
-
-export const FREQUENCY_LABELS: Record<string, string> = {
-  immediate: "Direct",
-  daily: "Dagelijks",
-  weekly: "Wekelijks",
-};
 
 export const SOURCE_OPTIONS = Object.entries(SOURCE_CONFIG).map(([key, { label }]) => ({
   value: key,
@@ -102,4 +96,11 @@ export function getFilterPills(filters: SavedSearchFilters): { label: string }[]
   }
 
   return pills;
+}
+
+/** Generate a human-readable display name from filter values. */
+export function generateSearchName(filters: SavedSearchFilters): string {
+  const pills = getFilterPills(filters);
+  if (pills.length === 0) return "Alle schepen";
+  return pills.map((p) => p.label).join(", ");
 }

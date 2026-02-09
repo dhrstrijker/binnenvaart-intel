@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useEscapeKey } from "@/lib/useEscapeKey";
 import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
+import type { User } from "@supabase/supabase-js";
 
 type Step =
   | "initial"
@@ -13,14 +14,16 @@ type Step =
   | "loggingIn"
   | "googleLoading";
 
+export type NotificationModalContextType = "vessel" | "search";
+
 interface NotificationOnboardingModalProps {
-  vesselId: string;
-  onSuccess: () => void;
+  contextType: NotificationModalContextType;
+  onSuccess: (user: User) => void;
   onClose: () => void;
 }
 
 export default function NotificationOnboardingModal({
-  vesselId,
+  contextType,
   onSuccess,
   onClose,
 }: NotificationOnboardingModalProps) {
@@ -47,12 +50,9 @@ export default function NotificationOnboardingModal({
     await fetch("/api/notifications/subscribe-auth", { method: "POST" });
     const { data } = await supabase.auth.getUser();
     if (data.user) {
-      await supabase
-        .from("watchlist")
-        .insert({ user_id: data.user.id, vessel_id: vesselId });
+      onSuccess(data.user);
     }
-    onSuccess();
-  }, [vesselId, onSuccess]);
+  }, [onSuccess]);
 
   function handleOverlayClick(e: React.MouseEvent) {
     if (e.target === overlayRef.current) onClose();
@@ -132,6 +132,20 @@ export default function NotificationOnboardingModal({
 
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
+  const headerTitle =
+    step === "login" || step === "loggingIn"
+      ? "Inloggen"
+      : "Ontvang meldingen";
+
+  const headerSubtitle =
+    step === "login" || step === "loggingIn"
+      ? contextType === "vessel"
+        ? "Log in om dit schip aan je volglijst toe te voegen."
+        : "Log in om meldingen voor je zoekopdracht te activeren."
+      : contextType === "vessel"
+        ? "Meld je aan om prijswijzigingen voor dit schip te ontvangen."
+        : "Meld je aan om meldingen voor je zoekopdracht te ontvangen.";
+
   return (
     <div
       ref={overlayRef}
@@ -177,14 +191,10 @@ export default function NotificationOnboardingModal({
             </div>
             <div>
               <h2 className="text-lg font-bold text-slate-900">
-                {step === "login" || step === "loggingIn"
-                  ? "Inloggen"
-                  : "Ontvang meldingen"}
+                {headerTitle}
               </h2>
               <p className="text-sm text-slate-500">
-                {step === "login" || step === "loggingIn"
-                  ? "Log in om dit schip aan je volglijst toe te voegen."
-                  : "Log direct in met Google, of ontvang meldingen via e-mail."}
+                {headerSubtitle}
               </p>
             </div>
           </div>
@@ -217,8 +227,8 @@ export default function NotificationOnboardingModal({
           ) : step === "login" || step === "loggingIn" ? (
             <>
               <div className="mb-4 rounded-lg bg-cyan-50 px-4 py-3 text-sm text-cyan-800">
-                Je ontvangt al meldingen op{" "}
-                <strong>{email}</strong>. Log in om dit schip te volgen.
+                Je hebt al een account met{" "}
+                <strong>{email}</strong>. Log in om verder te gaan.
               </div>
 
               <form onSubmit={handleLogin} className="space-y-3">
