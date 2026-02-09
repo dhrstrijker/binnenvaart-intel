@@ -1,4 +1,5 @@
 import logging
+import time
 
 import requests
 
@@ -89,7 +90,7 @@ TYPE_MAP = {
 }
 
 
-def _fetch_with_retry(url, json_body, retries=3):
+def _fetch_with_retry(url, json_body, retries=5):
     """POST a GraphQL request with exponential-backoff retries."""
     return _fetch_with_retry_base(requests.post, url, retries=retries, json=json_body)
 
@@ -449,6 +450,7 @@ def scrape() -> dict:
             # Fetch detail page for comprehensive raw_details
             slug = v.get("slug")
             if slug:
+                time.sleep(0.4)  # throttle to avoid GSK 429 rate-limits
                 detail_specs = _fetch_detail(slug)
                 if detail_specs:
                     # Merge detail specs into raw_details (detail takes precedence)
