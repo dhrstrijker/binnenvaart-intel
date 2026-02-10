@@ -145,29 +145,31 @@ export default function Filters({
         <div className="flex flex-wrap items-center gap-3 rounded-2xl bg-white px-4 py-3 shadow-md ring-1 ring-gray-100">
 
           {/* ── Type pills ── */}
-          <div className="flex min-w-0 items-center rounded-xl bg-slate-100 p-1">
-            <div className="flex min-w-0 items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              <TypePill active={!filters.type} onClick={() => update({ type: "" })}>
-                Alle
-              </TypePill>
-              {visibleTypes.map((t) => (
-                <TypePill
-                  key={t}
-                  active={filters.type === t}
-                  onClick={() => update({ type: filters.type === t ? "" : t })}
-                >
-                  {t}
+          {/* Outer wrapper is `relative` so the Meer dropdown can be positioned
+              outside the overflow-hidden container and won't be clipped. */}
+          <div className="relative flex min-w-0 items-center">
+            <div className="flex min-w-0 items-center overflow-hidden rounded-xl bg-slate-100 p-1">
+              <div className="flex min-w-0 items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <TypePill active={!filters.type} onClick={() => update({ type: "" })}>
+                  Alle
                 </TypePill>
-              ))}
-            </div>
+                {visibleTypes.map((t) => (
+                  <TypePill
+                    key={t}
+                    active={filters.type === t}
+                    onClick={() => update({ type: filters.type === t ? "" : t })}
+                  >
+                    {t}
+                  </TypePill>
+                ))}
+              </div>
 
-            {/* "Meer" dropdown — outside scroll area so dropdown won't be clipped */}
-            {meerTypes.length > 0 && (
-              <div className="relative shrink-0">
+              {/* "Meer" button — inside bg container, shrink-0 so it stays visible */}
+              {meerTypes.length > 0 && (
                 <button
                   type="button"
                   onClick={() => toggle("meer")}
-                  className={`flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition whitespace-nowrap ${
+                  className={`shrink-0 flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition whitespace-nowrap ${
                     selectedTypeInMeer
                       ? "bg-white text-cyan-700 shadow-sm ring-1 ring-slate-200"
                       : activePopover === "meer"
@@ -178,28 +180,29 @@ export default function Filters({
                   {selectedTypeInMeer ? filters.type : "Meer"}
                   <ChevronDown className="h-3.5 w-3.5" />
                 </button>
+              )}
+            </div>
 
-                {activePopover === "meer" && (
-                  <div className="absolute right-0 top-full z-30 mt-1.5 w-56 rounded-xl border border-slate-200 bg-white py-1.5 shadow-xl">
-                    {meerTypes.map((t) => (
-                      <button
-                        key={t}
-                        type="button"
-                        onClick={() => {
-                          update({ type: filters.type === t ? "" : t });
-                          setActivePopover(null);
-                        }}
-                        className={`block w-full px-4 py-2.5 text-left text-sm transition ${
-                          filters.type === t
-                            ? "bg-cyan-50 font-semibold text-cyan-700"
-                            : "text-slate-600 hover:bg-slate-50"
-                        }`}
-                      >
-                        {t}
-                      </button>
-                    ))}
-                  </div>
-                )}
+            {/* "Meer" dropdown — outside overflow-hidden so it won't be clipped */}
+            {activePopover === "meer" && meerTypes.length > 0 && (
+              <div className="absolute right-0 top-full z-30 mt-1.5 w-56 rounded-xl border border-slate-200 bg-white py-1.5 shadow-xl">
+                {meerTypes.map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => {
+                      update({ type: filters.type === t ? "" : t });
+                      setActivePopover(null);
+                    }}
+                    className={`block w-full px-4 py-2.5 text-left text-sm transition ${
+                      filters.type === t
+                        ? "bg-cyan-50 font-semibold text-cyan-700"
+                        : "text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
               </div>
             )}
           </div>

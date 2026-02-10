@@ -50,7 +50,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="nl">
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} font-sans antialiased overflow-x-hidden`}>
         <LocalFavoritesProvider>
           <AuthModalProvider>
             <NotificationModalProvider>
