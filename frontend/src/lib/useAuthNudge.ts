@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 
 const NUDGE_DISMISSED_KEY = "navisio_nudge_dismissed";
-const NUDGE_THRESHOLD = 3;
+const NUDGE_THRESHOLD = 1;
 
 export function useAuthNudge(localFavoritesCount: number) {
   const [dismissed, setDismissed] = useState(true); // default to hidden

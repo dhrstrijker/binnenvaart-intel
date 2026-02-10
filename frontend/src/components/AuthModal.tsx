@@ -40,12 +40,12 @@ export default function AuthModal({ message, onSuccess, onClose }: AuthModalProp
         </button>
 
         <div className="p-6 pt-8">
-          <h2 className="text-xl font-bold text-slate-900">Inloggen</h2>
-          <p className="mt-1 text-sm text-slate-500">
-            Log in of maak een account aan bij Navisio
-          </p>
+          <h2 className="text-xl font-bold text-slate-900">Welkom bij Navisio</h2>
+          {message && (
+            <p className="mt-1 text-sm text-slate-500">{message}</p>
+          )}
           <div className="mt-5">
-            <AuthForm message={message} onSuccess={onSuccess} />
+            <AuthForm onSuccess={onSuccess} />
           </div>
         </div>
       </div>
