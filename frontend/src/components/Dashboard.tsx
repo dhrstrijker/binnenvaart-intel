@@ -273,11 +273,9 @@ export default function Dashboard() {
 
     if (popoverOpenRef.current) return;
 
-    if (window.scrollY < 50) {
-      setFiltersCollapsed(false);
-    } else if (scrollDir === "down") {
+    if (scrollDir === "down") {
       setFiltersCollapsed(true);
-    } else if (scrollDir === "up") {
+    } else if (scrollDir === "up" || scrollDir === null) {
       setFiltersCollapsed(false);
     }
   }, [scrollDir]);
