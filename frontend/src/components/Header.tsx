@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -21,8 +21,24 @@ export default function Header() {
   const { openAuthModal } = useAuthModal();
   const { user, isPremium } = useSubscription();
 
+  const headerRef = useRef<HTMLElement>(null);
+
   const closeMenu = useCallback(() => setMenuOpen(false), []);
   const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
+
+  // Expose header height as CSS variable for sticky filter bar positioning
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([entry]) => {
+      document.documentElement.style.setProperty(
+        "--header-h",
+        `${entry.contentRect.height}px`,
+      );
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   useOutsideClick(menuRef, closeMenu, menuOpen);
   useOutsideClick(mobileNavRef, closeMobileNav, mobileNavOpen, [mobileToggleRef]);
@@ -45,7 +61,7 @@ export default function Header() {
     : user?.email?.slice(0, 2).toUpperCase() ?? "?";
 
   return (
-    <header className="bg-slate-950 shadow-lg">
+    <header ref={headerRef} className="sticky top-0 z-30 bg-slate-950 shadow-lg">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
         <Link href="/">
           <NavisioLogo size="md" variant="light" />

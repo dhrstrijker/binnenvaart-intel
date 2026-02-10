@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useCallback, useMemo } from "react";
+import React, { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { useOutsideClick } from "@/lib/useOutsideClick";
 import { useEscapeKey } from "@/lib/useEscapeKey";
 import { formatPriceShort } from "@/lib/formatting";
@@ -41,6 +41,8 @@ interface FiltersProps {
   availableTypes: string[];
   vesselCount: number;
   onSaveAsSearch?: (filters: FilterState) => void;
+  hideChips?: boolean;
+  onPopoverChange?: (open: boolean) => void;
 }
 
 export default function Filters({
@@ -49,6 +51,8 @@ export default function Filters({
   availableTypes,
   vesselCount,
   onSaveAsSearch,
+  hideChips,
+  onPopoverChange,
 }: FiltersProps) {
   const [activePopover, setActivePopover] = useState<"meer" | "price" | "length" | "filters" | null>(null);
   const barRef = useRef<HTMLDivElement>(null);
@@ -81,6 +85,11 @@ export default function Filters({
 
   /* Close on ESC */
   useEscapeKey(closePopover);
+
+  /* Notify parent when popover opens/closes */
+  useEffect(() => {
+    onPopoverChange?.(activePopover !== null);
+  }, [activePopover, onPopoverChange]);
 
   /* Extra filter badge count */
   const extraFilterCount = [
@@ -328,7 +337,7 @@ export default function Filters({
       </div>
 
       {/* ═══ Active filter chips ═══ */}
-      <ActiveChips filters={filters} onClear={update} />
+      {!hideChips && <ActiveChips filters={filters} onClear={update} />}
     </div>
   );
 }

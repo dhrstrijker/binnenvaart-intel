@@ -14,6 +14,8 @@ import VesselCard from "./VesselCard";
 import SkeletonCard from "./SkeletonCard";
 import AuthNudgeToast from "./AuthNudgeToast";
 import Filters, { FilterState } from "./Filters";
+import ActiveChips from "./filters/ActiveChips";
+import { useScrollDirection } from "@/lib/useScrollDirection";
 import { computeDealScores } from "@/lib/dealScore";
 import { predictPriceRange, PriceRange } from "@/lib/vesselPricing";
 import type { SavedSearchFilters } from "@/lib/savedSearchTypes";
@@ -249,6 +251,53 @@ export default function Dashboard() {
     [user, saveSearch, showToast, openNotificationModal]
   );
 
+  // Collapsible filter bar (mobile only)
+  const scrollDir = useScrollDirection();
+  const [filtersCollapsed, setFiltersCollapsed] = useState(false);
+  const popoverOpenRef = useRef(false);
+
+  const handlePopoverChange = useCallback((open: boolean) => {
+    popoverOpenRef.current = open;
+    // If a popover just opened, make sure filters are expanded
+    if (open) setFiltersCollapsed(false);
+  }, []);
+
+  // Auto-collapse/expand on scroll (mobile only)
+  useEffect(() => {
+    // Only collapse on mobile
+    const isMobile = window.innerWidth < 768;
+    if (!isMobile) {
+      setFiltersCollapsed(false);
+      return;
+    }
+
+    if (popoverOpenRef.current) return;
+
+    if (window.scrollY < 50) {
+      setFiltersCollapsed(false);
+    } else if (scrollDir === "down") {
+      setFiltersCollapsed(true);
+    } else if (scrollDir === "up") {
+      setFiltersCollapsed(false);
+    }
+  }, [scrollDir]);
+
+  // Expand on resize to desktop
+  useEffect(() => {
+    function onResize() {
+      if (window.innerWidth >= 768) setFiltersCollapsed(false);
+    }
+    window.addEventListener("resize", onResize, { passive: true });
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  const handleFilterUpdate = useCallback(
+    (partial: Partial<FilterState>) => {
+      setFilters((prev) => ({ ...prev, ...partial }));
+    },
+    [],
+  );
+
   const visibleVessels = filtered.slice(0, visibleCount);
 
   if (error) {
@@ -280,15 +329,53 @@ export default function Dashboard() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
       <h1 className="sr-only">Binnenvaartschepen te koop</h1>
-      {/* Filters */}
-      <div className="sticky top-0 z-20 -mx-4 px-4 sm:-mx-6 sm:px-6 pt-2 pb-2 bg-gradient-to-b from-slate-50 from-80% to-transparent">
-        <Filters
-          filters={filters}
-          onFilterChange={setFilters}
-          availableTypes={availableTypes}
-          vesselCount={filtered.length}
-          onSaveAsSearch={handleSaveSearch}
-        />
+      {/* Filters — collapsible on mobile scroll */}
+      <div className="sticky top-[var(--header-h,0px)] z-20 -mx-4 px-4 sm:-mx-6 sm:px-6 pt-2 pb-2 bg-gradient-to-b from-slate-50 from-80% to-transparent">
+        {/* Collapsible wrapper — CSS grid for smooth height animation */}
+        <div
+          className="grid transition-[grid-template-rows] duration-300 ease-in-out md:!grid-rows-[1fr]"
+          style={{ gridTemplateRows: filtersCollapsed ? "0fr" : "1fr" }}
+        >
+          <div className="overflow-hidden">
+            <Filters
+              filters={filters}
+              onFilterChange={setFilters}
+              availableTypes={availableTypes}
+              vesselCount={filtered.length}
+              onSaveAsSearch={handleSaveSearch}
+              hideChips
+              onPopoverChange={handlePopoverChange}
+            />
+          </div>
+        </div>
+
+        {/* Peek tab — visible on mobile when collapsed */}
+        <button
+          type="button"
+          onClick={() => setFiltersCollapsed(false)}
+          className={`flex w-full items-center justify-center gap-1.5 rounded-b-xl bg-white py-1.5 text-xs font-medium text-slate-500 shadow-md ring-1 ring-gray-100 transition-all duration-300 md:hidden ${
+            filtersCollapsed
+              ? "translate-y-0 opacity-100"
+              : "pointer-events-none -translate-y-1 opacity-0"
+          }`}
+          aria-label="Filters tonen"
+        >
+          <svg
+            className="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+          Filters
+        </button>
+
+        {/* Active filter chips — always visible */}
+        <div className="mt-1">
+          <ActiveChips filters={filters} onClear={handleFilterUpdate} />
+        </div>
       </div>
 
       {/* Loading state */}
