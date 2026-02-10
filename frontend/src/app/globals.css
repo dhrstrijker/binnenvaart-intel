@@ -42,3 +42,57 @@ body {
 .animate-bell-ring {
   animation: bell-ring 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+
+/* Dual range slider — native input styling */
+.dual-range-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+
+.dual-range-thumb::-webkit-slider-runnable-track {
+  appearance: none;
+  height: 8px;
+  background: transparent;
+}
+
+.dual-range-thumb::-moz-range-track {
+  height: 8px;
+  background: transparent;
+  border: none;
+}
+
+.dual-range-thumb::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  pointer-events: auto;
+  height: 24px;
+  width: 24px;
+  border-radius: 9999px;
+  border: 2px solid #06b6d4;
+  background: white;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.15);
+  cursor: grab;
+  margin-top: -8px;
+}
+
+.dual-range-thumb::-moz-range-thumb {
+  pointer-events: auto;
+  height: 20px;
+  width: 20px;
+  border-radius: 9999px;
+  border: 2px solid #06b6d4;
+  background: white;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.15);
+  cursor: grab;
+}
+
+.dual-range-thumb:active::-webkit-slider-thumb {
+  transform: scale(1.15);
+  cursor: grabbing;
+}
+
+.dual-range-thumb:active::-moz-range-thumb {
+  transform: scale(1.15);
+  cursor: grabbing;
+}

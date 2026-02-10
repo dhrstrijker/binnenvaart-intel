@@ -8,7 +8,7 @@ export function useOutsideClick(
 ): void {
   useEffect(() => {
     if (!active) return;
-    function handleClick(e: MouseEvent) {
+    function handleClick(e: Event) {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         if (ignoreRefs?.some((r) => r.current?.contains(e.target as Node))) {
           return;
@@ -16,7 +16,7 @@ export function useOutsideClick(
         callback();
       }
     }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+    document.addEventListener("pointerdown", handleClick);
+    return () => document.removeEventListener("pointerdown", handleClick);
   }, [ref, callback, active, ignoreRefs]);
 }

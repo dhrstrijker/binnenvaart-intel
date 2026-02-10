@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useEffect } from "react";
+import React, { useCallback } from "react";
 
 interface DualRangeSliderProps {
   min: number;
@@ -17,79 +17,23 @@ export default function DualRangeSlider({
   onChange,
   formatLabel,
 }: DualRangeSliderProps) {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const draggingRef = useRef<"min" | "max" | null>(null);
-  const valuesRef = useRef(values);
-  valuesRef.current = values;
-
   const pct = (v: number) => ((v - min) / (max - min)) * 100;
-  const snap = (raw: number) => Math.max(min, Math.min(max, Math.round(raw / step) * step));
 
-  const handleMove = useCallback(
-    (clientX: number) => {
-      if (!trackRef.current || !draggingRef.current) return;
-      const rect = trackRef.current.getBoundingClientRect();
-      const fraction = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-      const raw = min + fraction * (max - min);
-      const snapped = snap(raw);
-      const cur = valuesRef.current;
-
-      let next: [number, number];
-      if (draggingRef.current === "min") {
-        next = [Math.min(snapped, cur[1] - step), cur[1]];
-      } else {
-        next = [cur[0], Math.max(snapped, cur[0] + step)];
-      }
-      valuesRef.current = next;
-      onChange(next);
+  const handleMin = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const v = Number(e.target.value);
+      onChange([Math.min(v, values[1] - step), values[1]]);
     },
-    [min, max, step, onChange],
+    [values, step, onChange],
   );
 
-  useEffect(() => {
-    if (!draggingRef.current) return;
-
-    const onMouseMove = (e: MouseEvent) => handleMove(e.clientX);
-    const onTouchMove = (e: TouchEvent) => {
-      e.preventDefault();
-      handleMove(e.touches[0].clientX);
-    };
-    const onUp = () => { draggingRef.current = null; };
-
-    document.addEventListener("mousemove", onMouseMove);
-    document.addEventListener("touchmove", onTouchMove, { passive: false });
-    document.addEventListener("mouseup", onUp);
-    document.addEventListener("touchend", onUp);
-
-    return () => {
-      document.removeEventListener("mousemove", onMouseMove);
-      document.removeEventListener("touchmove", onTouchMove);
-      document.removeEventListener("mouseup", onUp);
-      document.removeEventListener("touchend", onUp);
-    };
-  });
-
-  function startDrag(thumb: "min" | "max") {
-    return (e: React.MouseEvent | React.TouchEvent) => {
-      e.preventDefault();
-      draggingRef.current = thumb;
-    };
-  }
-
-  function handleTrackClick(e: React.MouseEvent) {
-    if (!trackRef.current) return;
-    const rect = trackRef.current.getBoundingClientRect();
-    const fraction = (e.clientX - rect.left) / rect.width;
-    const raw = min + fraction * (max - min);
-    const snapped = snap(raw);
-    const distToMin = Math.abs(snapped - values[0]);
-    const distToMax = Math.abs(snapped - values[1]);
-    if (distToMin <= distToMax) {
-      onChange([Math.min(snapped, values[1] - step), values[1]]);
-    } else {
-      onChange([values[0], Math.max(snapped, values[0] + step)]);
-    }
-  }
+  const handleMax = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const v = Number(e.target.value);
+      onChange([values[0], Math.max(v, values[0] + step)]);
+    },
+    [values, step, onChange],
+  );
 
   return (
     <div className="py-3">
@@ -99,12 +43,11 @@ export default function DualRangeSlider({
         <span>{formatLabel(max)}</span>
       </div>
 
-      {/* Track */}
-      <div
-        ref={trackRef}
-        className="relative h-2 cursor-pointer rounded-full bg-slate-200"
-        onClick={handleTrackClick}
-      >
+      {/* Track + thumbs */}
+      <div className="relative h-2">
+        {/* Background track */}
+        <div className="absolute inset-0 rounded-full bg-slate-200" />
+
         {/* Active range fill */}
         <div
           className="absolute h-full rounded-full bg-gradient-to-r from-cyan-400 to-cyan-500"
@@ -114,20 +57,28 @@ export default function DualRangeSlider({
           }}
         />
 
-        {/* Min thumb */}
-        <div
-          className="absolute top-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 cursor-grab rounded-full border-2 border-cyan-500 bg-white shadow-md transition-transform hover:scale-110 active:scale-110 active:cursor-grabbing"
-          style={{ left: `${pct(values[0])}%` }}
-          onMouseDown={startDrag("min")}
-          onTouchStart={startDrag("min")}
+        {/* Min range input */}
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={values[0]}
+          onChange={handleMin}
+          className="dual-range-thumb pointer-events-none absolute inset-0 w-full appearance-none bg-transparent"
+          style={{ zIndex: values[0] > max - step ? 5 : 3 }}
         />
 
-        {/* Max thumb */}
-        <div
-          className="absolute top-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 cursor-grab rounded-full border-2 border-cyan-500 bg-white shadow-md transition-transform hover:scale-110 active:scale-110 active:cursor-grabbing"
-          style={{ left: `${pct(values[1])}%` }}
-          onMouseDown={startDrag("max")}
-          onTouchStart={startDrag("max")}
+        {/* Max range input */}
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={values[1]}
+          onChange={handleMax}
+          className="dual-range-thumb pointer-events-none absolute inset-0 w-full appearance-none bg-transparent"
+          style={{ zIndex: 4 }}
         />
       </div>
     </div>
