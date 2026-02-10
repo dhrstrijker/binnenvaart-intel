@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Vessel, PriceHistory } from "@/lib/supabase";
@@ -50,29 +50,10 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
   const trend = getPriceTrend(priceHistory);
   const effectiveTrend = trend ?? freeTierTrend ?? null;
 
-  // Price counter roll-up
-  const priceRef = useRef<HTMLSpanElement>(null);
-  const [priceInView, setPriceInView] = useState(false);
-
-  useEffect(() => {
-    const el = priceRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setPriceInView(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
+  // Price counter roll-up — starts immediately on mount
   const animatedPrice = useCountUp(vessel.price ?? 0, {
     duration: 800,
-    enabled: priceInView && vessel.price !== null && vessel.price > 0,
+    enabled: vessel.price !== null && vessel.price > 0,
   });
 
   return (
@@ -213,7 +194,7 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
         <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
           <div className="flex items-center gap-2">
             {vessel.price !== null ? (
-              <span ref={priceRef} className="text-xl font-extrabold text-slate-900">
+              <span className="text-xl font-extrabold text-slate-900">
                 {formatPrice(animatedPrice)}
               </span>
             ) : estimatedRange ? (
@@ -221,7 +202,7 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
                 {formatPrice(estimatedRange.low)} – {formatPrice(estimatedRange.high)}
               </span>
             ) : (
-              <span ref={priceRef} className="text-xl font-extrabold text-slate-900">
+              <span className="text-xl font-extrabold text-slate-900">
                 Prijs op aanvraag
               </span>
             )}

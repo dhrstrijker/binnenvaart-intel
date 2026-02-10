@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useLocalFavorites } from "@/lib/useLocalFavorites";
 import { useFlyingAnimation } from "@/lib/FlyingAnimationContext";
+import { useFavoritesCount } from "@/lib/FavoritesCountContext";
 import type { User } from "@supabase/supabase-js";
 
 interface FavoriteButtonProps {
@@ -22,6 +23,7 @@ export default function FavoriteButton({ vesselId, user, className, initialIsFav
   const [animating, setAnimating] = useState(false);
   const { isLocalFav, addLocal, removeLocal, migrateToSupabase } = useLocalFavorites();
   const flyingCtx = useFlyingAnimation();
+  const { bumpCount } = useFavoritesCount();
   const btnRef = useRef<HTMLButtonElement>(null);
 
   // Sync with batch-provided value when it changes
@@ -66,9 +68,11 @@ export default function FavoriteButton({ vesselId, user, className, initialIsFav
       if (!user) {
         if (isLocalFav(vesselId)) {
           removeLocal(vesselId);
+          bumpCount(-1);
           onToggle?.(false);
         } else {
           addLocal(vesselId);
+          bumpCount(1);
           onToggle?.(true);
           if (flyingCtx && btnRef.current) {
             flyingCtx.flyTo("favorites", btnRef.current.getBoundingClientRect(), "heart");
@@ -104,6 +108,7 @@ export default function FavoriteButton({ vesselId, user, className, initialIsFav
         succeeded = false;
       }
       if (succeeded) {
+        bumpCount(!prev ? 1 : -1);
         onToggle?.(!prev);
         if (!prev && flyingCtx && btnRef.current) {
           flyingCtx.flyTo("favorites", btnRef.current.getBoundingClientRect(), "heart");
@@ -111,7 +116,7 @@ export default function FavoriteButton({ vesselId, user, className, initialIsFav
       }
       setLoading(false);
     },
-    [user, vesselId, isFavorite, loading, isLocalFav, addLocal, removeLocal, onToggle, flyingCtx]
+    [user, vesselId, isFavorite, loading, isLocalFav, addLocal, removeLocal, onToggle, flyingCtx, bumpCount]
   );
 
   return (

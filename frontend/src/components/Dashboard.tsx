@@ -10,6 +10,7 @@ import { useAuthNudge } from "@/lib/useAuthNudge";
 import { useNotificationModal } from "@/lib/NotificationModalContext";
 import { useToast } from "@/lib/ToastContext";
 import { useWatchlistCount } from "@/lib/WatchlistContext";
+import { useFavoritesCount } from "@/lib/FavoritesCountContext";
 import { useSavedSearches } from "@/lib/useSavedSearches";
 import VesselCard from "./VesselCard";
 import SkeletonCard from "./SkeletonCard";
@@ -84,6 +85,7 @@ export default function Dashboard() {
   const { openNotificationModal } = useNotificationModal();
   const { showToast } = useToast();
   const { setWatchlistCount } = useWatchlistCount();
+  const { setFavoritesCount } = useFavoritesCount();
 
   // Data fetching
   const { vessels, priceHistoryMap, freeTierTrends, favoriteIds, watchlistIds, loading, error, user, isPremium } = useVesselData();
@@ -92,6 +94,11 @@ export default function Dashboard() {
   useEffect(() => {
     setWatchlistCount(watchlistIds.size);
   }, [watchlistIds.size, setWatchlistCount]);
+
+  // Sync favorites count to context for heart badge
+  useEffect(() => {
+    setFavoritesCount(user ? favoriteIds.size : localFavorites.length);
+  }, [user, favoriteIds.size, localFavorites.length, setFavoritesCount]);
 
   // Saved searches hook
   const { saveSearch } = useSavedSearches(user, isPremium);
@@ -317,6 +324,14 @@ export default function Dashboard() {
     [],
   );
 
+  // Track initial data load so cards only stagger-animate on first load
+  const hasLoadedRef = useRef(false);
+  useEffect(() => {
+    if (!loading && vessels.length > 0) {
+      hasLoadedRef.current = true;
+    }
+  }, [loading, vessels.length]);
+
   const visibleVessels = filtered.slice(0, visibleCount);
 
   if (error) {
@@ -454,15 +469,14 @@ export default function Dashboard() {
                   key={vessel.id}
                   layout
                   layoutId={vessel.id}
-                  initial={{ opacity: 0, y: 24 }}
+                  initial={hasLoadedRef.current ? false : { opacity: 0, y: 24 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{
                     duration: 0.4,
-                    delay: Math.min(index, 11) * 0.05,
+                    delay: hasLoadedRef.current ? 0 : Math.min(index, 11) * 0.05,
                     layout: { type: "spring", stiffness: 300, damping: 30 },
                   }}
-                  viewport={{ once: true, amount: 0.1 }}
                 >
                   <VesselCard
                     vessel={vessel}

@@ -12,39 +12,22 @@ import { useAuthModal } from "@/lib/AuthModalContext";
 import { useOutsideClick } from "@/lib/useOutsideClick";
 import { useSubscription } from "@/lib/useSubscription";
 import { useFlyingAnimation } from "@/lib/FlyingAnimationContext";
-import { useLocalFavorites } from "@/lib/useLocalFavorites";
+import { useFavoritesCount } from "@/lib/FavoritesCountContext";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const mobileNavRef = useRef<HTMLDivElement>(null);
-  const mobileToggleRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
   const { openAuthModal } = useAuthModal();
   const { user, isPremium } = useSubscription();
   const flyingCtx = useFlyingAnimation();
-  const { localFavorites } = useLocalFavorites();
+  const { favoritesCount } = useFavoritesCount();
 
   const headerRef = useRef<HTMLElement>(null);
   const favoritesTargetRef = useRef<HTMLSpanElement>(null);
   const notificationsTargetRef = useRef<HTMLSpanElement>(null);
-  const [authFavCount, setAuthFavCount] = useState(0);
 
-  // Fetch favorites count for logged-in users
-  useEffect(() => {
-    if (!user) { setAuthFavCount(0); return; }
-    const supabase = createClient();
-    supabase
-      .from("favorites")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", user.id)
-      .then(({ count }) => setAuthFavCount(count ?? 0));
-  }, [user]);
-
-  const favoritesCount = user ? authFavCount : localFavorites.length;
-
-  // Register flying animation targets
+  // Register flying animation targets (flying is skipped on mobile < 768px)
   useEffect(() => {
     if (!flyingCtx) return;
     flyingCtx.registerTarget("favorites", () => favoritesTargetRef.current?.getBoundingClientRect() ?? null);
@@ -52,7 +35,6 @@ export default function Header() {
   }, [flyingCtx]);
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
-  const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
 
   // Expose header height as CSS variable for sticky filter bar positioning
   useEffect(() => {
@@ -69,7 +51,6 @@ export default function Header() {
   }, []);
 
   useOutsideClick(menuRef, closeMenu, menuOpen);
-  useOutsideClick(mobileNavRef, closeMobileNav, mobileNavOpen, [mobileToggleRef]);
 
   async function handleSignOut() {
     const supabase = createClient();
@@ -95,9 +76,10 @@ export default function Header() {
           <NavisioLogo size="md" variant="light" />
         </Link>
 
-        {/* Desktop: Navigation + Auth */}
-        <div className="hidden items-center gap-4 md:flex">
-          <nav className="flex items-center gap-2">
+        {/* Right side: nav + icons + auth */}
+        <div className="flex items-center gap-1 md:gap-4">
+          {/* Desktop nav links */}
+          <nav className="hidden items-center gap-2 md:flex">
             <NavLink href="/">Dashboard</NavLink>
           </nav>
 
@@ -127,9 +109,10 @@ export default function Header() {
             <NotificationsDropdown user={user} isPremium={isPremium} />
           </span>
 
+          {/* Live badge (hidden on small screens via its own classes) */}
           <LiveDropdown />
 
-          {/* Auth buttons */}
+          {/* Account */}
           {user ? (
             <div className="relative" ref={menuRef}>
               <button
@@ -166,112 +149,33 @@ export default function Header() {
             </div>
           ) : (
             <div className="flex items-center gap-2">
+              {/* Desktop: text buttons */}
               <button
                 onClick={() => openAuthModal()}
-                className="rounded-lg px-3 py-1.5 text-sm font-medium text-cyan-200 transition hover:bg-white/10 hover:text-white"
+                className="hidden rounded-lg px-3 py-1.5 text-sm font-medium text-cyan-200 transition hover:bg-white/10 hover:text-white md:block"
               >
                 Inloggen
               </button>
               <button
                 onClick={() => openAuthModal()}
-                className="rounded-lg bg-cyan-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-cyan-500"
+                className="hidden rounded-lg bg-cyan-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-cyan-500 md:block"
               >
                 Registreren
+              </button>
+              {/* Mobile: person icon */}
+              <button
+                onClick={() => openAuthModal()}
+                className="flex h-8 w-8 items-center justify-center rounded-full text-cyan-200 transition hover:bg-white/10 hover:text-white md:hidden"
+                aria-label="Inloggen"
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                </svg>
               </button>
             </div>
           )}
         </div>
-
-        {/* Mobile: Bell + Hamburger button */}
-        <div className="flex items-center gap-1 md:hidden">
-          <NotificationsDropdown user={user} isPremium={isPremium} />
-          <button
-            ref={mobileToggleRef}
-            onClick={() => setMobileNavOpen(!mobileNavOpen)}
-            className="flex items-center justify-center rounded-lg p-2 text-cyan-200 transition hover:bg-white/10 hover:text-white"
-            aria-label={mobileNavOpen ? "Menu sluiten" : "Menu openen"}
-          >
-          {mobileNavOpen ? (
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          )}
-          </button>
-        </div>
       </div>
-
-      {/* Mobile navigation menu */}
-      {mobileNavOpen && (
-        <div ref={mobileNavRef} className="border-t border-white/10 md:hidden">
-          <nav className="flex flex-col gap-1 px-4 py-3">
-            <NavLink href="/" onClick={() => setMobileNavOpen(false)}>Dashboard</NavLink>
-            <NavLink href="/favorieten" onClick={() => setMobileNavOpen(false)}>
-              <span className="inline-flex items-center gap-2">
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-                </svg>
-                Favorieten
-                {favoritesCount > 0 && (
-                  <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
-                    {favoritesCount}
-                  </span>
-                )}
-              </span>
-            </NavLink>
-          </nav>
-          <div className="border-t border-white/10 px-4 py-3">
-            {user ? (
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-cyan-600 text-xs font-bold text-white">
-                    {initials}
-                  </span>
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-white">
-                      {user.user_metadata?.full_name || user.email}
-                    </p>
-                    {user.user_metadata?.full_name && (
-                      <p className="truncate text-xs text-cyan-300">{user.email}</p>
-                    )}
-                  </div>
-                </div>
-                <Link
-                  href="/account"
-                  onClick={() => setMobileNavOpen(false)}
-                  className="rounded-lg px-3 py-1.5 text-sm font-medium text-cyan-200 transition hover:bg-white/10 hover:text-white"
-                >
-                  Account
-                </Link>
-                <button
-                  onClick={handleSignOut}
-                  className="rounded-lg px-3 py-1.5 text-left text-sm font-medium text-red-400 transition hover:bg-white/10"
-                >
-                  Uitloggen
-                </button>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-2">
-                <button
-                  onClick={() => { setMobileNavOpen(false); openAuthModal(); }}
-                  className="rounded-lg px-3 py-1.5 text-left text-sm font-medium text-cyan-200 transition hover:bg-white/10 hover:text-white"
-                >
-                  Inloggen
-                </button>
-                <button
-                  onClick={() => { setMobileNavOpen(false); openAuthModal(); }}
-                  className="rounded-lg bg-cyan-600 px-3 py-1.5 text-center text-sm font-semibold text-white transition hover:bg-cyan-500"
-                >
-                  Registreren
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </header>
   );
 }

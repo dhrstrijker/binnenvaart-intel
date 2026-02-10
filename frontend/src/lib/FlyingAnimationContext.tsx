@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useCallback, useRef, useState } from "react";
+import React, { createContext, useContext, useCallback, useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type IconType = "heart" | "bell";
@@ -12,6 +12,7 @@ interface FlyingElement {
   startY: number;
   endX: number;
   endY: number;
+  createdAt: number;
 }
 
 interface FlyingAnimationContextValue {
@@ -25,11 +26,20 @@ export function useFlyingAnimation() {
   return useContext(FlyingAnimationContext);
 }
 
-let flyId = 0;
-
 export function FlyingAnimationProvider({ children }: { children: React.ReactNode }) {
   const targets = useRef<Map<string, () => DOMRect | null>>(new Map());
   const [elements, setElements] = useState<FlyingElement[]>([]);
+  const flyIdRef = useRef(0);
+
+  // Safety cleanup: remove flying elements older than 2s in case onAnimationComplete fails
+  useEffect(() => {
+    if (elements.length === 0) return;
+    const timer = setTimeout(() => {
+      const now = Date.now();
+      setElements((prev) => prev.filter((e) => now - e.createdAt < 2000));
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [elements]);
 
   const registerTarget = useCallback((name: string, getRect: () => DOMRect | null) => {
     targets.current.set(name, getRect);
@@ -44,7 +54,7 @@ export function FlyingAnimationProvider({ children }: { children: React.ReactNod
     const targetRect = getRect();
     if (!targetRect) return;
 
-    const id = ++flyId;
+    const id = ++flyIdRef.current;
     const el: FlyingElement = {
       id,
       icon,
@@ -52,10 +62,12 @@ export function FlyingAnimationProvider({ children }: { children: React.ReactNod
       startY: sourceRect.top + sourceRect.height / 2,
       endX: targetRect.left + targetRect.width / 2,
       endY: targetRect.top + targetRect.height / 2,
+      createdAt: Date.now(),
     };
     setElements((prev) => [...prev, el]);
   }, []);
 
+  // On arrival, pulse the target icon via CSS class toggle on [data-fly-target] elements
   const handleComplete = useCallback((id: number, targetName: string, icon: IconType) => {
     setElements((prev) => prev.filter((e) => e.id !== id));
     const targetEl = document.querySelector(`[data-fly-target="${targetName}"]`);

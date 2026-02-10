@@ -6,7 +6,8 @@ function easeOutExpo(t: number): number {
 
 /**
  * Animates a number from ~80% of the target to the target value.
- * Starts when `enabled` becomes true, runs once.
+ * Starts when `enabled` becomes true, runs once per mount.
+ * If target changes after animation completes, snaps to new value.
  */
 export function useCountUp(
   target: number,
@@ -15,15 +16,27 @@ export function useCountUp(
   const duration = options?.duration ?? 800;
   const enabled = options?.enabled ?? false;
   const [value, setValue] = useState(target);
-  const hasRun = useRef(false);
+  const startedRef = useRef(false);
+  const doneRef = useRef(false);
 
   useEffect(() => {
-    if (!enabled || hasRun.current || target <= 0) {
+    if (!enabled || target <= 0) {
+      setValue(target);
+      startedRef.current = false;
+      doneRef.current = false;
+      return;
+    }
+
+    // Already animated — snap to new target if it changed
+    if (doneRef.current) {
       setValue(target);
       return;
     }
 
-    hasRun.current = true;
+    // Already running
+    if (startedRef.current) return;
+
+    startedRef.current = true;
     const startValue = Math.round(target * 0.8);
     const range = target - startValue;
     let startTime: number | null = null;
@@ -38,6 +51,8 @@ export function useCountUp(
 
       if (progress < 1) {
         rafId = requestAnimationFrame(tick);
+      } else {
+        doneRef.current = true;
       }
     }
 

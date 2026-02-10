@@ -5,6 +5,7 @@ import { NotificationModalProvider } from "@/lib/NotificationModalContext";
 import { LocalFavoritesProvider } from "@/lib/useLocalFavorites";
 import { ToastProvider } from "@/lib/ToastContext";
 import { WatchlistProvider } from "@/lib/WatchlistContext";
+import { FavoritesCountProvider } from "@/lib/FavoritesCountContext";
 import { FlyingAnimationProvider } from "@/lib/FlyingAnimationContext";
 import "./globals.css";
 
@@ -55,7 +56,9 @@ export default function RootLayout({
             <NotificationModalProvider>
               <ToastProvider>
                 <WatchlistProvider>
-                  <FlyingAnimationProvider>{children}</FlyingAnimationProvider>
+                  <FavoritesCountProvider>
+                    <FlyingAnimationProvider>{children}</FlyingAnimationProvider>
+                  </FavoritesCountProvider>
                 </WatchlistProvider>
               </ToastProvider>
             </NotificationModalProvider>
