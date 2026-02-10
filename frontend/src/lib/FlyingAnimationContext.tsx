@@ -46,9 +46,6 @@ export function FlyingAnimationProvider({ children }: { children: React.ReactNod
   }, []);
 
   const flyTo = useCallback((targetName: string, sourceRect: DOMRect, icon: IconType) => {
-    // Skip on mobile
-    if (typeof window !== "undefined" && window.innerWidth < 768) return;
-
     const getRect = targets.current.get(targetName);
     if (!getRect) return;
     const targetRect = getRect();
