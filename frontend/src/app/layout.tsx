@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { AuthModalProvider } from "@/lib/AuthModalContext";
-import { NotificationModalProvider } from "@/lib/NotificationModalContext";
 import { LocalFavoritesProvider } from "@/lib/useLocalFavorites";
 import { ToastProvider } from "@/lib/ToastContext";
 import { WatchlistProvider } from "@/lib/WatchlistContext";
@@ -53,15 +52,13 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans antialiased overflow-x-hidden`}>
         <LocalFavoritesProvider>
           <AuthModalProvider>
-            <NotificationModalProvider>
-              <ToastProvider>
-                <WatchlistProvider>
-                  <FavoritesCountProvider>
-                    <FlyingAnimationProvider>{children}</FlyingAnimationProvider>
-                  </FavoritesCountProvider>
-                </WatchlistProvider>
-              </ToastProvider>
-            </NotificationModalProvider>
+            <ToastProvider>
+              <WatchlistProvider>
+                <FavoritesCountProvider>
+                  <FlyingAnimationProvider>{children}</FlyingAnimationProvider>
+                </FavoritesCountProvider>
+              </WatchlistProvider>
+            </ToastProvider>
           </AuthModalProvider>
         </LocalFavoritesProvider>
       </body>

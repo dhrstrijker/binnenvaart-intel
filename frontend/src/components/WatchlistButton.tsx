@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { useNotificationModal } from "@/lib/NotificationModalContext";
+import { useAuthModal } from "@/lib/AuthModalContext";
 import { useWatchlistCount } from "@/lib/WatchlistContext";
 import { useFlyingAnimation } from "@/lib/FlyingAnimationContext";
 import type { User } from "@supabase/supabase-js";
@@ -20,7 +20,7 @@ export default function WatchlistButton({ vesselId, user, className, onToggle, i
   const [isWatched, setIsWatched] = useState(initialIsWatched ?? false);
   const [loading, setLoading] = useState(false);
   const [animating, setAnimating] = useState(false);
-  const { openNotificationModal } = useNotificationModal();
+  const { openAuthModal } = useAuthModal();
   const { bumpCount } = useWatchlistCount();
   const flyingCtx = useFlyingAnimation();
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -99,8 +99,8 @@ export default function WatchlistButton({ vesselId, user, className, onToggle, i
       setTimeout(() => setAnimating(false), 500);
 
       if (!user) {
-        openNotificationModal({
-          contextType: "vessel",
+        openAuthModal({
+          message: "Log in om dit schip aan je volglijst toe te voegen.",
           onSuccess: async (authUser) => {
             // Add to watchlist after auth
             const supabase = createClient();
@@ -121,7 +121,7 @@ export default function WatchlistButton({ vesselId, user, className, onToggle, i
 
       await doToggle(user);
     },
-    [user, doToggle, vesselId, onToggle, openNotificationModal]
+    [user, doToggle, vesselId, onToggle, openAuthModal]
   );
 
   return (

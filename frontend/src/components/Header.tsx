@@ -131,18 +131,12 @@ export default function Header() {
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              {/* Desktop: text buttons */}
-              <button
-                onClick={() => openAuthModal()}
-                className="hidden rounded-lg px-3 py-1.5 text-sm font-medium text-cyan-200 transition hover:bg-white/10 hover:text-white md:block"
-              >
-                Inloggen
-              </button>
+              {/* Desktop: single login button */}
               <button
                 onClick={() => openAuthModal()}
                 className="hidden rounded-lg bg-cyan-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-cyan-500 md:block"
               >
-                Registreren
+                Inloggen
               </button>
               {/* Mobile: person icon */}
               <button

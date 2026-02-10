@@ -7,7 +7,7 @@ import { useVesselFiltering } from "@/lib/useVesselFiltering";
 import { useInfiniteScroll } from "@/lib/useInfiniteScroll";
 import { useLocalFavorites } from "@/lib/useLocalFavorites";
 import { useAuthNudge } from "@/lib/useAuthNudge";
-import { useNotificationModal } from "@/lib/NotificationModalContext";
+import { useAuthModal } from "@/lib/AuthModalContext";
 import { useToast } from "@/lib/ToastContext";
 import { useWatchlistCount } from "@/lib/WatchlistContext";
 import { useFavoritesCount } from "@/lib/FavoritesCountContext";
@@ -82,7 +82,7 @@ export default function Dashboard() {
   const scrollTargetRef = useRef<string | null>(null);
   const { localFavorites } = useLocalFavorites();
   const { shouldShowNudge, dismissNudge } = useAuthNudge(localFavorites.length);
-  const { openNotificationModal } = useNotificationModal();
+  const { openAuthModal } = useAuthModal();
   const { showToast } = useToast();
   const { setWatchlistCount } = useWatchlistCount();
   const { setFavoritesCount } = useFavoritesCount();
@@ -234,8 +234,8 @@ export default function Dashboard() {
       } else {
         // Store filters for after auth
         sessionStorage.setItem("pendingSaveSearch", JSON.stringify(searchFilters));
-        openNotificationModal({
-          contextType: "search",
+        openAuthModal({
+          message: "Log in om meldingen voor je zoekopdracht te activeren.",
           onSuccess: async (authUser) => {
             const stored = sessionStorage.getItem("pendingSaveSearch");
             if (stored) {
@@ -256,7 +256,7 @@ export default function Dashboard() {
         });
       }
     },
-    [user, saveSearch, showToast, openNotificationModal]
+    [user, saveSearch, showToast, openAuthModal]
   );
 
   // Collapsible filter bar (mobile only)

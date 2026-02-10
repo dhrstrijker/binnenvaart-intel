@@ -55,7 +55,7 @@ export default function AuthNudgeToast({ onDismiss }: AuthNudgeToastProps) {
             onClick={() => { openAuthModal(); handleDismiss(); }}
             className="mt-2.5 rounded-lg bg-cyan-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-cyan-700"
           >
-            Account aanmaken
+            Inloggen
           </button>
         </div>
       </div>

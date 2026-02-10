@@ -1,11 +1,12 @@
 "use client";
 
 import React, { createContext, useContext, useState, useCallback } from "react";
+import type { User } from "@supabase/supabase-js";
 import AuthModal from "@/components/AuthModal";
 
 interface AuthModalOptions {
   message?: string;
-  onSuccess?: () => void;
+  onSuccess?: (user: User) => void;
 }
 
 interface AuthModalContextValue {
@@ -36,8 +37,8 @@ export function AuthModalProvider({ children }: { children: React.ReactNode }) {
     setOptions({});
   }, []);
 
-  const handleSuccess = useCallback(() => {
-    options.onSuccess?.();
+  const handleSuccess = useCallback((user: User) => {
+    options.onSuccess?.(user);
     closeAuthModal();
   }, [options, closeAuthModal]);
 
