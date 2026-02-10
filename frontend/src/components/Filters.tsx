@@ -145,11 +145,11 @@ export default function Filters({
         <div className="flex flex-wrap items-center gap-3 rounded-2xl bg-white px-4 py-3 shadow-md ring-1 ring-gray-100">
 
           {/* ── Type pills ── */}
-          {/* Outer wrapper is `relative` so the Meer dropdown can be positioned
-              outside the overflow-hidden container and won't be clipped. */}
-          <div className="relative flex min-w-0 items-center">
-            <div className="flex min-w-0 items-center overflow-hidden rounded-xl bg-slate-100 p-1">
-              <div className="flex min-w-0 items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {/* max-w-full prevents pills from exceeding viewport on mobile;
+              overflow-x-auto on the inner div enables horizontal swipe */}
+          <div className="relative min-w-0 max-w-full">
+            <div className="overflow-hidden rounded-xl bg-slate-100 p-1">
+              <div className="flex items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 <TypePill active={!filters.type} onClick={() => update({ type: "" })}>
                   Alle
                 </TypePill>
@@ -162,25 +162,25 @@ export default function Filters({
                     {t}
                   </TypePill>
                 ))}
-              </div>
 
-              {/* "Meer" button — inside bg container, shrink-0 so it stays visible */}
-              {meerTypes.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => toggle("meer")}
-                  className={`shrink-0 flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition whitespace-nowrap ${
-                    selectedTypeInMeer
-                      ? "bg-white text-cyan-700 shadow-sm ring-1 ring-slate-200"
-                      : activePopover === "meer"
-                        ? "bg-white/80 text-slate-600 shadow-sm"
-                        : "text-slate-500 hover:text-slate-700 hover:bg-white/50"
-                  }`}
-                >
-                  {selectedTypeInMeer ? filters.type : "Meer"}
-                  <ChevronDown className="h-3.5 w-3.5" />
-                </button>
-              )}
+                {/* "Meer" button — scrolls with the type pills */}
+                {meerTypes.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => toggle("meer")}
+                    className={`shrink-0 flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition whitespace-nowrap ${
+                      selectedTypeInMeer
+                        ? "bg-white text-cyan-700 shadow-sm ring-1 ring-slate-200"
+                        : activePopover === "meer"
+                          ? "bg-white/80 text-slate-600 shadow-sm"
+                          : "text-slate-500 hover:text-slate-700 hover:bg-white/50"
+                    }`}
+                  >
+                    {selectedTypeInMeer ? filters.type : "Meer"}
+                    <ChevronDown className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* "Meer" dropdown — outside overflow-hidden so it won't be clipped */}

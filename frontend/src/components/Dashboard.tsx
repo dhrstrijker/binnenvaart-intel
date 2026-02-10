@@ -367,7 +367,7 @@ export default function Dashboard() {
       <div className="sticky top-[var(--header-h,0px)] z-20 -mx-4 px-4 sm:-mx-6 sm:px-6 pt-2 pb-2 bg-gradient-to-b from-slate-50 from-80% to-transparent">
         {/* Collapsible wrapper — CSS grid for smooth height animation */}
         <div
-          className="grid transition-[grid-template-rows] duration-300 ease-in-out md:!grid-rows-[1fr]"
+          className="grid grid-cols-1 transition-[grid-template-rows] duration-300 ease-in-out md:!grid-rows-[1fr]"
           style={{ gridTemplateRows: filtersCollapsed ? "0fr" : "1fr" }}
           onTransitionEnd={handleGridTransitionEnd}
         >
