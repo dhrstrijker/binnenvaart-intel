@@ -150,7 +150,7 @@ def run_extraction(vessels: list[dict]) -> dict:
         signals = extract_signals(v)
         return v, signals
 
-    with ThreadPoolExecutor(max_workers=10) as executor:
+    with ThreadPoolExecutor(max_workers=2) as executor:
         futures = {executor.submit(process_one, v): v for v in to_process}
         for future in as_completed(futures):
             vessel, signals = future.result()

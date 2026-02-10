@@ -11,9 +11,11 @@ interface FavoriteButtonProps {
   className?: string;
   /** Pre-fetched favorite status from batch query. Skips per-card fetch when provided. */
   initialIsFavorite?: boolean;
+  /** Called after toggling with the new favorite state. */
+  onToggle?: (isFavorite: boolean) => void;
 }
 
-export default function FavoriteButton({ vesselId, user, className, initialIsFavorite }: FavoriteButtonProps) {
+export default function FavoriteButton({ vesselId, user, className, initialIsFavorite, onToggle }: FavoriteButtonProps) {
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite ?? false);
   const [loading, setLoading] = useState(false);
   const [animating, setAnimating] = useState(false);
@@ -61,8 +63,10 @@ export default function FavoriteButton({ vesselId, user, className, initialIsFav
       if (!user) {
         if (isLocalFav(vesselId)) {
           removeLocal(vesselId);
+          onToggle?.(false);
         } else {
           addLocal(vesselId);
+          onToggle?.(true);
         }
         return;
       }
@@ -74,6 +78,7 @@ export default function FavoriteButton({ vesselId, user, className, initialIsFav
       setLoading(true);
 
       const supabase = createClient();
+      let succeeded = true;
       try {
         if (prev) {
           const { error } = await supabase
@@ -81,19 +86,21 @@ export default function FavoriteButton({ vesselId, user, className, initialIsFav
             .delete()
             .eq("user_id", user.id)
             .eq("vessel_id", vesselId);
-          if (error) setIsFavorite(prev);
+          if (error) { setIsFavorite(prev); succeeded = false; }
         } else {
           const { error } = await supabase
             .from("favorites")
             .insert({ user_id: user.id, vessel_id: vesselId });
-          if (error) setIsFavorite(prev);
+          if (error) { setIsFavorite(prev); succeeded = false; }
         }
       } catch {
         setIsFavorite(prev);
+        succeeded = false;
       }
+      if (succeeded) onToggle?.(!prev);
       setLoading(false);
     },
-    [user, vesselId, isFavorite, loading, isLocalFav, addLocal, removeLocal]
+    [user, vesselId, isFavorite, loading, isLocalFav, addLocal, removeLocal, onToggle]
   );
 
   return (

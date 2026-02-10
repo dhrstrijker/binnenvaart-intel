@@ -4,6 +4,7 @@ import { AuthModalProvider } from "@/lib/AuthModalContext";
 import { NotificationModalProvider } from "@/lib/NotificationModalContext";
 import { LocalFavoritesProvider } from "@/lib/useLocalFavorites";
 import { ToastProvider } from "@/lib/ToastContext";
+import { WatchlistProvider } from "@/lib/WatchlistContext";
 import "./globals.css";
 
 const inter = Inter({
@@ -51,7 +52,9 @@ export default function RootLayout({
         <LocalFavoritesProvider>
           <AuthModalProvider>
             <NotificationModalProvider>
-              <ToastProvider>{children}</ToastProvider>
+              <ToastProvider>
+                <WatchlistProvider>{children}</WatchlistProvider>
+              </ToastProvider>
             </NotificationModalProvider>
           </AuthModalProvider>
         </LocalFavoritesProvider>

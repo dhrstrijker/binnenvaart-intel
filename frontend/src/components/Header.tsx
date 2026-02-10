@@ -25,7 +25,7 @@ export default function Header() {
   const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
 
   useOutsideClick(menuRef, closeMenu, menuOpen);
-  useOutsideClick(mobileNavRef, closeMobileNav, mobileNavOpen);
+  useOutsideClick(mobileNavRef, closeMobileNav, mobileNavOpen, [mobileToggleRef]);
 
   async function handleSignOut() {
     const supabase = createClient();
@@ -122,13 +122,15 @@ export default function Header() {
           )}
         </div>
 
-        {/* Mobile: Hamburger button */}
-        <button
-          ref={mobileToggleRef}
-          onClick={() => setMobileNavOpen(!mobileNavOpen)}
-          className="flex items-center justify-center rounded-lg p-2 text-cyan-200 transition hover:bg-white/10 hover:text-white md:hidden"
-          aria-label={mobileNavOpen ? "Menu sluiten" : "Menu openen"}
-        >
+        {/* Mobile: Bell + Hamburger button */}
+        <div className="flex items-center gap-1 md:hidden">
+          <NotificationsDropdown user={user} isPremium={isPremium} />
+          <button
+            ref={mobileToggleRef}
+            onClick={() => setMobileNavOpen(!mobileNavOpen)}
+            className="flex items-center justify-center rounded-lg p-2 text-cyan-200 transition hover:bg-white/10 hover:text-white"
+            aria-label={mobileNavOpen ? "Menu sluiten" : "Menu openen"}
+          >
           {mobileNavOpen ? (
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -138,7 +140,8 @@ export default function Header() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           )}
-        </button>
+          </button>
+        </div>
       </div>
 
       {/* Mobile navigation menu */}
@@ -148,10 +151,6 @@ export default function Header() {
             <NavLink href="/" onClick={() => setMobileNavOpen(false)}>Dashboard</NavLink>
             <NavLink href="/favorieten" onClick={() => setMobileNavOpen(false)}>Favorieten</NavLink>
           </nav>
-          {/* Mobile notifications */}
-          <div className="border-t border-white/10 px-4 py-3">
-            <NotificationsDropdown user={user} isPremium={isPremium} />
-          </div>
           <div className="border-t border-white/10 px-4 py-3">
             {user ? (
               <div className="flex flex-col gap-2">

@@ -8,6 +8,7 @@ import { useLocalFavorites } from "@/lib/useLocalFavorites";
 import { useAuthNudge } from "@/lib/useAuthNudge";
 import { useNotificationModal } from "@/lib/NotificationModalContext";
 import { useToast } from "@/lib/ToastContext";
+import { useWatchlistCount } from "@/lib/WatchlistContext";
 import { useSavedSearches } from "@/lib/useSavedSearches";
 import VesselCard from "./VesselCard";
 import SkeletonCard from "./SkeletonCard";
@@ -79,9 +80,15 @@ export default function Dashboard() {
   const { shouldShowNudge, dismissNudge } = useAuthNudge(localFavorites.length);
   const { openNotificationModal } = useNotificationModal();
   const { showToast } = useToast();
+  const { setWatchlistCount } = useWatchlistCount();
 
   // Data fetching
   const { vessels, priceHistoryMap, freeTierTrends, favoriteIds, watchlistIds, loading, error, user, isPremium } = useVesselData();
+
+  // Sync watchlist count to context for bell badge
+  useEffect(() => {
+    setWatchlistCount(watchlistIds.size);
+  }, [watchlistIds.size, setWatchlistCount]);
 
   // Saved searches hook
   const { saveSearch } = useSavedSearches(user, isPremium);

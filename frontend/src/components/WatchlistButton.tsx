@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useNotificationModal } from "@/lib/NotificationModalContext";
+import { useWatchlistCount } from "@/lib/WatchlistContext";
 import type { User } from "@supabase/supabase-js";
 
 interface WatchlistButtonProps {
@@ -19,6 +20,7 @@ export default function WatchlistButton({ vesselId, user, className, onToggle, i
   const [loading, setLoading] = useState(false);
   const [animating, setAnimating] = useState(false);
   const { openNotificationModal } = useNotificationModal();
+  const { bumpCount } = useWatchlistCount();
 
   // Sync with batch-provided value when it changes
   useEffect(() => {
@@ -60,6 +62,7 @@ export default function WatchlistButton({ vesselId, user, className, onToggle, i
           if (error) {
             setIsWatched(prev);
           } else {
+            bumpCount(-1);
             onToggle?.(vesselId, false);
           }
         } else {
@@ -69,6 +72,7 @@ export default function WatchlistButton({ vesselId, user, className, onToggle, i
           if (error) {
             setIsWatched(prev);
           } else {
+            bumpCount(1);
             onToggle?.(vesselId, true);
           }
         }
@@ -99,6 +103,7 @@ export default function WatchlistButton({ vesselId, user, className, onToggle, i
               .from("watchlist")
               .insert({ user_id: authUser.id, vessel_id: vesselId });
             setIsWatched(true);
+            bumpCount(1);
             onToggle?.(vesselId, true);
           },
         });

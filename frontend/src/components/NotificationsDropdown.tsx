@@ -7,6 +7,7 @@ import { useOutsideClick } from "@/lib/useOutsideClick";
 import { useEscapeKey } from "@/lib/useEscapeKey";
 import { useAuthModal } from "@/lib/AuthModalContext";
 import { useSavedSearches } from "@/lib/useSavedSearches";
+import { useWatchlistCount } from "@/lib/WatchlistContext";
 import { getFilterPills, generateSearchName } from "@/lib/savedSearchTypes";
 import { formatPrice } from "@/lib/formatting";
 import { sourceLabel } from "@/lib/sources";
@@ -36,8 +37,8 @@ export default function NotificationsDropdown({ user, isPremium }: Notifications
   const { openAuthModal } = useAuthModal();
 
   const { searches, loading: searchesLoading, activeCount, deleteSearch, toggleActive, canAddSearch, refresh: refreshSearches } = useSavedSearches(user, isPremium);
+  const { watchlistCount, setWatchlistCount } = useWatchlistCount();
 
-  const watchlistCount = watchlistItems.length;
   const totalCount = activeCount + watchlistCount;
 
   const close = useCallback(() => setOpen(false), []);
@@ -58,7 +59,9 @@ export default function NotificationsDropdown({ user, isPremium }: Notifications
       .eq("user_id", user.id)
       .order("added_at", { ascending: false })
       .then(({ data }) => {
-        setWatchlistItems((data as unknown as WatchlistVessel[]) ?? []);
+        const items = (data as unknown as WatchlistVessel[]) ?? [];
+        setWatchlistItems(items);
+        setWatchlistCount(items.length);
         setWatchlistLoading(false);
       });
   }, [open, user, refreshSearches]);
@@ -66,7 +69,11 @@ export default function NotificationsDropdown({ user, isPremium }: Notifications
   async function handleRemoveWatchlist(watchlistId: string) {
     const supabase = createClient();
     await supabase.from("watchlist").delete().eq("id", watchlistId);
-    setWatchlistItems((prev) => prev.filter((w) => w.id !== watchlistId));
+    setWatchlistItems((prev) => {
+      const next = prev.filter((w) => w.id !== watchlistId);
+      setWatchlistCount(next.length);
+      return next;
+    });
   }
 
   return (
