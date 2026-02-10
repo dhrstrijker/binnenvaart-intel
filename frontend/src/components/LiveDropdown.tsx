@@ -91,7 +91,7 @@ export default function LiveDropdown() {
       {/* Trigger: Live badge */}
       <button
         onClick={() => setOpen(!open)}
-        className="hidden cursor-pointer items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 transition hover:bg-white/15 sm:flex"
+        className="flex cursor-pointer items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 transition hover:bg-white/15"
       >
         <span className="relative flex h-2 w-2">
           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
