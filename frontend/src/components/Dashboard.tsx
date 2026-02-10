@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useVesselData } from "@/lib/useVesselData";
 import { useVesselFiltering } from "@/lib/useVesselFiltering";
 import { useInfiniteScroll } from "@/lib/useInfiniteScroll";
@@ -289,6 +289,26 @@ export default function Dashboard() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
+  // Toggle overflow on the grid child: hidden during collapse/transition,
+  // visible when fully expanded so popovers aren't clipped.
+  const gridChildRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    if (filtersCollapsed && gridChildRef.current) {
+      gridChildRef.current.style.overflow = "hidden";
+    }
+  }, [filtersCollapsed]);
+
+  const handleGridTransitionEnd = useCallback(
+    (e: React.TransitionEvent) => {
+      if (e.propertyName !== "grid-template-rows") return;
+      if (!filtersCollapsed && gridChildRef.current) {
+        gridChildRef.current.style.overflow = "";
+      }
+    },
+    [filtersCollapsed],
+  );
+
   const handleFilterUpdate = useCallback(
     (partial: Partial<FilterState>) => {
       setFilters((prev) => ({ ...prev, ...partial }));
@@ -333,8 +353,9 @@ export default function Dashboard() {
         <div
           className="grid transition-[grid-template-rows] duration-300 ease-in-out md:!grid-rows-[1fr]"
           style={{ gridTemplateRows: filtersCollapsed ? "0fr" : "1fr" }}
+          onTransitionEnd={handleGridTransitionEnd}
         >
-          <div className="overflow-hidden">
+          <div ref={gridChildRef} className="min-h-0">
             <Filters
               filters={filters}
               onFilterChange={setFilters}
