@@ -97,7 +97,7 @@ export default function FavoritesDropdown({ user }: FavoritesDropdownProps) {
 
       {/* Dropdown */}
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-80 rounded-2xl bg-white shadow-xl ring-1 ring-gray-100">
+        <div className="fixed inset-x-4 top-16 z-50 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-80 rounded-2xl bg-white shadow-xl ring-1 ring-gray-100">
           {!user && localFavorites.length === 0 ? (
             <div className="p-5 text-center">
               <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-red-50">

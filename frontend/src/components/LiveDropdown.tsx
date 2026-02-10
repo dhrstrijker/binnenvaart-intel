@@ -102,7 +102,7 @@ export default function LiveDropdown() {
 
       {/* Dropdown panel */}
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-80 rounded-2xl bg-white shadow-xl ring-1 ring-gray-100">
+        <div className="fixed inset-x-4 top-16 z-50 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-80 rounded-2xl bg-white shadow-xl ring-1 ring-gray-100">
           <div className="p-4 pb-2">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
               Laatste wijzigingen
