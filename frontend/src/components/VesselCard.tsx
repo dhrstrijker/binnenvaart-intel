@@ -63,7 +63,7 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
       />
 
       {/* Image */}
-      <div className="relative z-10 pointer-events-none aspect-[16/10] w-full bg-slate-100 overflow-hidden">
+      <div className="relative z-10 pointer-events-none aspect-[2/1] w-full bg-slate-100 overflow-hidden">
         {vessel.image_url && !imgError ? (
           <Image
             src={vessel.image_url}
