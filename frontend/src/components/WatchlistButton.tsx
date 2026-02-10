@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useNotificationModal } from "@/lib/NotificationModalContext";
 import { useWatchlistCount } from "@/lib/WatchlistContext";
+import { useFlyingAnimation } from "@/lib/FlyingAnimationContext";
 import type { User } from "@supabase/supabase-js";
 
 interface WatchlistButtonProps {
@@ -21,6 +22,8 @@ export default function WatchlistButton({ vesselId, user, className, onToggle, i
   const [animating, setAnimating] = useState(false);
   const { openNotificationModal } = useNotificationModal();
   const { bumpCount } = useWatchlistCount();
+  const flyingCtx = useFlyingAnimation();
+  const btnRef = useRef<HTMLButtonElement>(null);
 
   // Sync with batch-provided value when it changes
   useEffect(() => {
@@ -74,6 +77,9 @@ export default function WatchlistButton({ vesselId, user, className, onToggle, i
           } else {
             bumpCount(1);
             onToggle?.(vesselId, true);
+            if (flyingCtx && btnRef.current) {
+              flyingCtx.flyTo("notifications", btnRef.current.getBoundingClientRect(), "bell");
+            }
           }
         }
       } catch {
@@ -105,6 +111,9 @@ export default function WatchlistButton({ vesselId, user, className, onToggle, i
             setIsWatched(true);
             bumpCount(1);
             onToggle?.(vesselId, true);
+            if (flyingCtx && btnRef.current) {
+              flyingCtx.flyTo("notifications", btnRef.current.getBoundingClientRect(), "bell");
+            }
           },
         });
         return;
@@ -117,6 +126,7 @@ export default function WatchlistButton({ vesselId, user, className, onToggle, i
 
   return (
     <button
+      ref={btnRef}
       onClick={toggle}
       disabled={loading}
       className={className ?? `flex h-8 w-8 items-center justify-center rounded-full transition-colors disabled:opacity-50 ${isWatched ? "text-amber-500 hover:text-amber-600" : "text-slate-400 hover:text-amber-500"}`}

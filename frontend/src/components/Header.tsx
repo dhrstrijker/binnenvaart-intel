@@ -7,9 +7,12 @@ import { createClient } from "@/lib/supabase/client";
 import NavisioLogo from "./NavisioLogo";
 import NavLink from "./NavLink";
 import NotificationsDropdown from "./NotificationsDropdown";
+import LiveDropdown from "./LiveDropdown";
 import { useAuthModal } from "@/lib/AuthModalContext";
 import { useOutsideClick } from "@/lib/useOutsideClick";
 import { useSubscription } from "@/lib/useSubscription";
+import { useFlyingAnimation } from "@/lib/FlyingAnimationContext";
+import { useLocalFavorites } from "@/lib/useLocalFavorites";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -20,8 +23,33 @@ export default function Header() {
   const router = useRouter();
   const { openAuthModal } = useAuthModal();
   const { user, isPremium } = useSubscription();
+  const flyingCtx = useFlyingAnimation();
+  const { localFavorites } = useLocalFavorites();
 
   const headerRef = useRef<HTMLElement>(null);
+  const favoritesTargetRef = useRef<HTMLSpanElement>(null);
+  const notificationsTargetRef = useRef<HTMLSpanElement>(null);
+  const [authFavCount, setAuthFavCount] = useState(0);
+
+  // Fetch favorites count for logged-in users
+  useEffect(() => {
+    if (!user) { setAuthFavCount(0); return; }
+    const supabase = createClient();
+    supabase
+      .from("favorites")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .then(({ count }) => setAuthFavCount(count ?? 0));
+  }, [user]);
+
+  const favoritesCount = user ? authFavCount : localFavorites.length;
+
+  // Register flying animation targets
+  useEffect(() => {
+    if (!flyingCtx) return;
+    flyingCtx.registerTarget("favorites", () => favoritesTargetRef.current?.getBoundingClientRect() ?? null);
+    flyingCtx.registerTarget("notifications", () => notificationsTargetRef.current?.getBoundingClientRect() ?? null);
+  }, [flyingCtx]);
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
   const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
@@ -71,19 +99,35 @@ export default function Header() {
         <div className="hidden items-center gap-4 md:flex">
           <nav className="flex items-center gap-2">
             <NavLink href="/">Dashboard</NavLink>
-            <NavLink href="/favorieten">Favorieten</NavLink>
           </nav>
 
-          {/* Notifications dropdown */}
-          <NotificationsDropdown user={user} isPremium={isPremium} />
+          {/* Favorites heart icon */}
+          <span ref={favoritesTargetRef} data-fly-target="favorites">
+            <Link
+              href="/favorieten"
+              className="relative flex h-8 w-8 items-center justify-center rounded-full text-cyan-200 transition hover:bg-white/10 hover:text-white"
+              title="Favorieten"
+            >
+              <svg className="h-5 w-5 fav-outline" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+              </svg>
+              <svg className="h-5 w-5 fav-filled hidden" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+              </svg>
+              {favoritesCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                  {favoritesCount}
+                </span>
+              )}
+            </Link>
+          </span>
 
-          <div className="hidden items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 sm:flex">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-            </span>
-            <span className="text-xs font-medium text-cyan-100">Live</span>
-          </div>
+          {/* Notifications dropdown */}
+          <span ref={notificationsTargetRef} data-fly-target="notifications">
+            <NotificationsDropdown user={user} isPremium={isPremium} />
+          </span>
+
+          <LiveDropdown />
 
           {/* Auth buttons */}
           {user ? (
@@ -165,7 +209,19 @@ export default function Header() {
         <div ref={mobileNavRef} className="border-t border-white/10 md:hidden">
           <nav className="flex flex-col gap-1 px-4 py-3">
             <NavLink href="/" onClick={() => setMobileNavOpen(false)}>Dashboard</NavLink>
-            <NavLink href="/favorieten" onClick={() => setMobileNavOpen(false)}>Favorieten</NavLink>
+            <NavLink href="/favorieten" onClick={() => setMobileNavOpen(false)}>
+              <span className="inline-flex items-center gap-2">
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                </svg>
+                Favorieten
+                {favoritesCount > 0 && (
+                  <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                    {favoritesCount}
+                  </span>
+                )}
+              </span>
+            </NavLink>
           </nav>
           <div className="border-t border-white/10 px-4 py-3">
             {user ? (

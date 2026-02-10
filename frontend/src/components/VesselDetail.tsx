@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import { Vessel, PriceHistory } from "@/lib/supabase";
 import { sourceLabel, safeUrl } from "@/lib/sources";
@@ -29,12 +30,23 @@ export default function VesselDetail({ vessel, history, isPremium = false, onClo
       : null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 backdrop-blur-sm p-4 sm:p-8">
+    <motion.div
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 sm:p-8"
+      initial={{ backgroundColor: "rgba(0,0,0,0)" }}
+      animate={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+      transition={{ duration: 0.2 }}
+      style={{ backdropFilter: "blur(4px)" }}
+    >
       {/* Backdrop click */}
       <div className="absolute inset-0" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative w-full max-w-2xl rounded-2xl bg-white shadow-2xl ring-1 ring-gray-100 animate-in fade-in zoom-in-95 my-4">
+      <motion.div
+        className="relative w-full max-w-2xl rounded-2xl bg-white shadow-2xl ring-1 ring-gray-100 my-4"
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 300, damping: 25, mass: 0.8 }}
+      >
         {/* Close button */}
         <button
           onClick={onClose}
@@ -239,8 +251,8 @@ export default function VesselDetail({ vessel, history, isPremium = false, onClo
             )}
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 

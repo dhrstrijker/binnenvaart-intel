@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useLocalFavorites } from "@/lib/useLocalFavorites";
+import { useFlyingAnimation } from "@/lib/FlyingAnimationContext";
 import type { User } from "@supabase/supabase-js";
 
 interface FavoriteButtonProps {
@@ -20,6 +21,8 @@ export default function FavoriteButton({ vesselId, user, className, initialIsFav
   const [loading, setLoading] = useState(false);
   const [animating, setAnimating] = useState(false);
   const { isLocalFav, addLocal, removeLocal, migrateToSupabase } = useLocalFavorites();
+  const flyingCtx = useFlyingAnimation();
+  const btnRef = useRef<HTMLButtonElement>(null);
 
   // Sync with batch-provided value when it changes
   useEffect(() => {
@@ -67,6 +70,9 @@ export default function FavoriteButton({ vesselId, user, className, initialIsFav
         } else {
           addLocal(vesselId);
           onToggle?.(true);
+          if (flyingCtx && btnRef.current) {
+            flyingCtx.flyTo("favorites", btnRef.current.getBoundingClientRect(), "heart");
+          }
         }
         return;
       }
@@ -97,14 +103,20 @@ export default function FavoriteButton({ vesselId, user, className, initialIsFav
         setIsFavorite(prev);
         succeeded = false;
       }
-      if (succeeded) onToggle?.(!prev);
+      if (succeeded) {
+        onToggle?.(!prev);
+        if (!prev && flyingCtx && btnRef.current) {
+          flyingCtx.flyTo("favorites", btnRef.current.getBoundingClientRect(), "heart");
+        }
+      }
       setLoading(false);
     },
-    [user, vesselId, isFavorite, loading, isLocalFav, addLocal, removeLocal, onToggle]
+    [user, vesselId, isFavorite, loading, isLocalFav, addLocal, removeLocal, onToggle, flyingCtx]
   );
 
   return (
     <button
+      ref={btnRef}
       onClick={toggle}
       disabled={loading}
       className={className ?? "flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:text-red-500 disabled:opacity-50"}

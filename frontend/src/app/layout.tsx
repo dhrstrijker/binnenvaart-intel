@@ -5,6 +5,7 @@ import { NotificationModalProvider } from "@/lib/NotificationModalContext";
 import { LocalFavoritesProvider } from "@/lib/useLocalFavorites";
 import { ToastProvider } from "@/lib/ToastContext";
 import { WatchlistProvider } from "@/lib/WatchlistContext";
+import { FlyingAnimationProvider } from "@/lib/FlyingAnimationContext";
 import "./globals.css";
 
 const inter = Inter({
@@ -53,7 +54,9 @@ export default function RootLayout({
           <AuthModalProvider>
             <NotificationModalProvider>
               <ToastProvider>
-                <WatchlistProvider>{children}</WatchlistProvider>
+                <WatchlistProvider>
+                  <FlyingAnimationProvider>{children}</FlyingAnimationProvider>
+                </WatchlistProvider>
               </ToastProvider>
             </NotificationModalProvider>
           </AuthModalProvider>

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Vessel, PriceHistory } from "@/lib/supabase";
@@ -13,6 +13,7 @@ import { DealScore } from "@/lib/dealScore";
 import DealScoreBadge from "./DealScoreBadge";
 import { computeDaysOnMarket, formatDaysOnMarket, PriceRange, getConfidenceLevel } from "@/lib/vesselPricing";
 import { formatPrice } from "@/lib/formatting";
+import { useCountUp } from "@/lib/useCountUp";
 
 function isNew(firstSeenAt: string): boolean {
   const sevenDaysAgo = new Date();
@@ -48,6 +49,31 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
   const [imgError, setImgError] = React.useState(false);
   const trend = getPriceTrend(priceHistory);
   const effectiveTrend = trend ?? freeTierTrend ?? null;
+
+  // Price counter roll-up
+  const priceRef = useRef<HTMLSpanElement>(null);
+  const [priceInView, setPriceInView] = useState(false);
+
+  useEffect(() => {
+    const el = priceRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setPriceInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const animatedPrice = useCountUp(vessel.price ?? 0, {
+    duration: 800,
+    enabled: priceInView && vessel.price !== null && vessel.price > 0,
+  });
 
   return (
     <div
@@ -187,15 +213,15 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
         <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
           <div className="flex items-center gap-2">
             {vessel.price !== null ? (
-              <span className="text-xl font-extrabold text-slate-900">
-                {formatPrice(vessel.price)}
+              <span ref={priceRef} className="text-xl font-extrabold text-slate-900">
+                {formatPrice(animatedPrice)}
               </span>
             ) : estimatedRange ? (
               <span className="text-lg font-extrabold text-slate-400 italic" title="Geschatte prijsrange">
                 {formatPrice(estimatedRange.low)} – {formatPrice(estimatedRange.high)}
               </span>
             ) : (
-              <span className="text-xl font-extrabold text-slate-900">
+              <span ref={priceRef} className="text-xl font-extrabold text-slate-900">
                 Prijs op aanvraag
               </span>
             )}

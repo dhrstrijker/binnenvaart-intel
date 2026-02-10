@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useVesselData } from "@/lib/useVesselData";
 import { useVesselFiltering } from "@/lib/useVesselFiltering";
 import { useInfiniteScroll } from "@/lib/useInfiniteScroll";
@@ -447,20 +448,36 @@ export default function Dashboard() {
       {!loading && filtered.length > 0 && (
         <>
           <div id="vessel-results" className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {visibleVessels.map((vessel) => (
-              <VesselCard
-                key={vessel.id}
-                vessel={vessel}
-                priceHistory={priceHistoryMap[vessel.id] ?? []}
-                isPremium={isPremium}
-                user={user}
-                freeTierTrend={freeTierTrends[vessel.id] ?? null}
-                dealScore={dealScores.get(vessel.id)}
-                estimatedRange={estimatedRanges.get(vessel.id) ?? null}
-                isFavorite={favoriteIds.has(vessel.id)}
-                isWatched={watchlistIds.has(vessel.id)}
-              />
-            ))}
+            <AnimatePresence mode="popLayout">
+              {visibleVessels.map((vessel, index) => (
+                <motion.div
+                  key={vessel.id}
+                  layout
+                  layoutId={vessel.id}
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{
+                    duration: 0.4,
+                    delay: Math.min(index, 11) * 0.05,
+                    layout: { type: "spring", stiffness: 300, damping: 30 },
+                  }}
+                  viewport={{ once: true, amount: 0.1 }}
+                >
+                  <VesselCard
+                    vessel={vessel}
+                    priceHistory={priceHistoryMap[vessel.id] ?? []}
+                    isPremium={isPremium}
+                    user={user}
+                    freeTierTrend={freeTierTrends[vessel.id] ?? null}
+                    dealScore={dealScores.get(vessel.id)}
+                    estimatedRange={estimatedRanges.get(vessel.id) ?? null}
+                    isFavorite={favoriteIds.has(vessel.id)}
+                    isWatched={watchlistIds.has(vessel.id)}
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
 
           {/* Scroll sentinel + loading indicator */}
