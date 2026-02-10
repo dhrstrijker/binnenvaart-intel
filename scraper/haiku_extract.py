@@ -11,7 +11,6 @@ import hashlib
 import json
 import logging
 import os
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 try:
     import anthropic
@@ -19,6 +18,7 @@ except ImportError:
     anthropic = None  # type: ignore[assignment]
 
 from db import supabase
+from rate_limiter import call_anthropic_with_rate_limit
 
 logger = logging.getLogger(__name__)
 
@@ -85,8 +85,10 @@ def extract_signals(vessel: dict) -> dict | None:
     )
 
     try:
-        client = anthropic.Anthropic()
-        response = client.messages.create(
+        client = anthropic.Anthropic(max_retries=0)
+        response = call_anthropic_with_rate_limit(
+            client,
+            estimated_output_tokens=400,
             model="claude-haiku-4-5-20251001",
             max_tokens=500,
             messages=[
@@ -146,31 +148,25 @@ def run_extraction(vessels: list[dict]) -> dict:
     if not to_process:
         return {"extracted": 0, "skipped": skipped, "errors": 0}
 
-    def process_one(v: dict) -> tuple[dict, dict | None]:
+    for v in to_process:
         signals = extract_signals(v)
-        return v, signals
+        vessel_id = v.get("id")
+        new_hash = v.get("_new_hash")
 
-    with ThreadPoolExecutor(max_workers=2) as executor:
-        futures = {executor.submit(process_one, v): v for v in to_process}
-        for future in as_completed(futures):
-            vessel, signals = future.result()
-            vessel_id = vessel.get("id")
-            new_hash = vessel.get("_new_hash")
+        if signals is None:
+            errors += 1
+            continue
 
-            if signals is None:
-                errors += 1
-                continue
-
-            try:
-                supabase.table("vessels").update({
-                    "condition_signals": signals,
-                    "condition_signals_hash": new_hash,
-                }).eq("id", vessel_id).execute()
-                vessel["condition_signals"] = signals
-                extracted += 1
-            except Exception:
-                logger.exception("Failed to save signals for %s", vessel.get("name"))
-                errors += 1
+        try:
+            supabase.table("vessels").update({
+                "condition_signals": signals,
+                "condition_signals_hash": new_hash,
+            }).eq("id", vessel_id).execute()
+            v["condition_signals"] = signals
+            extracted += 1
+        except Exception:
+            logger.exception("Failed to save signals for %s", v.get("name"))
+            errors += 1
 
     logger.info(
         "Condition extraction done: %d extracted, %d skipped, %d errors",
