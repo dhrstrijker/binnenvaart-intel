@@ -71,7 +71,8 @@ export function computeDaysOnMarket(firstSeenAt: string): number {
 }
 
 export function formatDaysOnMarket(days: number): string {
-  if (days <= 3) return "Nieuw";
+  if (days === 0) return "Vandaag";
+  if (days === 1) return "1 dag";
   if (days < 60) return `${days} dagen`;
   const months = Math.floor(days / 30);
   return `${months} maanden`;

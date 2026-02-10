@@ -15,10 +15,14 @@ import { computeDaysOnMarket, formatDaysOnMarket, PriceRange, getConfidenceLevel
 import { formatPrice } from "@/lib/formatting";
 import { useCountUp } from "@/lib/useCountUp";
 
-function isNew(firstSeenAt: string): boolean {
-  const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-  return new Date(firstSeenAt) > sevenDaysAgo;
+function formatNewBadge(firstSeenAt: string): string | null {
+  const first = new Date(firstSeenAt);
+  const now = new Date();
+  const days = Math.max(0, Math.floor((now.getTime() - first.getTime()) / 86_400_000));
+  if (days === 0) return "Vandaag toegevoegd";
+  if (days === 1) return "Gisteren toegevoegd";
+  if (days <= 7) return `${days} dagen geleden`;
+  return null;
 }
 
 type PriceTrend = "down" | "up" | "unchanged" | null;
@@ -110,11 +114,14 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
               NIET MEER BESCHIKBAAR
             </span>
           )}
-          {vessel.status !== "removed" && vessel.status !== "sold" && isNew(vessel.first_seen_at) && (
-            <span className="rounded-md bg-emerald-500 px-2 py-0.5 text-xs font-bold text-white shadow-sm">
-              NIEUW
-            </span>
-          )}
+          {vessel.status !== "removed" && vessel.status !== "sold" && (() => {
+            const label = formatNewBadge(vessel.first_seen_at);
+            return label ? (
+              <span className="rounded-md bg-emerald-500 px-2 py-0.5 text-xs font-bold text-white shadow-sm">
+                {label}
+              </span>
+            ) : null;
+          })()}
         </div>
 
         {/* Source badge */}
