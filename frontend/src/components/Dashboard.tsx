@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useVesselData } from "@/lib/useVesselData";
 import { useVesselFiltering } from "@/lib/useVesselFiltering";
@@ -260,7 +260,7 @@ export default function Dashboard() {
   );
 
   // Collapsible filter bar (mobile only)
-  const scrollDir = useScrollDirection();
+  const scrollDir = useScrollDirection(18);
   const [filtersCollapsed, setFiltersCollapsed] = useState(false);
   const popoverOpenRef = useRef(false);
 
@@ -270,7 +270,8 @@ export default function Dashboard() {
     if (open) setFiltersCollapsed(false);
   }, []);
 
-  // Auto-collapse/expand on scroll (mobile only)
+  // Auto-collapse/expand on scroll (mobile only).
+  // Filter bar visibility is transform-based, so cards don't jump when it reappears.
   useEffect(() => {
     // Only collapse on mobile
     const isMobile = window.innerWidth < 768;
@@ -288,6 +289,8 @@ export default function Dashboard() {
     }
   }, [scrollDir]);
 
+  const panelInFlow = !filtersCollapsed && scrollDir === null;
+
   // Expand on resize to desktop
   useEffect(() => {
     function onResize() {
@@ -296,26 +299,6 @@ export default function Dashboard() {
     window.addEventListener("resize", onResize, { passive: true });
     return () => window.removeEventListener("resize", onResize);
   }, []);
-
-  // Toggle overflow on the grid child: hidden during collapse/transition,
-  // visible when fully expanded so popovers aren't clipped.
-  const gridChildRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    if (filtersCollapsed && gridChildRef.current) {
-      gridChildRef.current.style.overflow = "hidden";
-    }
-  }, [filtersCollapsed]);
-
-  const handleGridTransitionEnd = useCallback(
-    (e: React.TransitionEvent) => {
-      if (e.propertyName !== "grid-template-rows") return;
-      if (!filtersCollapsed && gridChildRef.current) {
-        gridChildRef.current.style.overflow = "";
-      }
-    },
-    [filtersCollapsed],
-  );
 
   const handleFilterUpdate = useCallback(
     (partial: Partial<FilterState>) => {
@@ -365,13 +348,18 @@ export default function Dashboard() {
       <h1 className="sr-only">Binnenvaartschepen te koop</h1>
       {/* Filters — collapsible on mobile scroll */}
       <div className="sticky top-[var(--header-h,0px)] z-20 -mx-4 px-4 sm:-mx-6 sm:px-6 pt-2 pb-2 bg-gradient-to-b from-slate-50 from-80% to-transparent">
-        {/* Collapsible wrapper — CSS grid for smooth height animation */}
-        <div
-          className="grid grid-cols-1 transition-[grid-template-rows] duration-300 ease-in-out md:!grid-rows-[1fr]"
-          style={{ gridTemplateRows: filtersCollapsed ? "0fr" : "1fr" }}
-          onTransitionEnd={handleGridTransitionEnd}
-        >
-          <div ref={gridChildRef} className="min-h-0">
+        <div className="relative">
+          {/* Keep the panel in flow only near top; elsewhere render as overlay
+              so scroll-up auto-expand doesn't push cards down. */}
+          <div
+            className={`z-30 transition-all duration-300 ease-in-out ${
+              panelInFlow ? "relative" : "absolute left-0 right-0 top-0"
+            } ${
+              filtersCollapsed
+                ? "pointer-events-none -translate-y-[calc(100%+0.75rem)] opacity-0"
+                : "translate-y-0 opacity-100"
+            }`}
+          >
             <Filters
               filters={filters}
               onFilterChange={setFilters}
@@ -382,30 +370,30 @@ export default function Dashboard() {
               onPopoverChange={handlePopoverChange}
             />
           </div>
-        </div>
 
-        {/* Peek tab — visible on mobile when collapsed */}
-        <button
-          type="button"
-          onClick={() => setFiltersCollapsed(false)}
-          className={`flex w-full items-center justify-center gap-1.5 rounded-b-xl bg-white py-1.5 text-xs font-medium text-slate-500 shadow-md ring-1 ring-gray-100 transition-all duration-300 md:hidden ${
-            filtersCollapsed
-              ? "translate-y-0 opacity-100"
-              : "pointer-events-none -translate-y-1 opacity-0"
-          }`}
-          aria-label="Filters tonen"
-        >
-          <svg
-            className="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
+          {/* Peek tab — absolutely positioned so it doesn't affect layout when hidden */}
+          <button
+            type="button"
+            onClick={() => setFiltersCollapsed(false)}
+            className={`absolute left-0 right-0 top-full mx-auto flex w-full items-center justify-center gap-1.5 rounded-b-xl bg-white py-1.5 text-xs font-medium text-slate-500 shadow-md ring-1 ring-gray-100 transition-all duration-300 md:hidden ${
+              filtersCollapsed
+                ? "translate-y-0 opacity-100"
+                : "pointer-events-none -translate-y-1 opacity-0"
+            }`}
+            aria-label="Filters tonen"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-          </svg>
-          Filters
-        </button>
+            <svg
+              className="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+            Filters
+          </button>
+        </div>
 
         {/* Active filter chips — always visible */}
         <div className="mt-1">
