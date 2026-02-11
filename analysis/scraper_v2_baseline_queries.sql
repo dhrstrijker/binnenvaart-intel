@@ -62,7 +62,6 @@ WITH v1 AS (
     source,
     created_at,
     vessel_count,
-    removed_count,
     row_number() OVER (PARTITION BY source ORDER BY created_at DESC) AS rn
   FROM scraper_runs
   WHERE created_at >= now() - interval '7 days'
@@ -85,9 +84,7 @@ paired AS (
     v2.is_healthy,
     v2.staged_count,
     v1.vessel_count,
-    v2.removed_count AS v2_removed,
-    v1.removed_count AS v1_removed,
-    (v2.removed_count - v1.removed_count) AS removed_delta,
+    v2.removed_count,
     CASE
       WHEN v1.vessel_count = 0 THEN NULL
       ELSE (abs(v2.staged_count - v1.vessel_count)::numeric / v1.vessel_count::numeric)
@@ -99,10 +96,10 @@ guarded AS (
   SELECT
     p.*,
     (
-      abs(p.removed_delta) > 0
+      p.removed_count > 0
       AND p.is_healthy
       AND COALESCE(lag(p.is_healthy) OVER (PARTITION BY p.source ORDER BY p.started_at), false)
-      AND COALESCE(abs(lag(p.removed_delta) OVER (PARTITION BY p.source ORDER BY p.started_at)) > 0, false)
+      AND COALESCE(lag(p.removed_count) OVER (PARTITION BY p.source ORDER BY p.started_at) > 0, false)
     ) AS removed_parity_breach_guarded
   FROM paired p
 )
@@ -112,9 +109,7 @@ SELECT
   is_healthy,
   staged_count AS v2_count,
   vessel_count AS v1_count,
-  v2_removed,
-  v1_removed,
-  removed_delta,
+  removed_count AS v2_removed,
   removed_parity_breach_guarded,
   round(vessel_delta_ratio * 100, 2) AS vessel_pct_delta
 FROM guarded
@@ -126,7 +121,6 @@ WITH v1 AS (
     source,
     created_at,
     vessel_count,
-    removed_count,
     row_number() OVER (PARTITION BY source ORDER BY created_at DESC) AS rn
   FROM scraper_runs
   WHERE created_at >= now() - interval '7 days'
@@ -149,7 +143,7 @@ paired AS (
     v2.is_healthy,
     v2.staged_count,
     v1.vessel_count,
-    (v2.removed_count - v1.removed_count) AS removed_delta,
+    v2.removed_count,
     CASE
       WHEN v1.vessel_count = 0 THEN NULL
       ELSE (abs(v2.staged_count - v1.vessel_count)::numeric / v1.vessel_count::numeric)
@@ -161,10 +155,10 @@ passes AS (
   SELECT
     p.*,
     (
-      abs(p.removed_delta) > 0
+      p.removed_count > 0
       AND p.is_healthy
       AND COALESCE(lag(p.is_healthy) OVER (PARTITION BY p.source ORDER BY p.started_at), false)
-      AND COALESCE(abs(lag(p.removed_delta) OVER (PARTITION BY p.source ORDER BY p.started_at)) > 0, false)
+      AND COALESCE(lag(p.removed_count) OVER (PARTITION BY p.source ORDER BY p.started_at) > 0, false)
     ) AS removed_parity_breach_guarded,
     (
       p.is_healthy
