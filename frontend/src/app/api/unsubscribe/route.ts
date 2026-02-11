@@ -18,14 +18,23 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  const { error } = await getAdminClient()
+  const { data, error } = await getAdminClient()
     .from("notification_subscribers")
     .update({ active: false })
-    .eq("unsubscribe_token", token);
+    .eq("unsubscribe_token", token)
+    .select("id")
+    .maybeSingle();
 
   if (error) {
     return new NextResponse(htmlPage("Er ging iets mis. Probeer het later opnieuw."), {
       status: 500,
+      headers: { "Content-Type": "text/html; charset=utf-8" },
+    });
+  }
+
+  if (!data) {
+    return new NextResponse(htmlPage("Ongeldige link."), {
+      status: 400,
       headers: { "Content-Type": "text/html; charset=utf-8" },
     });
   }
