@@ -371,7 +371,7 @@ AS $$
 BEGIN
     RETURN QUERY
     WITH picked AS (
-        SELECT q.id
+        SELECT q.id AS picked_id
         FROM scrape_detail_queue_v3 q
         WHERE q.status = 'pending'
           AND q.next_attempt_at <= NOW()
@@ -385,7 +385,7 @@ BEGIN
                locked_at = NOW(),
                locked_by = CONCAT('db-', pg_backend_pid()::text),
                updated_at = NOW()
-         WHERE q.id IN (SELECT id FROM picked)
+         WHERE q.id IN (SELECT p.picked_id FROM picked p)
          RETURNING q.id, q.source, q.source_id, q.listing_payload, q.attempt_count, q.max_attempts, q.listing_fingerprint
     )
     SELECT * FROM claimed;
