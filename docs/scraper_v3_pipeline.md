@@ -65,7 +65,7 @@ This document explains the V3 sidecar pipeline designed for lower notification l
 - `.github/workflows/scrape-v3-detail-worker.yml` (`*/15 * * * *`)
 - `.github/workflows/scrape-v3-reconcile.yml` (`0 */6 * * *`)
 
-All V3 workflows are currently configured in `shadow` mode by default.
+V3 workflows are currently configured in `authoritative` mode.
 
 ## Runtime Flags
 
@@ -76,6 +76,12 @@ All V3 workflows are currently configured in `shadow` mode by default.
 - `PIPELINE_V3_MAX_QUEUE_AGE_MINUTES=60`
 - `PIPELINE_V3_RECONCILE_REMOVE_MISSES=2`
 - `PIPELINE_V3_RUN_POST_INGESTION=off|on` (used by reconcile)
+- `PIPELINE_V3_MAX_LISTING_PAGES=20` (optional hard ceiling for paginated listing fetches)
+- `SCRAPER_HTTP_MIN_INTERVAL_SECONDS=1.0` (global request spacing)
+- `SCRAPER_HTTP_MIN_INTERVAL_BY_HOST=host=seconds,...` (host override)
+- `SCRAPER_HTTP_JITTER_RATIO=0.2`
+- `SCRAPER_HTTP_JITTER_MAX_SECONDS=0.35`
+- `SCRAPER_HTTP_RESPECT_ROBOTS=1` (enforce `crawl-delay` when published)
 
 ## Local Execution
 

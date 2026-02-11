@@ -3,6 +3,7 @@ import time
 
 from scrape_gsk import PAGE_SIZE, GRAPHQL_URL, QUERY, _fetch_with_retry, parse_vessel, _fetch_detail
 from v2.sources.contracts import new_detail_metrics, new_listing_metrics
+from v2.sources.pagination import resolve_listing_page_cap
 
 logger = logging.getLogger(__name__)
 
@@ -14,10 +15,14 @@ class GSKAdapter:
     def scrape_listing(self) -> tuple[list[dict], dict]:
         metrics = new_listing_metrics()
         rows: list[dict] = []
+        max_pages = resolve_listing_page_cap(self.source_key, default_cap=None)
+        pages_fetched = 0
 
         skip = 0
         total_count = None
         while True:
+            if max_pages is not None and pages_fetched >= max_pages:
+                break
             metrics["external_requests"] += 1
             resp = _fetch_with_retry(
                 GRAPHQL_URL,
@@ -47,6 +52,7 @@ class GSKAdapter:
                 rows.append(parsed)
 
             skip += PAGE_SIZE
+            pages_fetched += 1
             if skip >= (total_count or 0):
                 break
 
