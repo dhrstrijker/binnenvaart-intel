@@ -45,6 +45,47 @@ V2 operational docs:
 - `docs/scraper_v2_pipeline.md`
 - `docs/scraper_v2_cleanup_plan.md`
 
+#### Scraper v3 (detect/detail-worker/reconcile)
+
+V3 runs as a sidecar pipeline with three run types:
+
+- `detect` (every 15 minutes target cadence)
+- `detail-worker` (every 15 minutes target cadence)
+- `reconcile` (every 6 hours target cadence)
+
+Local examples:
+
+```bash
+# detect
+PIPELINE_V3_MODE=shadow \
+PIPELINE_V3_NOTIFICATIONS=off \
+PIPELINE_V3_SOURCES=galle \
+python v3/main_v3.py --run-type detect
+
+# detail worker
+PIPELINE_V3_MODE=shadow \
+PIPELINE_V3_NOTIFICATIONS=off \
+PIPELINE_V3_SOURCES=galle \
+python v3/main_v3.py --run-type detail-worker
+
+# reconcile
+PIPELINE_V3_MODE=shadow \
+PIPELINE_V3_NOTIFICATIONS=off \
+PIPELINE_V3_SOURCES=galle \
+python v3/main_v3.py --run-type reconcile
+```
+
+- `PIPELINE_V3_MODE=shadow|authoritative`
+- `PIPELINE_V3_NOTIFICATIONS=off|on`
+- `PIPELINE_V3_SOURCES` comma-separated source allowlist
+- `PIPELINE_V3_DETAIL_BUDGET_PER_RUN` batch budget for detail-worker
+- `PIPELINE_V3_MAX_QUEUE_AGE_MINUTES` backlog threshold metric input
+- `PIPELINE_V3_RECONCILE_REMOVE_MISSES` consecutive healthy misses required for `removed`
+
+V3 operational docs:
+
+- `docs/scraper_v3_pipeline.md`
+
 ### Frontend
 
 ```bash

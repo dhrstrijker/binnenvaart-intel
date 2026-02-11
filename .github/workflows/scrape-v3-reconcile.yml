@@ -1,0 +1,41 @@
+name: Scrape vessels v3 (reconcile)
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scrape-v3-reconcile
+  cancel-in-progress: false
+
+jobs:
+  scrape-v3-reconcile:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: scraper
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements.txt
+      - name: Run scraper v3 reconcile
+        run: python v3/main_v3.py --run-type reconcile
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PIPELINE_V3_MODE: "authoritative"
+          PIPELINE_V3_NOTIFICATIONS: "on"
+          PIPELINE_V3_SOURCES: "galle,rensendriessen,pcshipbrokers,gtsschepen,gsk"
+          PIPELINE_V3_DETAIL_BUDGET_PER_RUN: "50"
+          PIPELINE_V3_MAX_QUEUE_AGE_MINUTES: "60"
+          PIPELINE_V3_RECONCILE_REMOVE_MISSES: "2"
+          PIPELINE_V3_RUN_POST_INGESTION: "on"
