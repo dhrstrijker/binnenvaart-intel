@@ -10,6 +10,17 @@ import {
 } from "@/lib/savedSearchTypes";
 import type { User } from "@supabase/supabase-js";
 
+function stableFilterKey(filters: SavedSearchFilters): string {
+  const normalized = Object.keys(filters)
+    .sort()
+    .reduce<Record<string, string>>((acc, key) => {
+      const value = (filters as Record<string, string | undefined>)[key];
+      if (value) acc[key] = value;
+      return acc;
+    }, {});
+  return JSON.stringify(normalized);
+}
+
 export function useSavedSearches(user: User | null, isPremium: boolean) {
   const [searches, setSearches] = useState<SavedSearch[]>([]);
   const [loading, setLoading] = useState(false);
@@ -51,9 +62,9 @@ export function useSavedSearches(user: User | null, isPremium: boolean) {
       }
 
       // Check for duplicate filters
-      const filterStr = JSON.stringify(cleanFilters);
+      const filterStr = stableFilterKey(cleanFilters);
       const isDuplicate = searches.some(
-        (s) => JSON.stringify(s.filters) === filterStr
+        (s) => stableFilterKey(s.filters) === filterStr
       );
       if (isDuplicate) {
         return { success: false, error: "Je hebt deze zoekopdracht al opgeslagen" };
