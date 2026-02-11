@@ -7,6 +7,60 @@ import { useWatchlistCount } from "@/lib/WatchlistContext";
 import { useFlyingAnimation } from "@/lib/FlyingAnimationContext";
 import type { User } from "@supabase/supabase-js";
 
+const PENDING_WATCHLIST_KEY = "pendingWatchlistAdds";
+const PENDING_WATCHLIST_MAX_AGE_MS = 30 * 60 * 1000;
+
+function getPendingWatchlistAdds(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = sessionStorage.getItem(PENDING_WATCHLIST_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      return parsed.filter((v): v is string => typeof v === "string");
+    }
+    if (parsed && typeof parsed === "object") {
+      const obj = parsed as { ids?: unknown; createdAt?: unknown };
+      const ids = Array.isArray(obj.ids)
+        ? obj.ids.filter((v): v is string => typeof v === "string")
+        : [];
+      const createdAt = typeof obj.createdAt === "number" ? obj.createdAt : 0;
+      if (ids.length === 0 || createdAt <= 0 || Date.now() - createdAt > PENDING_WATCHLIST_MAX_AGE_MS) {
+        sessionStorage.removeItem(PENDING_WATCHLIST_KEY);
+        return [];
+      }
+      return ids;
+    }
+    return [];
+  } catch {
+    return [];
+  }
+}
+
+function setPendingWatchlistAdds(vesselIds: string[]) {
+  if (typeof window === "undefined") return;
+  if (vesselIds.length === 0) {
+    sessionStorage.removeItem(PENDING_WATCHLIST_KEY);
+    return;
+  }
+  sessionStorage.setItem(
+    PENDING_WATCHLIST_KEY,
+    JSON.stringify({ ids: vesselIds, createdAt: Date.now() })
+  );
+}
+
+function queuePendingWatchlistAdd(vesselId: string) {
+  const pending = getPendingWatchlistAdds();
+  if (pending.includes(vesselId)) return;
+  setPendingWatchlistAdds([...pending, vesselId]);
+}
+
+function clearPendingWatchlistAdd(vesselId: string) {
+  const pending = getPendingWatchlistAdds();
+  if (!pending.includes(vesselId)) return;
+  setPendingWatchlistAdds(pending.filter((id) => id !== vesselId));
+}
+
 interface WatchlistButtonProps {
   vesselId: string;
   user: User | null;
@@ -27,8 +81,35 @@ export default function WatchlistButton({ vesselId, user, className, onToggle, i
 
   // Sync with batch-provided value when it changes
   useEffect(() => {
-    if (initialIsWatched !== undefined) setIsWatched(initialIsWatched);
+    if (initialIsWatched !== undefined) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIsWatched(initialIsWatched);
+    }
   }, [initialIsWatched]);
+
+  const addToWatchlist = useCallback(
+    async (currentUser: User, { animate }: { animate: boolean }) => {
+      const supabase = createClient();
+      // Best-effort auto-enroll for notifications; watchlist insert is primary action.
+      fetch("/api/notifications/subscribe-auth", { method: "POST" }).catch(() => {});
+
+      const { error } = await supabase
+        .from("watchlist")
+        .insert({ user_id: currentUser.id, vessel_id: vesselId });
+
+      const duplicate = error?.code === "23505";
+      if (error && !duplicate) return false;
+
+      setIsWatched(true);
+      if (!duplicate) bumpCount(1);
+      onToggle?.(vesselId, true);
+      if (!duplicate && animate && flyingCtx && btnRef.current) {
+        flyingCtx.flyTo("notifications", btnRef.current.getBoundingClientRect(), "bell");
+      }
+      return true;
+    },
+    [vesselId, bumpCount, onToggle, flyingCtx]
+  );
 
   // Fallback: check Supabase per-card only when no batch data provided (e.g. detail page)
   useEffect(() => {
@@ -45,6 +126,26 @@ export default function WatchlistButton({ vesselId, user, className, onToggle, i
         if (data) setIsWatched(true);
       });
   }, [user, vesselId, initialIsWatched]);
+
+  // Replay pending watchlist add after OAuth redirect/sign-in.
+  useEffect(() => {
+    if (!user) return;
+    const pending = getPendingWatchlistAdds();
+    if (!pending.includes(vesselId)) return;
+    if (isWatched) {
+      clearPendingWatchlistAdd(vesselId);
+      return;
+    }
+
+    let cancelled = false;
+    (async () => {
+      const ok = await addToWatchlist(user, { animate: false });
+      if (!cancelled && ok) clearPendingWatchlistAdd(vesselId);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, vesselId, isWatched, addToWatchlist]);
 
   const doToggle = useCallback(
     async (currentUser: User) => {
@@ -69,17 +170,9 @@ export default function WatchlistButton({ vesselId, user, className, onToggle, i
             onToggle?.(vesselId, false);
           }
         } else {
-          const { error } = await supabase
-            .from("watchlist")
-            .insert({ user_id: currentUser.id, vessel_id: vesselId });
-          if (error) {
+          const ok = await addToWatchlist(currentUser, { animate: true });
+          if (!ok) {
             setIsWatched(prev);
-          } else {
-            bumpCount(1);
-            onToggle?.(vesselId, true);
-            if (flyingCtx && btnRef.current) {
-              flyingCtx.flyTo("notifications", btnRef.current.getBoundingClientRect(), "bell");
-            }
           }
         }
       } catch {
@@ -87,7 +180,7 @@ export default function WatchlistButton({ vesselId, user, className, onToggle, i
       }
       setLoading(false);
     },
-    [vesselId, isWatched, loading, onToggle, bumpCount, flyingCtx]
+    [vesselId, isWatched, loading, onToggle, bumpCount, addToWatchlist]
   );
 
   const toggle = useCallback(
@@ -99,27 +192,12 @@ export default function WatchlistButton({ vesselId, user, className, onToggle, i
       setTimeout(() => setAnimating(false), 500);
 
       if (!user) {
+        queuePendingWatchlistAdd(vesselId);
         openAuthModal({
           message: "Log in om dit schip aan je volglijst toe te voegen.",
           onSuccess: async (authUser) => {
-            // Add to watchlist after auth
-            const supabase = createClient();
-            // Best-effort auto-enroll for notifications; watchlist insert is primary action.
-            fetch("/api/notifications/subscribe-auth", { method: "POST" }).catch(() => {});
-
-            const { error } = await supabase
-              .from("watchlist")
-              .insert({ user_id: authUser.id, vessel_id: vesselId });
-
-            const duplicate = error?.code === "23505";
-            if (error && !duplicate) return;
-
-            setIsWatched(true);
-            if (!duplicate) bumpCount(1);
-            onToggle?.(vesselId, true);
-            if (!duplicate && flyingCtx && btnRef.current) {
-              flyingCtx.flyTo("notifications", btnRef.current.getBoundingClientRect(), "bell");
-            }
+            const ok = await addToWatchlist(authUser, { animate: true });
+            if (ok) clearPendingWatchlistAdd(vesselId);
           },
         });
         return;
@@ -127,7 +205,7 @@ export default function WatchlistButton({ vesselId, user, className, onToggle, i
 
       await doToggle(user);
     },
-    [user, doToggle, vesselId, onToggle, openAuthModal, bumpCount, flyingCtx]
+    [user, doToggle, vesselId, openAuthModal, addToWatchlist]
   );
 
   return (

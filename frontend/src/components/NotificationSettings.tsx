@@ -10,11 +10,48 @@ interface NotificationPreferences {
   removed_vessels: boolean;
 }
 
+type NotificationFrequency = "immediate" | "daily" | "weekly";
+
 const DEFAULT_PREFS: NotificationPreferences = {
   new_vessels: true,
   price_changes: true,
   removed_vessels: false,
 };
+
+function normalizePreferences(raw: unknown): { prefs: NotificationPreferences; frequency: NotificationFrequency } {
+  if (!raw || typeof raw !== "object") {
+    return { prefs: DEFAULT_PREFS, frequency: "immediate" };
+  }
+
+  const obj = raw as Record<string, unknown>;
+  const frequency = obj.frequency === "daily" || obj.frequency === "weekly" || obj.frequency === "immediate"
+    ? obj.frequency
+    : "immediate";
+
+  const types = Array.isArray(obj.types)
+    ? new Set(obj.types.filter((t): t is string => typeof t === "string"))
+    : null;
+
+  if (types) {
+    return {
+      prefs: {
+        new_vessels: types.has("new"),
+        price_changes: types.has("price_change"),
+        removed_vessels: types.has("removed"),
+      },
+      frequency,
+    };
+  }
+
+  return {
+    prefs: {
+      new_vessels: typeof obj.new_vessels === "boolean" ? obj.new_vessels : DEFAULT_PREFS.new_vessels,
+      price_changes: typeof obj.price_changes === "boolean" ? obj.price_changes : DEFAULT_PREFS.price_changes,
+      removed_vessels: typeof obj.removed_vessels === "boolean" ? obj.removed_vessels : DEFAULT_PREFS.removed_vessels,
+    },
+    frequency,
+  };
+}
 
 interface NotificationSettingsProps {
   user: User;
@@ -23,6 +60,7 @@ interface NotificationSettingsProps {
 export default function NotificationSettings({ user }: NotificationSettingsProps) {
   const [masterEnabled, setMasterEnabled] = useState(true);
   const [prefs, setPrefs] = useState<NotificationPreferences>(DEFAULT_PREFS);
+  const [frequency, setFrequency] = useState<NotificationFrequency>("immediate");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -38,7 +76,9 @@ export default function NotificationSettings({ user }: NotificationSettingsProps
         if (data) {
           setMasterEnabled(data.active ?? true);
           if (data.preferences) {
-            setPrefs({ ...DEFAULT_PREFS, ...(data.preferences as NotificationPreferences) });
+            const normalized = normalizePreferences(data.preferences);
+            setPrefs(normalized.prefs);
+            setFrequency(normalized.frequency);
           }
         }
         setLoading(false);
@@ -57,7 +97,14 @@ export default function NotificationSettings({ user }: NotificationSettingsProps
     const payload = {
       user_id: user.id,
       email: user.email,
-      preferences: prefs,
+      preferences: {
+        frequency,
+        types: [
+          ...(prefs.new_vessels ? ["new"] : []),
+          ...(prefs.price_changes ? ["price_change"] : []),
+          ...(prefs.removed_vessels ? ["removed"] : []),
+        ],
+      },
       active: masterEnabled,
     };
 

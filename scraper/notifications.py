@@ -49,6 +49,42 @@ KIND_TO_WATCHLIST_FLAG = {
 }
 
 
+def _allowed_types_from_preferences(prefs: dict | None) -> set[str]:
+    """Resolve allowed notification types from preferences.
+
+    Supports both the canonical schema:
+      {"types": ["new", "price_change", "removed"], "frequency": "..."}
+    and the legacy boolean shape:
+      {"new_vessels": true, "price_changes": true, "removed_vessels": false}
+    """
+    default_types = {"new", "price_change", "removed"}
+    if not isinstance(prefs, dict):
+        return default_types
+
+    raw_types = prefs.get("types")
+    if isinstance(raw_types, list):
+        return {str(t) for t in raw_types if isinstance(t, str)}
+
+    legacy_mapping = (
+        ("new_vessels", "new"),
+        ("price_changes", "price_change"),
+        ("removed_vessels", "removed"),
+    )
+    saw_legacy_key = False
+    allowed: set[str] = set()
+    for legacy_key, normalized_key in legacy_mapping:
+        value = prefs.get(legacy_key)
+        if isinstance(value, bool):
+            saw_legacy_key = True
+            if value:
+                allowed.add(normalized_key)
+
+    if saw_legacy_key:
+        return allowed
+
+    return default_types
+
+
 def _get_active_subscribers() -> list[str]:
     """Fetch all active subscriber email addresses."""
     result = (
@@ -232,7 +268,7 @@ def filter_changes_for_user(subscriber: dict, all_changes: list[dict]) -> list[d
         return []
 
     prefs = subscriber.get("preferences") or {}
-    allowed_types = prefs.get("types", ["new", "price_change", "removed"])
+    allowed_types = _allowed_types_from_preferences(prefs)
 
     type_map = {
         "inserted": "new",
@@ -274,7 +310,7 @@ def build_personalized_subject(user_changes: list[dict]) -> str:
         parts.append(f"{removed_count} verkocht")
 
     summary = ", ".join(parts) if parts else "Wijzigingen"
-    return f"Navisio: {summary} in uw watchlist"
+    return f"Navisio: {summary} in uw meldingen"
 
 
 def _build_change_sections(changes: list[dict]) -> str:
@@ -319,7 +355,7 @@ def _build_change_sections(changes: list[dict]) -> str:
 
 
 def build_personalized_email(subscriber: dict, user_changes: list[dict]) -> str:
-    """Build personalized HTML email showing only watchlist changes."""
+    """Build personalized HTML email for immediate user notifications."""
     now = datetime.now(timezone.utc).strftime("%d-%m-%Y %H:%M UTC")
     unsubscribe_token = subscriber.get("unsubscribe_token", "")
     sections = _build_change_sections(user_changes)
@@ -333,14 +369,14 @@ def build_personalized_email(subscriber: dict, user_changes: list[dict]) -> str:
     <!-- Header -->
     <div style="background:#0f172a;border-radius:12px 12px 0 0;padding:24px;text-align:center;">
       <h1 style="margin:0;color:#ffffff;font-size:22px;letter-spacing:-0.03em;">NAVISIO</h1>
-      <p style="margin:4px 0 0;color:#06b6d4;font-size:13px;">Watchlist Wijzigingen</p>
+      <p style="margin:4px 0 0;color:#06b6d4;font-size:13px;">Meldingen</p>
     </div>
 
     <!-- Content -->
     <div style="background:#ffffff;padding:20px 24px;">
       <p style="margin:0 0 16px;color:#475569;font-size:14px;">
         Er zijn {len(user_changes)} wijziging{"en" if len(user_changes) != 1 else ""} gedetecteerd
-        in uw watchlist op {now}.
+        in uw volglijst en zoekopdrachten op {now}.
       </p>
       {sections}
     </div>
@@ -348,7 +384,7 @@ def build_personalized_email(subscriber: dict, user_changes: list[dict]) -> str:
     <!-- Footer -->
     <div style="background:#f8fafc;border-radius:0 0 12px 12px;padding:16px 24px;text-align:center;border-top:1px solid #e2e8f0;">
       <p style="margin:0;color:#94a3b8;font-size:11px;">
-        U ontvangt dit bericht omdat u watchlist-meldingen heeft ingeschakeld.
+        U ontvangt dit bericht omdat u meldingen heeft ingeschakeld.
         <br><a href="https://navisio.nl/api/unsubscribe?token={escape(quote(unsubscribe_token), quote=True)}"
           style="color:#06b6d4;text-decoration:underline;">Uitschrijven</a>
       </p>
@@ -424,10 +460,11 @@ def send_verification_email(email: str, verification_token: str) -> None:
 
 
 def send_personalized_notifications(stats: dict, changes: list[dict]) -> None:
-    """Send personalized notifications to verified subscribers with watchlists.
+    """Send immediate personalized notifications to verified subscribers.
 
-    Subscribers with a user_id get personalized emails filtered to their
-    watchlist. Legacy subscribers (no user_id) receive the generic summary.
+    Subscribers with a user_id get personalized emails containing matching
+    watchlist events plus active immediate saved-search matches. Legacy
+    subscribers (no user_id) receive the generic summary.
     """
     if not changes:
         logger.info("Geen wijzigingen, geen e-mails verstuurd.")
@@ -447,7 +484,16 @@ def send_personalized_notifications(stats: dict, changes: list[dict]) -> None:
 
     # Personalized emails for subscribers with user accounts
     for sub in personalized_subs:
-        user_changes = filter_changes_for_user(sub, changes)
+        watchlist_changes = filter_changes_for_user(sub, changes)
+        seen_vessel_ids = {
+            c.get("vessel", {}).get("id")
+            for c in watchlist_changes
+            if c.get("vessel", {}).get("id")
+        }
+        saved_search_changes = _get_saved_search_matches_deduped(
+            sub["user_id"], "immediate", changes, seen_vessel_ids
+        )
+        user_changes = watchlist_changes + saved_search_changes
         if not user_changes:
             continue
 
@@ -470,7 +516,7 @@ def send_personalized_notifications(stats: dict, changes: list[dict]) -> None:
             save_notification_history(
                 sub["user_id"],
                 [c["vessel"]["id"] for c in user_changes if "vessel" in c],
-                "watchlist",
+                "watchlist_and_saved_searches",
                 message_id,
             )
             logger.info("Gepersonaliseerde e-mail verstuurd naar %s", sub["email"])

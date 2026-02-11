@@ -59,9 +59,12 @@ def main():
         logger.info("Notifications disabled by PIPELINE_V2_NOTIFICATIONS=off")
     else:
         send_personalized_notifications(combined_stats, changes)
-        # Send daily digest after scraping
-        logger.info("Sending daily digest...")
-        send_digest("daily")
+        auto_daily_digest = os.environ.get("PIPELINE_V2_AUTO_DAILY_DIGEST", "off").strip().lower()
+        if auto_daily_digest == "on":
+            logger.info("Sending daily digest...")
+            send_digest("daily")
+        else:
+            logger.info("Skipping daily digest (set PIPELINE_V2_AUTO_DAILY_DIGEST=on to enable)")
 
 
 if __name__ == "__main__":

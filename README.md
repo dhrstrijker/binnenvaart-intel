@@ -39,6 +39,7 @@ python main.py
 - `PIPELINE_V2_MODE=shadow|authoritative`
 - `PIPELINE_V2_NOTIFICATIONS=off|on`
 - `PIPELINE_V2_SOURCES` is a comma-separated source allowlist
+- `PIPELINE_V2_AUTO_DAILY_DIGEST=off|on` (default `off`; use `python main.py --digest-only daily|weekly` for scheduled digest runs)
 
 V2 operational docs:
 

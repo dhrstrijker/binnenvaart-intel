@@ -447,8 +447,17 @@ def get_subscribers_with_frequency(frequency: str) -> list[dict]:
         .not_.is_("user_id", "null")
         .execute()
     )
+
+    def _get_frequency(preferences: dict | None) -> str:
+        if isinstance(preferences, dict):
+            pref_frequency = preferences.get("frequency")
+            if pref_frequency in {"immediate", "daily", "weekly"}:
+                return str(pref_frequency)
+        # Backward-compat default if preferences are missing/legacy.
+        return "immediate"
+
     # Filter by frequency preference in Python since JSONB filtering is complex
-    return [s for s in (res.data or []) if (s.get("preferences") or {}).get("frequency") == frequency]
+    return [s for s in (res.data or []) if _get_frequency(s.get("preferences")) == frequency]
 
 
 def get_user_saved_searches(user_id: str, frequency: str | None = None) -> list[dict]:

@@ -35,13 +35,18 @@ export function useSavedSearches(user: User | null, isPremium: boolean) {
     }
     setLoading(true);
     const supabase = createClient();
-    const { data } = await supabase
-      .from("saved_searches")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
-    setSearches((data as SavedSearch[]) ?? []);
-    setLoading(false);
+    try {
+      const { data, error } = await supabase
+        .from("saved_searches")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+      if (!error) {
+        setSearches((data as SavedSearch[]) ?? []);
+      }
+    } finally {
+      setLoading(false);
+    }
   }, [user]);
 
   useEffect(() => {
@@ -98,8 +103,10 @@ export function useSavedSearches(user: User | null, isPremium: boolean) {
   const deleteSearch = useCallback(
     async (id: string) => {
       const supabase = createClient();
-      await supabase.from("saved_searches").delete().eq("id", id);
-      setSearches((prev) => prev.filter((s) => s.id !== id));
+      const { error } = await supabase.from("saved_searches").delete().eq("id", id);
+      if (!error) {
+        setSearches((prev) => prev.filter((s) => s.id !== id));
+      }
     },
     []
   );
@@ -107,10 +114,12 @@ export function useSavedSearches(user: User | null, isPremium: boolean) {
   const toggleActive = useCallback(
     async (id: string, active: boolean) => {
       const supabase = createClient();
-      await supabase.from("saved_searches").update({ active }).eq("id", id);
-      setSearches((prev) =>
-        prev.map((s) => (s.id === id ? { ...s, active } : s))
-      );
+      const { error } = await supabase.from("saved_searches").update({ active }).eq("id", id);
+      if (!error) {
+        setSearches((prev) =>
+          prev.map((s) => (s.id === id ? { ...s, active } : s))
+        );
+      }
     },
     []
   );

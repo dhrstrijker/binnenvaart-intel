@@ -45,6 +45,32 @@ export default function NotificationsDropdown({ user, isPremium }: Notifications
   useOutsideClick(dropdownRef, close, open);
   useEscapeKey(close);
 
+  // Keep badge count in sync across auth transitions, even before opening dropdown.
+  useEffect(() => {
+    let cancelled = false;
+
+    async function syncWatchlistCount() {
+      if (!user) {
+        setWatchlistItems([]);
+        setWatchlistCount(0);
+        return;
+      }
+
+      const supabase = createClient();
+      const { count } = await supabase
+        .from("watchlist")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id);
+
+      if (!cancelled) setWatchlistCount(count ?? 0);
+    }
+
+    syncWatchlistCount();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, setWatchlistCount]);
+
   // Fetch data when dropdown opens
   useEffect(() => {
     if (!open || !user) return;
@@ -80,7 +106,8 @@ export default function NotificationsDropdown({ user, isPremium }: Notifications
 
   async function handleRemoveWatchlist(watchlistId: string) {
     const supabase = createClient();
-    await supabase.from("watchlist").delete().eq("id", watchlistId);
+    const { error } = await supabase.from("watchlist").delete().eq("id", watchlistId);
+    if (error) return;
     setWatchlistItems((prev) => {
       const next = prev.filter((w) => w.id !== watchlistId);
       setWatchlistCount(next.length);

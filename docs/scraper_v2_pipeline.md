@@ -70,7 +70,8 @@ Authoritative production workflow:
 9. **Post-ingestion + notifications**
 - `main.py` runs dedup + extraction + prediction via `post_ingestion.py`.
 - Changes are read from DB using `get_changes_since(run_start_iso)` (no in-memory change cache).
-- Personalized notifications and digest dispatch run from this DB-backed change set.
+- Personalized notifications run from this DB-backed change set.
+- Daily digest dispatch is optional (`PIPELINE_V2_AUTO_DAILY_DIGEST=on`) or run explicitly via `python main.py --digest-only daily|weekly`.
 
 ## Core Tables
 
@@ -94,6 +95,7 @@ If any threshold fails, run is unhealthy.
 
 - Notifications run from `main.py` unless `PIPELINE_V2_NOTIFICATIONS=off`.
 - In production authoritative workflow, this is now `on`.
+- Automatic digest on each run is disabled by default to avoid overlapping-window duplicates.
 
 ## Alert Routing
 
