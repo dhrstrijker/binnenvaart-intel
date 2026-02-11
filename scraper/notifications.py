@@ -49,6 +49,18 @@ KIND_TO_WATCHLIST_FLAG = {
 }
 
 
+def _new_dispatch_report(*, blocked_reason: str | None = None) -> dict:
+    """Create a normalized report for notification dispatch outcomes."""
+    return {
+        "matched_recipients": 0,
+        "send_attempts": 0,
+        "successful_sends": 0,
+        "failed_sends": 0,
+        "history_write_failures": 0,
+        "blocked_reason": blocked_reason,
+    }
+
+
 def _allowed_types_from_preferences(prefs: dict | None) -> set[str]:
     """Resolve allowed notification types from preferences.
 
@@ -216,31 +228,38 @@ def _build_summary_html(stats: dict, changes: list[dict]) -> str:
 </html>"""
 
 
-def send_summary_email(stats: dict, changes: list[dict]) -> None:
+def send_summary_email(stats: dict, changes: list[dict]) -> dict:
     """Send a summary email to all active subscribers.
 
     Args:
         stats: Combined scrape stats with keys total, inserted, price_changed, unchanged.
         changes: List of change dicts with keys: kind, vessel, and optionally old_price/new_price.
     """
+    report = _new_dispatch_report()
+
     if not changes:
         logger.info("Geen wijzigingen, geen e-mail verstuurd.")
-        return
+        report["blocked_reason"] = "no_changes"
+        return report
 
     if not resend.api_key:
         logger.warning("RESEND_API_KEY niet ingesteld, overgeslagen.")
-        return
+        report["blocked_reason"] = "missing_api_key"
+        return report
 
     subscribers = _get_active_subscribers()
     if not subscribers:
         logger.info("Geen actieve abonnees gevonden.")
-        return
+        report["blocked_reason"] = "no_active_subscribers"
+        return report
 
     count = len(changes)
     subject = f"Navisio: {count} wijziging{'en' if count != 1 else ''} gedetecteerd"
     html = _build_summary_html(stats, changes)
 
     for email in subscribers:
+        report["matched_recipients"] += 1
+        report["send_attempts"] += 1
         try:
             resend.Emails.send(
                 {
@@ -250,9 +269,13 @@ def send_summary_email(stats: dict, changes: list[dict]) -> None:
                     "html": html,
                 }
             )
+            report["successful_sends"] += 1
             logger.info("E-mail verstuurd naar %s", email)
         except Exception:
+            report["failed_sends"] += 1
             logger.exception("Fout bij verzenden naar %s", email)
+
+    return report
 
 
 def filter_changes_for_user(subscriber: dict, all_changes: list[dict]) -> list[dict]:
@@ -459,25 +482,30 @@ def send_verification_email(email: str, verification_token: str) -> None:
         logger.exception("Fout bij verzenden verificatie naar %s", email)
 
 
-def send_personalized_notifications(stats: dict, changes: list[dict]) -> None:
+def send_personalized_notifications(stats: dict, changes: list[dict]) -> dict:
     """Send immediate personalized notifications to verified subscribers.
 
     Subscribers with a user_id get personalized emails containing matching
     watchlist events plus active immediate saved-search matches. Legacy
     subscribers (no user_id) receive the generic summary.
     """
+    report = _new_dispatch_report()
+
     if not changes:
         logger.info("Geen wijzigingen, geen e-mails verstuurd.")
-        return
+        report["blocked_reason"] = "no_changes"
+        return report
 
     if not resend.api_key:
         logger.warning("RESEND_API_KEY niet ingesteld, overgeslagen.")
-        return
+        report["blocked_reason"] = "missing_api_key"
+        return report
 
     subscribers = get_verified_subscribers()
     if not subscribers:
         logger.info("Geen geverifieerde abonnees gevonden.")
-        return
+        report["blocked_reason"] = "no_verified_subscribers"
+        return report
 
     personalized_subs = [s for s in subscribers if s.get("user_id")]
     legacy_subs = [s for s in subscribers if not s.get("user_id")]
@@ -497,6 +525,8 @@ def send_personalized_notifications(stats: dict, changes: list[dict]) -> None:
         if not user_changes:
             continue
 
+        report["matched_recipients"] += 1
+        report["send_attempts"] += 1
         html = build_personalized_email(sub, user_changes)
         subject = build_personalized_subject(user_changes)
 
@@ -512,15 +542,24 @@ def send_personalized_notifications(stats: dict, changes: list[dict]) -> None:
                     },
                 }
             )
+            report["successful_sends"] += 1
             message_id = result.get("id") if isinstance(result, dict) else None
-            save_notification_history(
-                sub["user_id"],
-                [c["vessel"]["id"] for c in user_changes if "vessel" in c],
-                "watchlist_and_saved_searches",
-                message_id,
-            )
+            try:
+                save_notification_history(
+                    sub["user_id"],
+                    [c["vessel"]["id"] for c in user_changes if "vessel" in c],
+                    "watchlist_and_saved_searches",
+                    message_id,
+                )
+            except Exception:
+                report["history_write_failures"] += 1
+                logger.exception(
+                    "E-mail verstuurd naar %s maar opslaan notification_history faalde",
+                    sub["email"],
+                )
             logger.info("Gepersonaliseerde e-mail verstuurd naar %s", sub["email"])
         except Exception:
+            report["failed_sends"] += 1
             logger.exception("Fout bij verzenden naar %s", sub["email"])
 
     # Legacy generic email for subscribers without user accounts
@@ -528,7 +567,30 @@ def send_personalized_notifications(stats: dict, changes: list[dict]) -> None:
         logger.info(
             "%d legacy abonnees krijgen generieke samenvatting.", len(legacy_subs)
         )
-        send_summary_email(stats, changes)
+        summary_report = send_summary_email(stats, changes)
+        for key in (
+            "matched_recipients",
+            "send_attempts",
+            "successful_sends",
+            "failed_sends",
+            "history_write_failures",
+        ):
+            report[key] += summary_report.get(key, 0)
+
+    if report["failed_sends"] > 0:
+        logger.warning(
+            "Notification dispatch completed with failures: %s failed send(s), %s success(es).",
+            report["failed_sends"],
+            report["successful_sends"],
+        )
+
+    if report["history_write_failures"] > 0:
+        logger.warning(
+            "Notification dispatch completed with %s notification_history write failure(s).",
+            report["history_write_failures"],
+        )
+
+    return report
 
 
 def get_saved_search_matches(search: dict, all_changes: list[dict]) -> list[dict]:

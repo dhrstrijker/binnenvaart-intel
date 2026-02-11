@@ -210,11 +210,13 @@ def _compute_factor_adjustment(target: dict, neighbors: list[dict]) -> float:
     return max(-0.20, min(0.20, adjustment))
 
 
-def predict_all(vessels: list[dict]) -> dict:
+def predict_all(vessels: list[dict], target_ids: list[str] | None = None) -> dict:
     """Run KNN prediction for all vessels and write results to DB.
 
     Returns summary dict with counts.
     """
+    target_id_set = None if target_ids is None else {str(v) for v in target_ids if str(v).strip()}
+
     # Build feature vectors for the whole fleet
     fleet: list[tuple[dict, dict]] = []
     for v in vessels:
@@ -222,13 +224,22 @@ def predict_all(vessels: list[dict]) -> dict:
         if features is not None:
             fleet.append((v, features))
 
-    logger.info("Price model: %d vessels with features out of %d total", len(fleet), len(vessels))
+    logger.info(
+        "Price model: %d vessels with features out of %d total%s",
+        len(fleet),
+        len(vessels),
+        f"; targeting {len(target_id_set)} vessel(s)" if target_id_set is not None else "",
+    )
 
     predicted_count = 0
     suppressed_count = 0
     error_count = 0
 
     for vessel, features in fleet:
+        vessel_id = str(vessel.get("id") or "")
+        if target_id_set is not None and vessel_id not in target_id_set:
+            continue
+
         try:
             result = _knn_predict(vessel, features, fleet)
 
