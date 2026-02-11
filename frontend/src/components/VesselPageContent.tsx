@@ -25,7 +25,6 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
   const [history, setHistory] = useState<PriceHistory[]>([]);
   const [shareOpen, setShareOpen] = useState(false);
   const shareTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [freeTrend, setFreeTrend] = useState<'up' | 'down' | null>(null);
 
   useEffect(() => {
     return () => {
@@ -58,32 +57,6 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
 
     fetchHistory();
   }, [vessel.id, vessel.linked_sources, user, isPremium, subLoading]);
-
-  // Free-tier price trend from activity_log
-  useEffect(() => {
-    if (subLoading || isPremium) return;
-
-    async function fetchFreeTrend() {
-      const supabase = createClient();
-      const { data } = await supabase
-        .from("activity_log")
-        .select("old_price, new_price")
-        .eq("vessel_id", vessel.id)
-        .eq("event_type", "price_changed")
-        .order("recorded_at", { ascending: false })
-        .limit(1);
-
-      if (data && data.length > 0) {
-        const { old_price, new_price } = data[0];
-        if (old_price !== null && new_price !== null) {
-          if (new_price > old_price) setFreeTrend('up');
-          else if (new_price < old_price) setFreeTrend('down');
-        }
-      }
-    }
-
-    fetchFreeTrend();
-  }, [vessel.id, isPremium, subLoading]);
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -207,7 +180,6 @@ export default function VesselPageContent({ vessel, similarVessels }: VesselPage
               vessel={vessel}
               history={history}
               isPremium={isPremium}
-              freeTrend={freeTrend}
             />
           </motion.div>
         </div>

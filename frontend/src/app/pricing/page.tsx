@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -19,9 +20,18 @@ const features = [
 ];
 
 export default function PricingPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [user, setUser] = useState<User | null>(null);
   const [isPremium, setIsPremium] = useState(false);
   const [loading, setLoading] = useState(true);
+  const checkoutStartedRef = useRef(false);
+
+  const checkoutIntentParam = searchParams.get("checkout");
+  const checkoutIntent =
+    checkoutIntentParam === "monthly" || checkoutIntentParam === "annual"
+      ? checkoutIntentParam
+      : null;
 
   useEffect(() => {
     async function check() {
@@ -44,14 +54,29 @@ export default function PricingPage() {
     check();
   }, []);
 
-  function checkoutUrl(productId: string) {
+  const checkoutUrl = useCallback((productId: string) => {
     const params = new URLSearchParams({ products: productId });
     if (user) {
       params.set("customerEmail", user.email ?? "");
       params.set("metadata", JSON.stringify({ user_id: user.id }));
     }
     return `/api/checkout?${params.toString()}`;
+  }, [user]);
+
+  function loginHrefForPlan(plan: "monthly" | "annual") {
+    return `/login?next=${encodeURIComponent(`/pricing?checkout=${plan}`)}`;
   }
+
+  useEffect(() => {
+    if (loading || !user || isPremium || !checkoutIntent || checkoutStartedRef.current) return;
+
+    const productId = checkoutIntent === "monthly" ? MONTHLY_PRODUCT_ID : ANNUAL_PRODUCT_ID;
+    if (!productId) return;
+
+    checkoutStartedRef.current = true;
+    router.replace("/pricing");
+    window.location.assign(checkoutUrl(productId));
+  }, [loading, user, isPremium, checkoutIntent, checkoutUrl, router]);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -112,7 +137,7 @@ export default function PricingPage() {
                 </a>
               ) : (
                 <Link
-                  href="/login"
+                  href={loginHrefForPlan("monthly")}
                   className="mt-8 block w-full rounded-lg bg-cyan-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-cyan-700"
                 >
                   Log in om te abonneren
@@ -152,7 +177,7 @@ export default function PricingPage() {
                 </a>
               ) : (
                 <Link
-                  href="/login"
+                  href={loginHrefForPlan("annual")}
                   className="mt-8 block w-full rounded-lg bg-cyan-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-cyan-700"
                 >
                   Log in om te abonneren

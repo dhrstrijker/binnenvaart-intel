@@ -91,7 +91,7 @@ export default function Dashboard() {
   const { setFavoritesCount } = useFavoritesCount();
 
   // Data fetching
-  const { vessels, priceHistoryMap, freeTierTrends, favoriteIds, watchlistIds, loading, error, user, isPremium } = useVesselData();
+  const { vessels, priceHistoryMap, favoriteIds, watchlistIds, loading, error, user, isPremium } = useVesselData();
 
   // Sync watchlist count to context for bell badge
   useEffect(() => {
@@ -555,7 +555,6 @@ export default function Dashboard() {
                     priceHistory={priceHistoryMap[vessel.id] ?? []}
                     isPremium={isPremium}
                     user={user}
-                    freeTierTrend={freeTierTrends[vessel.id] ?? null}
                     dealScore={dealScores.get(vessel.id)}
                     estimatedRange={estimatedRanges.get(vessel.id) ?? null}
                     isFavorite={favoriteIds.has(vessel.id)}

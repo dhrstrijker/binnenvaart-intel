@@ -8,7 +8,6 @@ import { useSubscription } from "@/lib/useSubscription";
 interface VesselData {
   vessels: Vessel[];
   priceHistoryMap: Record<string, PriceHistory[]>;
-  freeTierTrends: Record<string, "up" | "down">;
   favoriteIds: Set<string>;
   watchlistIds: Set<string>;
   loading: boolean;
@@ -20,7 +19,6 @@ interface VesselData {
 export function useVesselData(): VesselData {
   const [vessels, setVessels] = useState<Vessel[]>([]);
   const [priceHistoryMap, setPriceHistoryMap] = useState<Record<string, PriceHistory[]>>({});
-  const [freeTierTrends, setFreeTierTrends] = useState<Record<string, "up" | "down">>({});
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   const [watchlistIds, setWatchlistIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
@@ -84,27 +82,6 @@ export function useVesselData(): VesselData {
             }
           } else {
             if (!cancelled) setPriceHistoryMap({});
-            parallel.push(
-              Promise.resolve(
-                supabase
-                  .from("activity_log")
-                  .select("vessel_id, old_price, new_price")
-                  .eq("event_type", "price_changed")
-                  .order("recorded_at", { ascending: false })
-                  .limit(500)
-              ).then(({ data: activityData }) => {
-                if (!cancelled && activityData) {
-                  const trendMap: Record<string, "up" | "down"> = {};
-                  for (const entry of activityData) {
-                    if (!trendMap[entry.vessel_id] && entry.old_price != null && entry.new_price != null) {
-                      if (entry.new_price > entry.old_price) trendMap[entry.vessel_id] = "up";
-                      else if (entry.new_price < entry.old_price) trendMap[entry.vessel_id] = "down";
-                    }
-                  }
-                  setFreeTierTrends(trendMap);
-                }
-              })
-            );
           }
 
           // Batch-fetch user's favorites + watchlist (eliminates per-card N+1 queries)
@@ -154,5 +131,5 @@ export function useVesselData(): VesselData {
     };
   }, [user, isPremium, subLoading]);
 
-  return { vessels, priceHistoryMap, freeTierTrends, favoriteIds, watchlistIds, loading, error, user, isPremium };
+  return { vessels, priceHistoryMap, favoriteIds, watchlistIds, loading, error, user, isPremium };
 }

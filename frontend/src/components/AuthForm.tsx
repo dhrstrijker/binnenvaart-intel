@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 
@@ -13,29 +13,50 @@ interface AuthFormProps {
 
 export default function AuthForm({ message, onSuccess, redirectTo }: AuthFormProps) {
   const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
+  const [step, setStep] = useState<"request" | "verify">("request");
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const successNotifiedRef = useRef(false);
+
+  const notifySuccess = useCallback((user: User) => {
+    if (successNotifiedRef.current) return;
+    successNotifiedRef.current = true;
+    onSuccess?.(user);
+  }, [onSuccess]);
 
   // Detect cross-tab magic link completion (user clicks link in another tab)
   useEffect(() => {
     const supabase = createClient();
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session?.user) {
-        onSuccess?.(session.user);
+        notifySuccess(session.user);
       }
     });
     return () => subscription.unsubscribe();
-  }, [onSuccess]);
+  }, [notifySuccess]);
 
-  async function handleMagicLink(e: React.FormEvent) {
-    e.preventDefault();
+  // Countdown for resend cooldown to limit accidental rapid retries.
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
+
+  function buildRedirectUrl() {
+    return redirectTo ??
+      `${window.location.origin}/auth/callback?next=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+  }
+
+  async function sendEmailCode() {
     setError(null);
     setLoading(true);
 
     const supabase = createClient();
-    const emailRedirectTo = redirectTo ??
-      `${window.location.origin}/auth/callback?next=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+    const emailRedirectTo = buildRedirectUrl();
 
     const { error } = await supabase.auth.signInWithOtp({
       email,
@@ -48,14 +69,50 @@ export default function AuthForm({ message, onSuccess, redirectTo }: AuthFormPro
       return;
     }
 
-    setEmailSent(true);
+    successNotifiedRef.current = false;
+    setStep("verify");
+    setCode("");
+    setResendCooldown(30);
     setLoading(false);
+  }
+
+  async function handleRequestCode(e: React.FormEvent) {
+    e.preventDefault();
+    await sendEmailCode();
+  }
+
+  async function handleVerifyCode(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    const supabase = createClient();
+    const token = code.trim();
+
+    const { data, error } = await supabase.auth.verifyOtp({
+      email,
+      token,
+      type: "email",
+    });
+
+    if (error || !data.user) {
+      setError("Code ongeldig of verlopen. Vraag een nieuwe code aan.");
+      setLoading(false);
+      return;
+    }
+
+    notifySuccess(data.user);
+    setLoading(false);
+  }
+
+  async function handleResendCode() {
+    if (resendCooldown > 0 || loading) return;
+    await sendEmailCode();
   }
 
   async function handleGoogle() {
     const supabase = createClient();
-    const googleRedirectTo = redirectTo ??
-      `${window.location.origin}/auth/callback?next=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+    const googleRedirectTo = buildRedirectUrl();
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -64,26 +121,84 @@ export default function AuthForm({ message, onSuccess, redirectTo }: AuthFormPro
     if (error) setError("Inloggen met Google mislukt. Probeer het later opnieuw.");
   }
 
-  // "Check your inbox" state
-  if (emailSent) {
+  if (step === "verify") {
     return (
-      <div className="text-center py-2">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100">
-          <svg className="h-6 w-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-          </svg>
+      <div className="py-2">
+        {message && (
+          <div className="mb-4 rounded-lg bg-cyan-50 px-4 py-3 text-sm text-cyan-800">
+            {message}
+          </div>
+        )}
+
+        <div className="text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100">
+            <svg className="h-6 w-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 4.26a2.25 2.25 0 002.22 0L21 8m-18 0h18v8.25A2.25 2.25 0 0118.75 18.5H5.25A2.25 2.25 0 013 16.25V8z" />
+            </svg>
+          </div>
+          <h2 className="mt-4 text-xl font-bold text-slate-900">Voer je code in</h2>
+          <p className="mt-2 text-sm text-slate-500">
+            We hebben een e-mail gestuurd naar <strong>{email}</strong> met een 6-cijferige code.
+          </p>
         </div>
-        <h2 className="mt-4 text-xl font-bold text-slate-900">Controleer je inbox</h2>
-        <p className="mt-2 text-sm text-slate-500">
-          We hebben een inloglink gestuurd naar <strong>{email}</strong>.
-          Klik op de link in de e-mail om in te loggen.
+
+        {error && (
+          <div className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleVerifyCode} className="mt-4 space-y-3">
+          <div>
+            <label htmlFor="auth-code" className="block text-sm font-medium text-slate-700">
+              6-cijferige code
+            </label>
+            <input
+              id="auth-code"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              pattern="[0-9]{6}"
+              required
+              maxLength={6}
+              value={code}
+              onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2.5 text-center text-base tracking-[0.2em] text-slate-900 shadow-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              placeholder="123456"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading || code.length !== 6}
+            className="w-full rounded-lg bg-cyan-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-cyan-700 disabled:opacity-50"
+          >
+            {loading ? "Bezig..." : "Inloggen met code"}
+          </button>
+        </form>
+
+        <div className="mt-3 flex items-center justify-between">
+          <button
+            onClick={handleResendCode}
+            disabled={loading || resendCooldown > 0}
+            className="text-sm font-medium text-cyan-600 transition hover:text-cyan-700 disabled:opacity-50"
+          >
+            {resendCooldown > 0 ? `Nieuwe code over ${resendCooldown}s` : "Nieuwe code sturen"}
+          </button>
+          <button
+            onClick={() => {
+              setStep("request");
+              setCode("");
+              setError(null);
+            }}
+            className="text-sm font-medium text-slate-500 transition hover:text-slate-700"
+          >
+            Andere e-mail
+          </button>
+        </div>
+
+        <p className="mt-3 text-center text-xs text-slate-400">
+          Werkt de code niet? Je kunt ook de link uit dezelfde e-mail gebruiken.
         </p>
-        <button
-          onClick={() => { setEmailSent(false); setEmail(""); }}
-          className="mt-4 text-sm font-medium text-cyan-600 transition hover:text-cyan-700"
-        >
-          Andere e-mail gebruiken
-        </button>
       </div>
     );
   }
@@ -128,8 +243,8 @@ export default function AuthForm({ message, onSuccess, redirectTo }: AuthFormPro
         </div>
       </div>
 
-      {/* Magic link email form */}
-      <form onSubmit={handleMagicLink} className="space-y-3">
+      {/* Email OTP form */}
+      <form onSubmit={handleRequestCode} className="space-y-3">
         <div>
           <label htmlFor="auth-email" className="block text-sm font-medium text-slate-700">
             E-mailadres
@@ -149,10 +264,10 @@ export default function AuthForm({ message, onSuccess, redirectTo }: AuthFormPro
           disabled={loading}
           className="w-full rounded-lg bg-cyan-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-cyan-700 disabled:opacity-50"
         >
-          {loading ? "Bezig..." : "Inloglink versturen"}
+          {loading ? "Bezig..." : "Code versturen"}
         </button>
         <p className="text-center text-xs text-slate-400">
-          We sturen een link waarmee je direct inlogt
+          We sturen een eenmalige code (en eventueel een inloglink) naar je e-mail
         </p>
       </form>
     </div>

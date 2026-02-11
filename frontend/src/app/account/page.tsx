@@ -16,7 +16,7 @@ export default function AccountPage() {
 
   useEffect(() => {
     if (!isLoading && !user) {
-      router.push("/login");
+      router.push("/login?next=%2Faccount");
     }
   }, [user, isLoading, router]);
 

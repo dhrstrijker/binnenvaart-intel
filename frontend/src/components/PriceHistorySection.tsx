@@ -11,14 +11,12 @@ interface PriceHistorySectionProps {
   vessel: Vessel;
   history: PriceHistory[];
   isPremium: boolean;
-  freeTrend: "up" | "down" | null;
 }
 
 export default function PriceHistorySection({
   vessel,
   history,
   isPremium,
-  freeTrend,
 }: PriceHistorySectionProps) {
   const [priceExpanded, setPriceExpanded] = useState(false);
 
@@ -33,9 +31,8 @@ export default function PriceHistorySection({
       : null;
 
   // Don't render if there's nothing to show
-  const hasPremiumContent = isPremium && history.length >= 2;
-  const hasFreeTrend = !isPremium && freeTrend !== null;
-  if (!hasPremiumContent && !hasFreeTrend) return null;
+  const shouldRender = isPremium ? history.length >= 2 : true;
+  if (!shouldRender) return null;
 
   return (
     <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
@@ -61,25 +58,6 @@ export default function PriceHistorySection({
             >
               {priceChange < 0 ? "" : "+"}
               {priceChangePercent.toFixed(1)}% ({formatPrice(priceChange)}) sinds eerste waarneming
-            </p>
-          )}
-          {/* Free tier: simple trend arrow */}
-          {!isPremium && freeTrend !== null && (
-            <p
-              className={`mt-0.5 flex items-center gap-1 text-xs font-semibold ${
-                freeTrend === "down" ? "text-emerald-600" : "text-red-500"
-              }`}
-            >
-              {freeTrend === "down" ? (
-                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                </svg>
-              ) : (
-                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                </svg>
-              )}
-              {freeTrend === "down" ? "Prijs gedaald" : "Prijs gestegen"}
             </p>
           )}
         </div>

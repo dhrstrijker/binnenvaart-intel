@@ -10,6 +10,8 @@ function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const errorParam = searchParams.get("error");
+  const nextParam = searchParams.get("next") ?? "/";
+  const safeNext = nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : "/";
 
   return (
     <div className="rounded-2xl bg-white p-8 shadow-lg ring-1 ring-gray-100">
@@ -27,10 +29,12 @@ function LoginContent() {
       <div className="mt-6">
         <AuthForm
           onSuccess={() => {
-            router.push("/");
+            router.push(safeNext);
             router.refresh();
           }}
-          redirectTo={typeof window !== "undefined" ? `${window.location.origin}/auth/callback` : undefined}
+          redirectTo={typeof window !== "undefined"
+            ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeNext)}`
+            : undefined}
         />
       </div>
     </div>

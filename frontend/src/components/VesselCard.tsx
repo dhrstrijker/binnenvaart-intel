@@ -41,7 +41,6 @@ interface VesselCardProps {
   priceHistory?: PriceHistory[];
   isPremium?: boolean;
   user?: User | null;
-  freeTierTrend?: 'up' | 'down' | null;
   dealScore?: DealScore;
   estimatedRange?: PriceRange | null;
   isFavorite?: boolean;
@@ -49,10 +48,9 @@ interface VesselCardProps {
   onFavoriteToggle?: (isFavorite: boolean) => void;
 }
 
-export default function VesselCard({ vessel, priceHistory = [], isPremium = false, user = null, freeTierTrend = null, dealScore, estimatedRange, isFavorite, isWatched, onFavoriteToggle }: VesselCardProps) {
+export default function VesselCard({ vessel, priceHistory = [], isPremium = false, user = null, dealScore, estimatedRange, isFavorite, isWatched, onFavoriteToggle }: VesselCardProps) {
   const [imgError, setImgError] = React.useState(false);
   const trend = getPriceTrend(priceHistory);
-  const effectiveTrend = trend ?? freeTierTrend ?? null;
 
   // Price counter roll-up — starts immediately on mount
   const animatedPrice = useCountUp(vessel.price ?? 0, {
@@ -213,21 +211,21 @@ export default function VesselCard({ vessel, priceHistory = [], isPremium = fals
                 Prijs op aanvraag
               </span>
             )}
-            {effectiveTrend === "down" && (
+            {trend === "down" && (
               <span className="flex items-center gap-0.5 text-xs font-semibold text-emerald-600" title="Prijs gedaald">
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                 </svg>
               </span>
             )}
-            {effectiveTrend === "up" && (
+            {trend === "up" && (
               <span className="flex items-center gap-0.5 text-xs font-semibold text-red-500" title="Prijs gestegen">
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
                 </svg>
               </span>
             )}
-            {effectiveTrend === "unchanged" && (
+            {trend === "unchanged" && (
               <span className="flex items-center text-xs font-semibold text-slate-400" title="Prijs ongewijzigd">
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
