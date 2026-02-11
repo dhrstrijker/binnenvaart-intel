@@ -87,7 +87,7 @@ export default function WatchlistButton({ vesselId, user, className, onToggle, i
       }
       setLoading(false);
     },
-    [vesselId, isWatched, loading, onToggle]
+    [vesselId, isWatched, loading, onToggle, bumpCount, flyingCtx]
   );
 
   const toggle = useCallback(
@@ -104,14 +104,20 @@ export default function WatchlistButton({ vesselId, user, className, onToggle, i
           onSuccess: async (authUser) => {
             // Add to watchlist after auth
             const supabase = createClient();
-            await fetch("/api/notifications/subscribe-auth", { method: "POST" });
-            await supabase
+            // Best-effort auto-enroll for notifications; watchlist insert is primary action.
+            fetch("/api/notifications/subscribe-auth", { method: "POST" }).catch(() => {});
+
+            const { error } = await supabase
               .from("watchlist")
               .insert({ user_id: authUser.id, vessel_id: vesselId });
+
+            const duplicate = error?.code === "23505";
+            if (error && !duplicate) return;
+
             setIsWatched(true);
-            bumpCount(1);
+            if (!duplicate) bumpCount(1);
             onToggle?.(vesselId, true);
-            if (flyingCtx && btnRef.current) {
+            if (!duplicate && flyingCtx && btnRef.current) {
               flyingCtx.flyTo("notifications", btnRef.current.getBoundingClientRect(), "bell");
             }
           },
@@ -121,7 +127,7 @@ export default function WatchlistButton({ vesselId, user, className, onToggle, i
 
       await doToggle(user);
     },
-    [user, doToggle, vesselId, onToggle, openAuthModal]
+    [user, doToggle, vesselId, onToggle, openAuthModal, bumpCount, flyingCtx]
   );
 
   return (
