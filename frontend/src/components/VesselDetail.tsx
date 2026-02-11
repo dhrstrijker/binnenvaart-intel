@@ -58,18 +58,19 @@ export default function VesselDetail({ vessel, history, isPremium = false, onClo
         </button>
 
         {/* Image */}
-        <div className="relative aspect-[16/9] w-full overflow-hidden rounded-t-2xl bg-slate-100">
+        <div className="relative w-full overflow-hidden rounded-t-2xl bg-slate-100">
           {vessel.image_url && !imgError ? (
             <Image
               src={vessel.image_url}
               alt={vessel.name}
-              fill
-              className="object-cover"
+              width={672}
+              height={450}
+              className="h-auto w-full"
               sizes="(max-width: 768px) 100vw, 672px"
               onError={() => setImgError(true)}
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center">
+            <div className="flex aspect-[16/9] w-full items-center justify-center">
               <svg className="h-20 w-20 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 17h1l1-5h14l1 5h1M5 17l-2 4h18l-2-4M7 7h10l2 5H5l2-5zM9 7V5a1 1 0 011-1h4a1 1 0 011 1v2" />
               </svg>

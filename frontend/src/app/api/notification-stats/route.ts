@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createClient as createServerClient } from "@/lib/supabase/server";
+import { PREMIUM_SUBSCRIPTION_STATUSES } from "@/lib/polar/subscriptionSync";
 
 function getAdminClient() {
   return createClient(
@@ -23,7 +24,7 @@ export async function GET() {
     .from("subscriptions")
     .select("id")
     .eq("user_id", user.id)
-    .eq("status", "active")
+    .in("status", [...PREMIUM_SUBSCRIPTION_STATUSES])
     .gt("current_period_end", new Date().toISOString())
     .limit(1)
     .maybeSingle();

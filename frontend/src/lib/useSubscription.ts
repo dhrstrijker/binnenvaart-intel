@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { PREMIUM_SUBSCRIPTION_STATUSES } from "@/lib/polar/subscriptionSync";
 import type { User } from "@supabase/supabase-js";
 
 export interface Subscription {
@@ -41,27 +42,35 @@ export function useSubscription() {
     }
 
     async function load(providedUser?: User | null) {
+      setIsLoading(true);
+
       try {
         const currentUser = providedUser === undefined ? await getUserWithTimeout(8000) : providedUser;
-        setUser(currentUser ?? null);
-        setIsPremium(false);
-        setSubscription(null);
 
-        if (currentUser) {
-          const { data } = await supabase
-            .from("subscriptions")
-            .select("id, status, current_period_end, recurring_interval, cancel_at_period_end")
-            .eq("user_id", currentUser.id)
-            .eq("status", "active")
-            .gt("current_period_end", new Date().toISOString())
-            .limit(1)
-            .maybeSingle();
-
-          if (data) {
-            setIsPremium(true);
-            setSubscription(data);
-          }
+        if (!currentUser) {
+          setUser(null);
+          setIsPremium(false);
+          setSubscription(null);
+          return;
         }
+
+        setUser(currentUser);
+
+        const { data, error } = await supabase
+          .from("subscriptions")
+          .select("id, status, current_period_end, recurring_interval, cancel_at_period_end")
+          .eq("user_id", currentUser.id)
+          .in("status", [...PREMIUM_SUBSCRIPTION_STATUSES])
+          .gt("current_period_end", new Date().toISOString())
+          .limit(1)
+          .maybeSingle();
+
+        if (error) {
+          throw error;
+        }
+
+        setIsPremium(Boolean(data));
+        setSubscription(data ?? null);
       } catch (err) {
         console.error("Failed to load subscription state", err);
         setUser(null);

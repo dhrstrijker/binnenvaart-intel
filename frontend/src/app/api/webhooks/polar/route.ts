@@ -1,5 +1,12 @@
 import { Webhooks } from "@polar-sh/nextjs";
 import { createClient } from "@supabase/supabase-js";
+import {
+  buildSubscriptionPatch,
+  buildSubscriptionUpsert,
+  resolveUserIdFromCheckout,
+  resolveUserIdFromSubscription,
+  type PolarSubscriptionLike,
+} from "@/lib/polar/subscriptionSync";
 
 function getAdminClient() {
   return createClient(
@@ -8,66 +15,113 @@ function getAdminClient() {
   );
 }
 
+async function findUserIdByPolarCustomerId(
+  admin: ReturnType<typeof getAdminClient>,
+  polarCustomerId: string | null,
+): Promise<string | null> {
+  if (!polarCustomerId) return null;
+
+  const { data, error } = await admin
+    .from("profiles")
+    .select("id")
+    .eq("polar_customer_id", polarCustomerId)
+    .maybeSingle();
+
+  if (error && error.code !== "PGRST116") {
+    throw error;
+  }
+
+  return data?.id ?? null;
+}
+
+async function linkProfileCustomer(
+  admin: ReturnType<typeof getAdminClient>,
+  userId: string,
+  polarCustomerId: string | null,
+) {
+  if (!polarCustomerId) return;
+
+  const { error } = await admin
+    .from("profiles")
+    .update({
+      polar_customer_id: polarCustomerId,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", userId);
+
+  if (error) {
+    throw error;
+  }
+}
+
+async function syncSubscription(
+  admin: ReturnType<typeof getAdminClient>,
+  subscription: PolarSubscriptionLike,
+): Promise<string | null> {
+  const nowIso = new Date().toISOString();
+
+  const { data: updatedRows, error: updateError } = await admin
+    .from("subscriptions")
+    .update(buildSubscriptionPatch(subscription, nowIso))
+    .eq("id", subscription.id)
+    .select("id,user_id");
+  if (updateError) {
+    throw updateError;
+  }
+
+  if ((updatedRows?.length ?? 0) > 0) {
+    return updatedRows?.[0]?.user_id ?? null;
+  }
+
+  const profileUserId = await findUserIdByPolarCustomerId(admin, subscription.customerId);
+  const userId = resolveUserIdFromSubscription(subscription, profileUserId);
+  if (!userId) {
+    console.error("[polar-webhook] Unable to resolve user_id for subscription", {
+      subscriptionId: subscription.id,
+      customerId: subscription.customerId,
+    });
+    throw new Error("Unable to resolve user_id for subscription");
+  }
+
+  const { data: upserted, error: upsertError } = await admin
+    .from("subscriptions")
+    .upsert(buildSubscriptionUpsert(subscription, userId, nowIso))
+    .select("id,user_id")
+    .single();
+  if (upsertError) {
+    throw upsertError;
+  }
+
+  return upserted?.user_id ?? userId;
+}
+
 export const POST = Webhooks({
   webhookSecret: process.env.POLAR_WEBHOOK_SECRET!,
 
   onSubscriptionCreated: async (payload) => {
     const sub = payload.data;
-    const metadata = sub.metadata as Record<string, string> | undefined;
-    const userId = metadata?.user_id;
-    if (!userId) {
-      console.error("[polar-webhook] onSubscriptionCreated: missing user_id in metadata", { subId: sub.id, customerId: sub.customerId });
-      throw new Error("Missing user_id in subscription metadata");
-    }
-
     const admin = getAdminClient();
-    const { error } = await admin.from("subscriptions").upsert({
-      id: sub.id,
-      user_id: userId,
-      polar_customer_id: sub.customerId,
-      product_id: sub.productId,
-      status: sub.status,
-      amount: sub.amount,
-      currency: sub.currency,
-      recurring_interval: sub.recurringInterval,
-      current_period_start: sub.currentPeriodStart,
-      current_period_end: sub.currentPeriodEnd,
-      cancel_at_period_end: sub.cancelAtPeriodEnd,
-      created_at: sub.createdAt,
-      updated_at: new Date().toISOString(),
-    });
-    if (error) {
-      console.error("[polar-webhook] onSubscriptionCreated upsert failed", error);
-      throw error;
-    }
-
-    // Link polar_customer_id to user profile
-    if (sub.customerId) {
-      const { error: profileError } = await admin
-        .from("profiles")
-        .update({ polar_customer_id: sub.customerId, updated_at: new Date().toISOString() })
-        .eq("id", userId);
-      if (profileError) {
-        console.error("[polar-webhook] onSubscriptionCreated profile update failed", profileError);
-        throw profileError;
+    try {
+      const userId = await syncSubscription(admin, sub);
+      if (userId) {
+        await linkProfileCustomer(admin, userId, sub.customerId);
       }
+    } catch (error) {
+      console.error("[polar-webhook] onSubscriptionCreated sync failed", error);
+      throw error;
     }
   },
 
   onSubscriptionActive: async (payload) => {
     const sub = payload.data;
     const admin = getAdminClient();
-    const { error } = await admin
-      .from("subscriptions")
-      .update({
-        status: sub.status,
-        current_period_start: sub.currentPeriodStart,
-        current_period_end: sub.currentPeriodEnd,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", sub.id);
-    if (error) {
-      console.error("[polar-webhook] onSubscriptionActive update failed", error);
+    try {
+      const userId = await syncSubscription(admin, sub);
+      if (userId) {
+        await linkProfileCustomer(admin, userId, sub.customerId);
+      }
+    } catch (error) {
+      console.error("[polar-webhook] onSubscriptionActive sync failed", error);
       throw error;
     }
   },
@@ -75,22 +129,13 @@ export const POST = Webhooks({
   onSubscriptionUpdated: async (payload) => {
     const sub = payload.data;
     const admin = getAdminClient();
-    const { error } = await admin
-      .from("subscriptions")
-      .update({
-        status: sub.status,
-        amount: sub.amount,
-        currency: sub.currency,
-        recurring_interval: sub.recurringInterval,
-        current_period_start: sub.currentPeriodStart,
-        current_period_end: sub.currentPeriodEnd,
-        cancel_at_period_end: sub.cancelAtPeriodEnd,
-        canceled_at: sub.canceledAt,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", sub.id);
-    if (error) {
-      console.error("[polar-webhook] onSubscriptionUpdated update failed", error);
+    try {
+      const userId = await syncSubscription(admin, sub);
+      if (userId) {
+        await linkProfileCustomer(admin, userId, sub.customerId);
+      }
+    } catch (error) {
+      console.error("[polar-webhook] onSubscriptionUpdated sync failed", error);
       throw error;
     }
   },
@@ -98,17 +143,13 @@ export const POST = Webhooks({
   onSubscriptionCanceled: async (payload) => {
     const sub = payload.data;
     const admin = getAdminClient();
-    const { error } = await admin
-      .from("subscriptions")
-      .update({
-        status: "canceled",
-        cancel_at_period_end: sub.cancelAtPeriodEnd,
-        canceled_at: sub.canceledAt ?? new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", sub.id);
-    if (error) {
-      console.error("[polar-webhook] onSubscriptionCanceled update failed", error);
+    try {
+      const userId = await syncSubscription(admin, sub);
+      if (userId) {
+        await linkProfileCustomer(admin, userId, sub.customerId);
+      }
+    } catch (error) {
+      console.error("[polar-webhook] onSubscriptionCanceled sync failed", error);
       throw error;
     }
   },
@@ -116,15 +157,27 @@ export const POST = Webhooks({
   onSubscriptionRevoked: async (payload) => {
     const sub = payload.data;
     const admin = getAdminClient();
-    const { error } = await admin
-      .from("subscriptions")
-      .update({
-        status: "revoked",
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", sub.id);
-    if (error) {
-      console.error("[polar-webhook] onSubscriptionRevoked update failed", error);
+    try {
+      const userId = await syncSubscription(admin, sub);
+      if (userId) {
+        await linkProfileCustomer(admin, userId, sub.customerId);
+      }
+    } catch (error) {
+      console.error("[polar-webhook] onSubscriptionRevoked sync failed", error);
+      throw error;
+    }
+  },
+
+  onSubscriptionUncanceled: async (payload) => {
+    const sub = payload.data;
+    const admin = getAdminClient();
+    try {
+      const userId = await syncSubscription(admin, sub);
+      if (userId) {
+        await linkProfileCustomer(admin, userId, sub.customerId);
+      }
+    } catch (error) {
+      console.error("[polar-webhook] onSubscriptionUncanceled sync failed", error);
       throw error;
     }
   },
@@ -133,22 +186,18 @@ export const POST = Webhooks({
     const checkout = payload.data;
     if (checkout.status !== "succeeded") return;
 
-    const metadata = checkout.metadata as Record<string, string> | undefined;
-    const userId = metadata?.user_id;
+    const userId = resolveUserIdFromCheckout(checkout);
     if (!userId || !checkout.customerId) {
-      console.error("[polar-webhook] onCheckoutUpdated: missing user_id or customerId", { checkoutId: checkout.id });
+      console.error("[polar-webhook] onCheckoutUpdated: missing user_id or customerId", {
+        checkoutId: checkout.id,
+      });
       return;
     }
 
     const admin = getAdminClient();
-    const { error } = await admin
-      .from("profiles")
-      .update({
-        polar_customer_id: checkout.customerId,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", userId);
-    if (error) {
+    try {
+      await linkProfileCustomer(admin, userId, checkout.customerId);
+    } catch (error) {
       console.error("[polar-webhook] onCheckoutUpdated profile update failed", error);
       throw error;
     }

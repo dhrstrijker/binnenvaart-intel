@@ -15,6 +15,11 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://navisio.nl"),
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    shortcut: ["/favicon.svg"],
+    apple: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+  },
   title: {
     default: "Navisio - Scheepsmarkt Intelligence",
     template: "%s | Navisio",

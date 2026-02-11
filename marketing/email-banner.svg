@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" role="img" aria-label="Navisio email banner">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#1E293B"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#22D3EE"/>
+      <stop offset="100%" stop-color="#06B6D4"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="400" fill="url(#bg)"/>
+  <circle cx="1020" cy="90" r="110" fill="#06B6D4" fill-opacity="0.14"/>
+  <circle cx="940" cy="320" r="170" fill="#22D3EE" fill-opacity="0.1"/>
+
+  <text x="80" y="150" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="56" font-weight="800" letter-spacing="-1.2">NAVISIO</text>
+  <text x="80" y="205" fill="#CFFAFE" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="500">
+    marktinzicht voor binnenvaartondernemers
+  </text>
+
+  <path d="M 80 280 Q 150 245 220 280 T 360 280 T 500 280 T 640 280" fill="none" stroke="url(#accent)" stroke-width="16" stroke-linecap="round"/>
+</svg>

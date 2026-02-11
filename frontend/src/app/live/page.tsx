@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { createClient } from "@/lib/supabase/client";
@@ -11,14 +11,6 @@ import { useSubscription } from "@/lib/useSubscription";
 import type { ActivityLogEntry } from "@/lib/supabase";
 
 const DAYS_WINDOW = 14;
-
-const FAKE_ROWS = [
-  "Prijswijziging € 950.000 -> € 910.000 · Galle Makelaars",
-  "Nieuw schip toegevoegd · GSK Brokers",
-  "Verwijderd uit aanbod · P.C. Shipbrokers",
-  "Prijswijziging € 680.000 -> € 725.000 · Rensen-Driessen",
-  "Verkocht · GTS Schepen",
-];
 
 function relativeTime(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
@@ -110,6 +102,7 @@ function eventIcon(entry: ActivityLogEntry) {
 }
 
 export default function LivePage() {
+  const router = useRouter();
   const { user, isPremium, isLoading: subLoading } = useSubscription();
   const [entries, setEntries] = useState<ActivityLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -117,6 +110,17 @@ export default function LivePage() {
 
   useEffect(() => {
     if (subLoading) return;
+    if (!user) {
+      router.replace("/login?next=%2Flive");
+      return;
+    }
+    if (!isPremium) {
+      router.replace("/pricing");
+    }
+  }, [subLoading, user, isPremium, router]);
+
+  useEffect(() => {
+    if (subLoading || !user || !isPremium) return;
 
     let cancelled = false;
 
@@ -149,7 +153,21 @@ export default function LivePage() {
     return () => {
       cancelled = true;
     };
-  }, [subLoading, user?.id]);
+  }, [subLoading, user, isPremium]);
+
+  if (subLoading || !user || !isPremium) {
+    return (
+      <div className="min-h-screen bg-slate-50">
+        <Header />
+        <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
+          <div className="flex justify-center py-10">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-200 border-t-cyan-500" />
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -220,34 +238,6 @@ export default function LivePage() {
             </div>
           )}
 
-          {!isPremium && (
-            <div className="relative mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
-              <div className="space-y-2 p-4" aria-hidden="true">
-                {FAKE_ROWS.map((line, idx) => (
-                  <div key={idx} className="rounded-lg border border-slate-100 px-3 py-2 text-sm text-slate-500">
-                    {line}
-                  </div>
-                ))}
-              </div>
-
-              <div className="pointer-events-none absolute inset-0 bg-white/65 backdrop-blur-[4px]" />
-
-              <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 rounded-xl bg-slate-950/90 p-5 text-center text-white shadow-xl">
-                <p className="text-sm font-semibold">
-                  Historische wijzigingen ouder dan de 3 meest recente zijn alleen zichtbaar met Pro.
-                </p>
-                <p className="mt-1 text-xs text-slate-200">
-                  Upgrade voor volledige toegang tot 2 weken historie.
-                </p>
-                <Link
-                  href="/pricing"
-                  className="pointer-events-auto mt-3 inline-block rounded-lg bg-cyan-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-cyan-400"
-                >
-                  Upgrade naar Navisio Pro
-                </Link>
-              </div>
-            </div>
-          )}
         </div>
       </main>
       <Footer />

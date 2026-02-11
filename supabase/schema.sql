@@ -158,7 +158,7 @@ AS $$
   SELECT EXISTS(
     SELECT 1 FROM subscriptions
     WHERE user_id = (SELECT auth.uid())
-    AND status IN ('active')
+    AND status IN ('active', 'trialing', 'canceled')
     AND current_period_end > NOW()
   );
 $$;

@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { PREMIUM_SUBSCRIPTION_STATUSES } from "@/lib/polar/subscriptionSync";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import type { User } from "@supabase/supabase-js";
@@ -44,7 +45,7 @@ export default function PricingPage() {
           .from("subscriptions")
           .select("status, current_period_end")
           .eq("user_id", user.id)
-          .eq("status", "active")
+          .in("status", [...PREMIUM_SUBSCRIPTION_STATUSES])
           .gt("current_period_end", new Date().toISOString())
           .limit(1);
         setIsPremium((data?.length ?? 0) > 0);
@@ -58,6 +59,8 @@ export default function PricingPage() {
     const params = new URLSearchParams({ products: productId });
     if (user) {
       params.set("customerEmail", user.email ?? "");
+      params.set("customerExternalId", user.id);
+      params.set("customerMetadata", JSON.stringify({ user_id: user.id }));
       params.set("metadata", JSON.stringify({ user_id: user.id }));
     }
     return `/api/checkout?${params.toString()}`;

@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:filterbar": "node --test tests/filterBarBehavior.test.mjs"
+    "test:filterbar": "node --test tests/filterBarBehavior.test.mjs",
+    "test:polar": "node --test tests/polarSubscriptionSync.test.mjs",
+    "test": "node --test tests/filterBarBehavior.test.mjs tests/polarSubscriptionSync.test.mjs"
   },
   "dependencies": {
     "@polar-sh/nextjs": "^0.9.3",

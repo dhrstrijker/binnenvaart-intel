@@ -20,10 +20,16 @@ export default function CheckoutSuccessPage() {
             Je Navisio Pro-abonnement is geactiveerd. Je hebt nu toegang tot
             prijsgeschiedenis, marktanalyses en meer.
           </p>
-          <div className="mt-8">
+          <div className="mt-8 flex flex-col gap-3">
+            <Link
+              href="/live"
+              className="inline-block rounded-lg bg-cyan-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-cyan-700"
+            >
+              Naar live wijzigingen
+            </Link>
             <Link
               href="/"
-              className="inline-block rounded-lg bg-cyan-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-cyan-700"
+              className="inline-block rounded-lg border border-slate-300 bg-white px-6 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
             >
               Naar dashboard
             </Link>
