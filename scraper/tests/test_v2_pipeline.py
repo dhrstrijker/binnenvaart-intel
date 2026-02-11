@@ -19,16 +19,24 @@ class _RpcOp:
 
 
 class _TableOp:
-    def __init__(self, data=None):
+    def __init__(self, data=None, log_calls=None, table_name=None):
         self._data = data
+        self._log_calls = log_calls
+        self._table_name = table_name
 
     def insert(self, *_args, **_kwargs):
+        if self._log_calls is not None:
+            self._log_calls.append(("table.insert", self._table_name))
         return self
 
     def upsert(self, *_args, **_kwargs):
+        if self._log_calls is not None:
+            self._log_calls.append(("table.upsert", self._table_name))
         return self
 
     def update(self, *_args, **_kwargs):
+        if self._log_calls is not None:
+            self._log_calls.append(("table.update", self._table_name))
         return self
 
     def eq(self, *_args, **_kwargs):
@@ -45,17 +53,20 @@ class _FakeSupabase:
     def __init__(self):
         self.table_calls = []
         self.rpc_calls = []
+        self.call_order = []
 
     def table(self, name):
         self.table_calls.append(name)
+        self.call_order.append(("table", name))
         if name == "vessels":
-            return _TableOp(data=[])
+            return _TableOp(data=[], log_calls=self.call_order, table_name=name)
         if name == "scrape_runs_v2":
-            return _TableOp(data=[{"id": "run-1"}])
-        return _TableOp(data=[])
+            return _TableOp(data=[{"id": "run-1"}], log_calls=self.call_order, table_name=name)
+        return _TableOp(data=[], log_calls=self.call_order, table_name=name)
 
     def rpc(self, name, params):
         self.rpc_calls.append((name, params))
+        self.call_order.append(("rpc", name))
         if name == "compute_scrape_diff":
             return _RpcOp(
                 data=[
@@ -140,6 +151,21 @@ def test_detail_fetch_policy_new_or_changed(monkeypatch):
     pipeline.run_source(adapter, config)
 
     assert adapter.detail_calls == 0
+
+
+def test_run_metadata_written_before_mark_missing_candidates(monkeypatch):
+    fake = _FakeSupabase()
+    monkeypatch.setattr("v2.pipeline.supabase", fake)
+
+    pipeline = PipelineV2(mode="shadow")
+    adapter = _Adapter()
+    config = DEFAULT_SOURCE_CONFIGS["galle"]
+
+    pipeline.run_source(adapter, config)
+
+    first_mark_missing_idx = fake.call_order.index(("rpc", "mark_missing_candidates"))
+    metadata_update_idx = fake.call_order.index(("table.update", "scrape_runs_v2"))
+    assert metadata_update_idx < first_mark_missing_idx
 
 
 def test_health_summary_marks_unhealthy_on_parse_fail_ratio():
