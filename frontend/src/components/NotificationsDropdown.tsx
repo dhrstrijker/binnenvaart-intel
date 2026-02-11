@@ -49,22 +49,33 @@ export default function NotificationsDropdown({ user, isPremium }: Notifications
   useEffect(() => {
     if (!open || !user) return;
 
-    refreshSearches();
+    let cancelled = false;
 
-    setWatchlistLoading(true);
-    const supabase = createClient();
-    supabase
-      .from("watchlist")
-      .select("id, vessel_id, vessels(id, name, source, price)")
-      .eq("user_id", user.id)
-      .order("added_at", { ascending: false })
-      .then(({ data }) => {
+    async function loadDropdownData() {
+      refreshSearches();
+      setWatchlistLoading(true);
+      const supabase = createClient();
+      try {
+        const { data } = await supabase
+          .from("watchlist")
+          .select("id, vessel_id, vessels(id, name, source, price)")
+          .eq("user_id", user.id)
+          .order("added_at", { ascending: false });
+        if (cancelled) return;
         const items = (data as unknown as WatchlistVessel[]) ?? [];
         setWatchlistItems(items);
         setWatchlistCount(items.length);
-        setWatchlistLoading(false);
-      });
-  }, [open, user, refreshSearches]);
+      } finally {
+        if (!cancelled) setWatchlistLoading(false);
+      }
+    }
+
+    loadDropdownData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open, user, refreshSearches, setWatchlistCount]);
 
   async function handleRemoveWatchlist(watchlistId: string) {
     const supabase = createClient();

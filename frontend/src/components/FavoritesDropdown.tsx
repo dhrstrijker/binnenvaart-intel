@@ -41,34 +41,46 @@ export default function FavoritesDropdown({ user }: FavoritesDropdownProps) {
   useEffect(() => {
     if (!open) return;
 
-    setLoading(true);
-    const supabase = createClient();
+    let cancelled = false;
 
-    if (user) {
-      supabase
-        .from("favorites")
-        .select("vessel_id, vessels(id, name, source, price, image_url)")
-        .eq("user_id", user.id)
-        .order("added_at", { ascending: false })
-        .limit(4)
-        .then(({ data }) => {
+    async function loadFavorites() {
+      setLoading(true);
+      const supabase = createClient();
+      try {
+        if (user) {
+          const { data } = await supabase
+            .from("favorites")
+            .select("vessel_id, vessels(id, name, source, price, image_url)")
+            .eq("user_id", user.id)
+            .order("added_at", { ascending: false })
+            .limit(4);
+          if (cancelled) return;
           const items = (data ?? []) as unknown as { vessel_id: string; vessels: FavoriteVessel }[];
           setVessels(items.map((r) => r.vessels));
-          setLoading(false);
-        });
-    } else if (localFavorites.length > 0) {
-      supabase
-        .from("vessels")
-        .select("id, name, source, price, image_url")
-        .in("id", localFavorites.slice(0, 4))
-        .then(({ data }) => {
+          return;
+        }
+
+        if (localFavorites.length > 0) {
+          const { data } = await supabase
+            .from("vessels")
+            .select("id, name, source, price, image_url")
+            .in("id", localFavorites.slice(0, 4));
+          if (cancelled) return;
           setVessels((data as FavoriteVessel[]) ?? []);
-          setLoading(false);
-        });
-    } else {
-      setVessels([]);
-      setLoading(false);
+          return;
+        }
+
+        if (!cancelled) setVessels([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     }
+
+    loadFavorites();
+
+    return () => {
+      cancelled = true;
+    };
   }, [open, user, localFavorites]);
 
   const preview = vessels.slice(0, 3);
