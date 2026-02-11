@@ -5,21 +5,25 @@ from bs4 import BeautifulSoup
 
 from http_utils import fetch_with_retry
 from scrape_galle import URL as GALLE_URL, parse_card, _fetch_detail
+from v2.sources.contracts import new_detail_metrics, new_listing_metrics
 
 logger = logging.getLogger(__name__)
 
 
 class GalleAdapter:
     source_key = "galle"
+    owner = "scraper-pipeline"
 
     def scrape_listing(self) -> tuple[list[dict], dict]:
-        metrics = {"external_requests": 1, "selector_fail_count": 0, "parse_fail_count": 0}
+        metrics = new_listing_metrics()
+        metrics["external_requests"] = 1
 
         resp = fetch_with_retry(requests.get, GALLE_URL)
         soup = BeautifulSoup(resp.text, "html.parser")
         cards = soup.select(".cat-product-small")
         if not cards:
             metrics["selector_fail_count"] += 1
+            metrics["page_coverage_ratio"] = 0.0
 
         rows = []
         for card in cards:
@@ -37,7 +41,7 @@ class GalleAdapter:
         return rows, metrics
 
     def enrich_detail(self, listing_row: dict) -> tuple[dict, dict]:
-        metrics = {"external_requests": 0, "parse_fail_count": 0}
+        metrics = new_detail_metrics()
 
         vessel = dict(listing_row)
         detail_url = vessel.get("url")

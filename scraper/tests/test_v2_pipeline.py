@@ -91,7 +91,12 @@ class _Adapter:
                 "url": "https://example.com/v1",
                 "image_url": "https://example.com/v1.jpg",
             }
-        ], {"external_requests": 1, "parse_fail_count": 0, "selector_fail_count": 0})
+        ], {
+            "external_requests": 1,
+            "parse_fail_count": 0,
+            "selector_fail_count": 0,
+            "page_coverage_ratio": 1.0,
+        })
 
     def enrich_detail(self, listing_row):
         self.detail_calls += 1

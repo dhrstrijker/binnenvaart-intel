@@ -1,7 +1,7 @@
 import logging
 import os
 
-from v2.config import DEFAULT_SOURCE_CONFIGS
+from v2.config import DEFAULT_SOURCE_CONFIGS, SOURCE_ADAPTER_OWNERS
 from v2.pipeline import PipelineV2
 from v2.sources.galle_v2 import GalleAdapter
 from v2.sources.gsk_v2 import GSKAdapter
@@ -40,6 +40,7 @@ def run_pipeline_v2() -> list[dict]:
     for source in sources:
         config = DEFAULT_SOURCE_CONFIGS.get(source)
         adapter_cls = ADAPTERS.get(source)
+        owner = SOURCE_ADAPTER_OWNERS.get(source)
 
         if not config:
             logger.warning("Skipping unknown v2 source config: %s", source)
@@ -47,8 +48,11 @@ def run_pipeline_v2() -> list[dict]:
         if not adapter_cls:
             logger.warning("Skipping source without v2 adapter implementation: %s", source)
             continue
+        if not owner:
+            raise ValueError(f"Missing source owner mapping for v2 source: {source}")
 
         adapter = adapter_cls()
+        logger.info("Running v2 source %s (owner=%s, adapter=%s)", source, owner, adapter.__class__.__name__)
         result = pipeline.run_source(adapter, config)
         results.append(result)
         logger.info(

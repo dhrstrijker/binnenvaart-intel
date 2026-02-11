@@ -4,6 +4,7 @@ import requests
 
 from db import upsert_vessel
 from http_utils import fetch_with_retry as _fetch_with_retry
+from parsing import parse_bool as _parse_bool, parse_dimension_value
 
 logger = logging.getLogger(__name__)
 
@@ -12,37 +13,13 @@ MAX_PAGES = 50
 
 
 def parse_bool(value) -> bool:
-    """Parse explicit boolean-like values from source payloads.
-
-    Avoid Python truthiness pitfalls where non-empty strings like \"false\"
-    would otherwise evaluate to True.
-    """
-    if isinstance(value, bool):
-        return value
-    if value is None:
-        return False
-    if isinstance(value, (int, float)):
-        return value != 0
-    if isinstance(value, str):
-        normalized = value.strip().lower()
-        if normalized in {"true", "1", "yes", "y", "ja"}:
-            return True
-        if normalized in {"false", "0", "no", "n", "nee", ""}:
-            return False
-    return False
+    """Backwards-compatible wrapper for shared parsing utility."""
+    return _parse_bool(value)
 
 
 def parse_dimension(value):
-    """Parse a dimension like '110,00m' or 110.0 to float."""
-    if value is None:
-        return None
-    s = str(value).strip().lower().replace("m", "").replace(",", ".").strip()
-    if not s:
-        return None
-    try:
-        return float(s)
-    except (ValueError, TypeError):
-        return None
+    """Backwards-compatible wrapper for shared parsing utility."""
+    return parse_dimension_value(value)
 
 
 def parse_vessel(ship: dict) -> dict:

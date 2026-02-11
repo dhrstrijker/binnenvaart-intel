@@ -142,7 +142,6 @@ class TestMarkRemovedLogsActivity:
             _FakeSelectResponse(data=removed_vessels)
         )
         with patch.object(db, "supabase", mock_sb), patch.object(db, "_log_activity") as mock_log:
-            db.clear_changes()
             count = db.mark_removed("galle", "2025-01-01T00:00:00Z")
         assert count == 2
         assert mock_log.call_count == 2
