@@ -49,18 +49,31 @@ export default function NotificationSettings({ user }: NotificationSettingsProps
     setSaving(true);
     setSaved(false);
     const supabase = createClient();
+    if (!user.email) {
+      setSaving(false);
+      return;
+    }
 
-    const { error } = await supabase
+    const payload = {
+      user_id: user.id,
+      email: user.email,
+      preferences: prefs,
+      active: masterEnabled,
+    };
+
+    const { data: updatedRows, error: updateError } = await supabase
       .from("notification_subscribers")
-      .upsert(
-        {
-          user_id: user.id,
-          email: user.email,
-          preferences: prefs,
-          active: masterEnabled,
-        },
-        { onConflict: "user_id" }
-      );
+      .update(payload)
+      .eq("user_id", user.id)
+      .select("id");
+
+    let error = updateError;
+    if (!error && (!updatedRows || updatedRows.length === 0)) {
+      const { error: insertError } = await supabase
+        .from("notification_subscribers")
+        .insert(payload);
+      error = insertError;
+    }
 
     setSaving(false);
     if (!error) {
