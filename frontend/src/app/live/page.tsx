@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -199,9 +200,10 @@ export default function LivePage() {
           ) : (
             <div className="mt-5 space-y-2">
               {entries.map((entry) => (
-                <div
+                <Link
                   key={entry.id}
-                  className="flex items-start gap-3 rounded-xl border border-slate-100 px-4 py-3"
+                  href={`/schepen/${entry.vessel_id}`}
+                  className="flex items-start gap-3 rounded-xl border border-slate-100 px-4 py-3 transition hover:bg-slate-50"
                 >
                   {eventIcon(entry)}
                   <div className="min-w-0 flex-1">
@@ -233,7 +235,7 @@ export default function LivePage() {
                       )}
                     </p>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}

@@ -141,8 +141,10 @@ export default function LiveDropdown() {
           ) : (
             <div className="space-y-1 px-2 pb-2">
               {entries.map((entry) => (
-                <div
+                <Link
                   key={entry.id}
+                  href={`/schepen/${entry.vessel_id}`}
+                  onClick={close}
                   className="flex items-start gap-3 rounded-xl px-3 py-2.5 transition hover:bg-slate-50"
                 >
                   {eventIcon(entry)}
@@ -181,7 +183,7 @@ export default function LiveDropdown() {
                       )}
                     </p>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}
