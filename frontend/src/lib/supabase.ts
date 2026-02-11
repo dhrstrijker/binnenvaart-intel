@@ -90,7 +90,21 @@ export interface StructuredTanker {
   capacity_m3?: number | null;
   coating?: string | null;
   pipe_system?: string | null;
-  cargo_pumps?: string | null;
+  cargo_pumps?: string | {
+    make?: string | null;
+    type?: string | null;
+    year?: number | null;
+    revision_year?: number | null;
+    capacity_m3_per_hour?: number | null;
+    revision_description?: string | null;
+  } | Array<{
+    make?: string | null;
+    type?: string | null;
+    year?: number | null;
+    revision_year?: number | null;
+    capacity_m3_per_hour?: number | null;
+    revision_description?: string | null;
+  }> | null;
   heating?: string | null;
 }
 

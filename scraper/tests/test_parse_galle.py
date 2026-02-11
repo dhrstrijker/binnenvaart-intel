@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 from scrape_galle import (
     parse_price, parse_dimensions, extract_image_url, parse_card,
     _parse_detail_specs, _parse_detail_images, _parse_tonnage,
-    _parse_dutch_number,
+    _parse_dutch_number, _fetch_detail,
 )
 
 
@@ -257,6 +257,90 @@ class TestParseDetailSpecs:
         specs = _parse_detail_specs(soup)
         assert specs == {}
 
+    def test_multiple_product_specs_containers(self):
+        html = """
+        <div class="product-specs">
+          <h7>Algemeen</h7>
+          <div class="spec-row">
+            <label class="spec-label">naam</label>
+            <label class="spec-value">Liverpool</label>
+          </div>
+        </div>
+        <div class="product-specs">
+          <h7>Hoofdmotor(en)</h7>
+          <div class="spec-row">
+            <label class="spec-label">fabr. merk</label>
+            <label class="spec-value">Mitsubishi</label>
+          </div>
+          <div class="spec-row">
+            <label class="spec-label">type</label>
+            <label class="spec-value">S12R STAGE 5</label>
+          </div>
+        </div>
+        """
+        specs = _parse_detail_specs(BeautifulSoup(html, "html.parser"))
+        assert specs["naam"] == "Liverpool"
+        assert specs["hoofdmotor(en) > fabr. merk"] == "Mitsubishi"
+        assert specs["hoofdmotor(en) > type"] == "S12R STAGE 5"
+
+    def test_nested_spec_rows_inside_wrapper(self):
+        html = """
+        <div class="product-specs">
+          <h7>Hoofdmotor(en)</h7>
+          <div class="spec-group">
+            <div class="spec-row">
+              <label class="spec-label">pk</label>
+              <label class="spec-value">1.278</label>
+            </div>
+            <div class="spec-row">
+              <label class="spec-label">kw</label>
+              <label class="spec-value">940</label>
+            </div>
+          </div>
+        </div>
+        """
+        specs = _parse_detail_specs(BeautifulSoup(html, "html.parser"))
+        assert specs["hoofdmotor(en) > pk"] == "1.278"
+        assert specs["hoofdmotor(en) > kw"] == "940"
+
+    def test_rows_without_spec_label_classes(self):
+        html = """
+        <div class="product-specs">
+          <h7>Hoofdmotor(en)</h7>
+          <div class="spec-row">
+            <label>Keerkoppeling</label>
+            <label>ZF, BW 461, rev. 2024.</label>
+          </div>
+          <div class="spec-row">
+            <label>Reductie</label>
+            <label>4,294:1</label>
+          </div>
+        </div>
+        """
+        specs = _parse_detail_specs(BeautifulSoup(html, "html.parser"))
+        assert specs["hoofdmotor(en) > keerkoppeling"] == "ZF, BW 461, rev. 2024."
+        assert specs["hoofdmotor(en) > reductie"] == "4,294:1"
+
+    def test_rows_with_spec_value_1_and_2_classes(self):
+        html = """
+        <div class="product-specs">
+          <h7>Hoofdmotor(en)</h7>
+          <div class="spec-row">
+            <label class="spec-label mobile_fix">&nbsp;</label>
+            <label class="spec-value-1">fabr. merk</label>
+            <label class="spec-value-2">Mitsubishi</label>
+          </div>
+          <div class="spec-row">
+            <label class="spec-label mobile_fix">&nbsp;</label>
+            <label class="spec-value-1">keerkoppeling</label>
+            <label class="spec-value-2">ZF, BW 461, rev. 2024.</label>
+          </div>
+        </div>
+        """
+        specs = _parse_detail_specs(BeautifulSoup(html, "html.parser"))
+        assert specs["hoofdmotor(en) > fabr. merk"] == "Mitsubishi"
+        assert specs["hoofdmotor(en) > keerkoppeling"] == "ZF, BW 461, rev. 2024."
+
 
 class TestParseDetailImages:
     def _soup(self, html=DETAIL_HTML):
@@ -350,3 +434,46 @@ class TestParseTonnage:
     def test_invalid_value(self):
         specs = {"tonnenmaat > maximum diepgang (t)": "n/a"}
         assert _parse_tonnage(specs) is None
+
+
+def test_fetch_detail_prefers_richer_url_variant(monkeypatch):
+    sparse_html = """
+    <html><body>
+      <div class="product-specs">
+        <h7>Algemeen</h7>
+        <div class="spec-row"><label class="spec-label">naam</label><label class="spec-value">Liverpool</label></div>
+      </div>
+    </body></html>
+    """
+    rich_html = """
+    <html><body>
+      <div class="product-specs">
+        <h7>Algemeen</h7>
+        <div class="spec-row"><label class="spec-label">naam</label><label class="spec-value">Liverpool</label></div>
+      </div>
+      <div class="product-specs">
+        <h7>Hoofdmotor(en)</h7>
+        <div class="spec-row"><label class="spec-label">fabr. merk</label><label class="spec-value">Mitsubishi</label></div>
+        <div class="spec-row"><label class="spec-label">type</label><label class="spec-value">S12R STAGE 5</label></div>
+      </div>
+    </body></html>
+    """
+
+    calls = []
+
+    class _Resp:
+        def __init__(self, text: str):
+            self.text = text
+
+    def _fake_fetch(_method, url, **_kwargs):
+        calls.append(url)
+        if "/scheepsaanbod/" in url:
+            return _Resp(rich_html)
+        return _Resp(sparse_html)
+
+    monkeypatch.setattr("scrape_galle._fetch_with_retry", _fake_fetch)
+
+    result = _fetch_detail("http://gallemakelaars.nl/liverpool")
+    assert result["raw_details"]["hoofdmotor(en) > fabr. merk"] == "Mitsubishi"
+    assert result["raw_details"]["hoofdmotor(en) > type"] == "S12R STAGE 5"
+    assert any("/scheepsaanbod/liverpool" in u for u in calls)

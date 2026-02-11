@@ -25,7 +25,39 @@ export interface RawDetailGroup {
 
 function num(v: unknown): number | null {
   if (v === null || v === undefined || v === "") return null;
-  const n = typeof v === "number" ? v : parseFloat(String(v).replace(",", "."));
+  if (typeof v === "number") return Number.isFinite(v) ? v : null;
+
+  const raw = String(v).trim().replace(/\u00A0/g, " ").replace(/\s+/g, "");
+  const cleaned = raw.replace(/[^\d,.\-]/g, "");
+  if (!cleaned || cleaned === "-") return null;
+
+  const hasComma = cleaned.includes(",");
+  const hasDot = cleaned.includes(".");
+
+  let normalized = cleaned;
+  if (hasComma && hasDot) {
+    // Handle locale formats:
+    // - 1.234,56 -> 1234.56
+    // - 1,234.56 -> 1234.56
+    if (cleaned.lastIndexOf(",") > cleaned.lastIndexOf(".")) {
+      normalized = cleaned.replace(/\./g, "").replace(",", ".");
+    } else {
+      normalized = cleaned.replace(/,/g, "");
+    }
+  } else if (hasComma) {
+    // Prefer Dutch decimal comma for single-comma values (e.g. 648,573).
+    // Only treat commas as thousands separators when there are multiple groups.
+    normalized = /^-?\d{1,3}(,\d{3}){2,}$/.test(cleaned)
+      ? cleaned.replace(/,/g, "")
+      : cleaned.replace(",", ".");
+  } else if (hasDot) {
+    // Dot-only thousands format: 1.234.567
+    if (/^-?\d{1,3}(\.\d{3})+$/.test(cleaned)) {
+      normalized = cleaned.replace(/\./g, "");
+    }
+  }
+
+  const n = parseFloat(normalized);
   return isNaN(n) ? null : n;
 }
 
@@ -110,6 +142,9 @@ function flattenObject(
 export function extractTonnageByDepth(raw: Raw): TonnageByDepth[] {
   if (!raw) return [];
   const results: TonnageByDepth[] = [];
+  const pushPoint = (depth_m: number, tonnage_t: number) => {
+    results.push({ depth_m, tonnage_t: Math.round(tonnage_t) });
+  };
 
   // Try to find the vessel's actual maximum draft for placing maxTonnage
   const general = raw["general"];
@@ -123,6 +158,8 @@ export function extractTonnageByDepth(raw: Raw): TonnageByDepth[] {
   const draft = num(raw["draft"])
     ?? num(raw["diepgang"])
     ?? num(dimsObj?.["draft"])
+    ?? num(raw["afmetingen > diepgang (m)"])
+    ?? num(raw["algemene gegevens - diepgang"])
     ?? null;
 
   // RensenDriessen: tonnage_1_50, tonnage_2_00, tonnage_2_50, tonnage_2_60, tonnage_2_80, tonnage_3_00m, tonnage_3_50m, tonnage_max
@@ -139,16 +176,16 @@ export function extractTonnageByDepth(raw: Raw): TonnageByDepth[] {
   for (const [key, depth] of depthMap) {
     const t = num(raw[key]);
     if (t !== null && t > 0) {
-      results.push({ depth_m: depth, tonnage_t: t });
+      pushPoint(depth, t);
     }
   }
 
   // tonnage_max as special "max" entry — use actual draft as depth
   const tMax = num(raw["tonnage_max"]);
   if (tMax !== null && tMax > 0) {
-    if (!results.some((r) => r.tonnage_t === tMax)) {
+    if (!results.some((r) => r.tonnage_t === Math.round(tMax))) {
       const maxDepth = draft ?? (results.length > 0 ? Math.max(...results.map((r) => r.depth_m)) + 0.5 : 4.0);
-      results.push({ depth_m: maxDepth, tonnage_t: tMax });
+      pushPoint(maxDepth, tMax);
     }
   }
 
@@ -164,11 +201,11 @@ export function extractTonnageByDepth(raw: Raw): TonnageByDepth[] {
         if (t === null || t <= 0) continue;
         const m = k.match(/at(\d)m(\d{2})/);
         if (m) {
-          results.push({ depth_m: parseFloat(`${m[1]}.${m[2]}`), tonnage_t: t });
+          pushPoint(parseFloat(`${m[1]}.${m[2]}`), t);
         } else if (k.toLowerCase().includes("max")) {
-          if (!results.some((r) => r.tonnage_t === t)) {
+          if (!results.some((r) => r.tonnage_t === Math.round(t))) {
             const maxDepth = draft ?? (results.length > 0 ? Math.max(...results.map((r) => r.depth_m)) + 0.5 : 4.0);
-            results.push({ depth_m: maxDepth, tonnage_t: t });
+            pushPoint(maxDepth, t);
           }
         }
       }
@@ -184,12 +221,13 @@ export function extractTonnageByDepth(raw: Raw): TonnageByDepth[] {
     if (t === null || t <= 0) continue;
 
     // Try to extract depth from key
-    const depthMatch = k.match(/(\d)[,.]?(\d{2})/);
+    const depthMatch = k.match(/(\d)\s*(?:m|[,.])\s*(\d{2})/i);
     if (depthMatch) {
       const depth = parseFloat(`${depthMatch[1]}.${depthMatch[2]}`);
-      results.push({ depth_m: depth, tonnage_t: t });
+      pushPoint(depth, t);
     } else if (k.toLowerCase().includes("max")) {
-      results.push({ depth_m: 4.0, tonnage_t: t });
+      const maxDepth = draft ?? (results.length > 0 ? Math.max(...results.map((r) => r.depth_m)) + 0.5 : 4.0);
+      pushPoint(maxDepth, t);
     }
   }
 
@@ -199,10 +237,10 @@ export function extractTonnageByDepth(raw: Raw): TonnageByDepth[] {
     for (const [k, v] of gtsEntries) {
       const t = num(v);
       if (t === null || t <= 0) continue;
-      const depthMatch = k.match(/(\d)[,.]?(\d{2})/);
+      const depthMatch = k.match(/(\d)\s*(?:m|[,.])\s*(\d{2})/i);
       if (depthMatch) {
         const depth = parseFloat(`${depthMatch[1]}.${depthMatch[2]}`);
-        results.push({ depth_m: depth, tonnage_t: t });
+        pushPoint(depth, t);
       }
     }
   }

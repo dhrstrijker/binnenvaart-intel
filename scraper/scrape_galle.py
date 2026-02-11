@@ -1,5 +1,6 @@
 import logging
 import re
+from urllib.parse import urlparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -43,41 +44,75 @@ def _parse_detail_specs(soup) -> dict:
     are prefixed to avoid collisions (e.g. "luiken > type").
     Text-only sections are stored as "section_name" key with the text value.
     """
-    container = soup.select_one(".product-specs")
-    if not container:
+    containers = soup.select(".product-specs")
+    if not containers:
         return {}
 
     all_specs = {}
-    current_section = ""
+    for container in containers:
+        current_section = ""
 
-    for child in container.children:
-        if not hasattr(child, "name") or child.name is None:
-            continue
+        for node in container.descendants:
+            if not hasattr(node, "name") or node.name is None:
+                continue
 
-        if child.name == "h7":
-            full_text = child.get_text(strip=True)
-            # Some sections embed their content directly in the h7 tag
-            # e.g. <h7>Buikdenning\nStaal 12mm</h7>
-            lines = [l.strip() for l in full_text.split("\n") if l.strip()]
-            current_section = lines[0].lower() if lines else ""
-            if len(lines) > 1:
-                # Text-only section: store the content after the header
-                all_specs[current_section] = " ".join(lines[1:])
+            tag_name = node.name.lower()
 
-        elif "spec-row" in (child.get("class") or []):
-            label_el = child.select_one(".spec-label")
-            value_el = child.select_one(".spec-value")
-            if label_el and value_el:
-                label = label_el.get_text(strip=True).lower()
-                value = value_el.get_text(strip=True)
-                if label and value:
-                    # Prefix with section to avoid collisions
-                    # (e.g. "luiken > bouwjaar" vs top-level "bouwjaar")
-                    if current_section and current_section != "algemeen":
-                        key = f"{current_section} > {label}"
-                    else:
-                        key = label
-                    all_specs[key] = value
+            if tag_name in {"h7", "h6", "h5", "h4"}:
+                raw_text = node.get_text("\n", strip=True)
+                lines = [part.strip() for part in raw_text.split("\n") if part.strip()]
+                current_section = lines[0].lower() if lines else ""
+                if len(lines) > 1 and current_section:
+                    # Text-only section: store the content after the header
+                    all_specs[current_section] = " ".join(lines[1:])
+                continue
+
+            classes = node.get("class") or []
+            is_row = "spec-row" in classes or tag_name == "tr"
+            if not is_row:
+                continue
+
+            label_el = node.select_one(".spec-label")
+            value_el = node.select_one(".spec-value")
+
+            # Hoofdmotor rows on Galle use spec-value-1/spec-value-2
+            # with an empty placeholder spec-label.
+            if (not label_el or not value_el):
+                alt_label_el = node.select_one(".spec-value-1")
+                alt_value_el = node.select_one(".spec-value-2")
+                if alt_label_el and alt_value_el:
+                    label_el = alt_label_el
+                    value_el = alt_value_el
+
+            # Fallback: some templates omit class names on label/value pairs.
+            if not label_el or not value_el:
+                labels = node.find_all("label")
+                if len(labels) >= 2:
+                    label_el = labels[0]
+                    value_el = labels[1]
+
+            # Fallback: table-style rows.
+            if (not label_el or not value_el) and tag_name == "tr":
+                cells = node.find_all(["th", "td"], recursive=False)
+                if len(cells) >= 2:
+                    label_el = cells[0]
+                    value_el = cells[1]
+
+            if not label_el or not value_el:
+                continue
+
+            label = label_el.get_text(" ", strip=True).lower()
+            value = value_el.get_text(" ", strip=True)
+            if not label or not value:
+                continue
+
+            # Prefix with section to avoid collisions
+            # (e.g. "luiken > bouwjaar" vs top-level "bouwjaar")
+            if current_section and current_section != "algemeen":
+                key = f"{current_section} > {label}"
+            else:
+                key = label
+            all_specs[key] = value
 
     return all_specs
 
@@ -164,33 +199,48 @@ def _fetch_detail(detail_url: str) -> dict:
     """
     result = {"type": None, "build_year": None, "tonnage": None,
               "raw_details": None, "image_urls": None}
-    try:
-        resp = _fetch_with_retry(requests.get, detail_url)
-    except requests.RequestException:
-        logger.warning("Could not fetch detail page: %s", detail_url)
-        return result
+    parsed_url = urlparse(detail_url)
+    host = parsed_url.netloc.lower()
+    path = parsed_url.path.rstrip("/")
+    slug = path.split("/")[-1] if path else ""
 
-    soup = BeautifulSoup(resp.text, "html.parser")
+    candidate_urls = [detail_url]
+    if "gallemakelaars.nl" in host and slug:
+        canonical = f"https://gallemakelaars.nl/scheepsaanbod/{slug}"
+        short = f"https://gallemakelaars.nl/{slug}"
+        for alt in (canonical, short):
+            if alt not in candidate_urls:
+                candidate_urls.append(alt)
 
-    all_specs = _parse_detail_specs(soup)
-    if all_specs:
-        result["raw_details"] = all_specs
-
-    # Parse the specific fields we store as columns
-    if all_specs.get("type schip"):
-        result["type"] = all_specs["type schip"]
-
-    if all_specs.get("bouwjaar"):
+    best_score = -1
+    for url in candidate_urls:
         try:
-            result["build_year"] = int(all_specs["bouwjaar"])
-        except ValueError:
-            pass
+            resp = _fetch_with_retry(requests.get, url)
+        except requests.RequestException:
+            logger.warning("Could not fetch detail page: %s", url)
+            continue
 
-    result["tonnage"] = _parse_tonnage(all_specs)
+        soup = BeautifulSoup(resp.text, "html.parser")
+        all_specs = _parse_detail_specs(soup)
+        image_urls = _parse_detail_images(soup)
 
-    image_urls = _parse_detail_images(soup)
-    if image_urls:
-        result["image_urls"] = image_urls
+        score = len(all_specs) + len(image_urls)
+        if score <= best_score:
+            continue
+
+        best_score = score
+        result["raw_details"] = all_specs or None
+        result["image_urls"] = image_urls or None
+        result["type"] = all_specs.get("type schip") if all_specs else None
+
+        build_year = None
+        if all_specs and all_specs.get("bouwjaar"):
+            try:
+                build_year = int(all_specs["bouwjaar"])
+            except ValueError:
+                build_year = None
+        result["build_year"] = build_year
+        result["tonnage"] = _parse_tonnage(all_specs)
 
     return result
 

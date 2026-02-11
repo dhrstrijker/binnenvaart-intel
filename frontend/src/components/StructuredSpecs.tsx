@@ -25,12 +25,50 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function Row({ label, value }: { label: string; value: React.ReactNode }) {
-  if (value === null || value === undefined || value === "") return null;
+function stringifyStructuredValue(value: unknown): string | number | null {
+  if (value == null || value === "") return null;
+  if (typeof value === "string" || typeof value === "number") return value;
+  if (typeof value === "boolean") return value ? "Ja" : "Nee";
+
+  if (Array.isArray(value)) {
+    const parts = value
+      .map((item) => stringifyStructuredValue(item))
+      .filter((item): item is string | number => item != null && item !== "");
+    return parts.length > 0 ? parts.join(", ") : null;
+  }
+
+  if (typeof value === "object") {
+    const obj = value as Record<string, unknown>;
+    const engineLike = [
+      stringifyStructuredValue(obj.make),
+      stringifyStructuredValue(obj.type),
+      stringifyStructuredValue(obj.year),
+      obj.revision_year != null ? `revisie ${obj.revision_year}` : null,
+      obj.capacity_m3_per_hour != null ? `${obj.capacity_m3_per_hour} m\u00B3/u` : null,
+      stringifyStructuredValue(obj.revision_description),
+    ].filter((item): item is string | number => item != null && item !== "");
+    if (engineLike.length > 0) return engineLike.join(", ");
+
+    const pairs = Object.entries(obj)
+      .map(([key, val]) => {
+        const rendered = stringifyStructuredValue(val);
+        if (rendered == null || rendered === "") return null;
+        return `${key.replace(/_/g, " ")}: ${rendered}`;
+      })
+      .filter((item): item is string => item != null && item !== "");
+    return pairs.length > 0 ? pairs.join(", ") : null;
+  }
+
+  return String(value);
+}
+
+function Row({ label, value }: { label: string; value: unknown }) {
+  const rendered = React.isValidElement(value) ? value : stringifyStructuredValue(value);
+  if (rendered === null || rendered === undefined || rendered === "") return null;
   return (
     <div className="flex justify-between gap-4 py-1.5">
       <dt className="text-sm text-slate-500 shrink-0">{label}</dt>
-      <dd className="text-sm font-medium text-slate-800 text-right">{value}</dd>
+      <dd className="text-sm font-medium text-slate-800 text-right">{rendered}</dd>
     </div>
   );
 }
