@@ -1,9 +1,6 @@
-name: Scrape vessels v2 (authoritative)
+name: Scrape vessels v2 (legacy fallback)
 
 on:
-  schedule:
-    # Production authoritative run cadence.
-    - cron: "0 7,19 * * *"
   workflow_dispatch:
 
 permissions:
@@ -25,7 +22,7 @@ jobs:
         with:
           python-version: "3.13"
       - run: pip install -r requirements.txt
-      - name: Run scraper v2 in authoritative mode
+      - name: Run scraper v2 in shadow fallback mode
         run: python main.py
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -33,6 +30,6 @@ jobs:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          PIPELINE_V2_MODE: "authoritative"
-          PIPELINE_V2_NOTIFICATIONS: "on"
+          PIPELINE_V2_MODE: "shadow"
+          PIPELINE_V2_NOTIFICATIONS: "off"
           PIPELINE_V2_SOURCES: "galle,rensendriessen,pcshipbrokers,gtsschepen,gsk"
