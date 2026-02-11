@@ -42,7 +42,10 @@ interface FiltersProps {
   vesselCount: number;
   onSaveAsSearch?: (filters: FilterState) => void;
   hideChips?: boolean;
-  onPopoverChange?: (open: boolean) => void;
+  onPopoverChange?: (state: {
+    open: boolean;
+    popover: "meer" | "price" | "length" | "filters" | null;
+  }) => void;
 }
 
 export default function Filters({
@@ -56,6 +59,9 @@ export default function Filters({
 }: FiltersProps) {
   const [activePopover, setActivePopover] = useState<"meer" | "price" | "length" | "filters" | null>(null);
   const barRef = useRef<HTMLDivElement>(null);
+  const [isMobileViewport, setIsMobileViewport] = useState(
+    typeof window !== "undefined" ? window.innerWidth < 768 : false,
+  );
 
   const update = useCallback(
     (partial: Partial<FilterState>) => {
@@ -79,17 +85,47 @@ export default function Filters({
   }
 
   const closePopover = useCallback(() => setActivePopover(null), []);
+  const isMobileFiltersSheetOpen = activePopover === "filters" && isMobileViewport;
+  const shouldUseOutsideClick = !!activePopover && !isMobileFiltersSheetOpen;
 
   /* Close on outside click */
-  useOutsideClick(barRef, closePopover, !!activePopover);
+  useOutsideClick(barRef, closePopover, shouldUseOutsideClick);
 
   /* Close on ESC */
   useEscapeKey(closePopover);
 
   /* Notify parent when popover opens/closes */
   useEffect(() => {
-    onPopoverChange?.(activePopover !== null);
+    onPopoverChange?.({ open: activePopover !== null, popover: activePopover });
   }, [activePopover, onPopoverChange]);
+
+  /* Track mobile viewport for bottom-sheet behavior */
+  useEffect(() => {
+    function onResize() {
+      setIsMobileViewport(window.innerWidth < 768);
+    }
+    window.addEventListener("resize", onResize, { passive: true });
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  /* Lock body scroll when mobile filters sheet is open */
+  useEffect(() => {
+    if (!(activePopover === "filters" && isMobileViewport)) return;
+
+    const prevBodyOverflow = document.body.style.overflow;
+    const prevBodyOverscroll = document.body.style.overscrollBehavior;
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+
+    document.body.style.overflow = "hidden";
+    document.body.style.overscrollBehavior = "contain";
+    document.documentElement.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = prevBodyOverflow;
+      document.body.style.overscrollBehavior = prevBodyOverscroll;
+      document.documentElement.style.overflow = prevHtmlOverflow;
+    };
+  }, [activePopover, isMobileViewport]);
 
   /* Extra filter badge count */
   const extraFilterCount = [
@@ -137,9 +173,11 @@ export default function Filters({
   return (
     <div className="space-y-2">
       {/* Backdrop for modal-style popovers */}
-      {(activePopover === "price" || activePopover === "length" || activePopover === "filters") && (
+      {(activePopover === "price" || activePopover === "length" || (activePopover === "filters" && !isMobileViewport)) && (
         <div
-          className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[1px]"
+          className={`fixed inset-0 z-40 backdrop-blur-[1px] ${
+            activePopover === "filters" ? "bg-black/25" : "bg-black/10"
+          }`}
           onClick={closePopover}
           aria-hidden="true"
         />
@@ -357,6 +395,7 @@ export default function Filters({
         {activePopover === "filters" && (
           <FiltersDropdown
             id={filtersPopoverId}
+            mobileSheet={isMobileViewport}
             filters={filters}
             update={update}
             onSaveAsSearch={onSaveAsSearch}

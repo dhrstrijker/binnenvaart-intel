@@ -271,17 +271,19 @@ export default function Dashboard() {
   );
   const [filtersCollapsed, setFiltersCollapsed] = useState(false);
   const popoverOpenRef = useRef(false);
+  const [activeFilterPopover, setActiveFilterPopover] = useState<"meer" | "price" | "length" | "filters" | null>(null);
   const lastScrollYRef = useRef(0);
   const nearTopRef = useRef(true);
-  const overlayRootRef = useRef<HTMLDivElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
+  const controlsMeasureRef = useRef<HTMLDivElement>(null);
   const peekTabRef = useRef<HTMLButtonElement>(null);
-  const [chipsOverlayTop, setChipsOverlayTop] = useState(0);
+  const [controlsHeight, setControlsHeight] = useState(0);
+  const [peekHeight, setPeekHeight] = useState(0);
 
-  const handlePopoverChange = useCallback((open: boolean) => {
-    popoverOpenRef.current = open;
+  const handlePopoverChange = useCallback((state: { open: boolean; popover: "meer" | "price" | "length" | "filters" | null }) => {
+    popoverOpenRef.current = state.open;
+    setActiveFilterPopover(state.popover);
     // If a popover just opened, make sure filters are expanded
-    if (open) setFiltersCollapsed(false);
+    if (state.open) setFiltersCollapsed(false);
   }, []);
 
   // Auto-collapse/expand on scroll (mobile only).
@@ -323,62 +325,39 @@ export default function Dashboard() {
     return () => window.removeEventListener("scroll", onScroll);
   }, [isMobile]);
 
-  const panelInFlow = !filtersCollapsed && isNearTop;
-
-  const measureChipsOverlayTop = useCallback(() => {
-    const root = overlayRootRef.current;
-    const anchor = filtersCollapsed ? peekTabRef.current : panelRef.current;
-    if (!root || !anchor) return;
-    const rootTop = root.getBoundingClientRect().top;
-    const anchorBottom = anchor.getBoundingClientRect().bottom;
-    const next = Math.ceil(anchorBottom - rootTop + 4);
-    setChipsOverlayTop((prev) => (prev === next ? prev : next));
-  }, [filtersCollapsed]);
-
   useEffect(() => {
-    if (panelInFlow) return;
-
-    let rafId: number | null = null;
-    let loopRafId: number | null = null;
-    const scheduleMeasure = () => {
-      if (rafId !== null) return;
-      rafId = window.requestAnimationFrame(() => {
-        rafId = null;
-        measureChipsOverlayTop();
-      });
-    };
-
-    scheduleMeasure();
-    // Re-measure through the transition window so overlay chips stay locked
-    // to the moving bar while it animates between collapsed/expanded states.
-    let startedAt: number | null = null;
-    const tick = (ts: number) => {
-      if (startedAt === null) startedAt = ts;
-      scheduleMeasure();
-      if (ts - startedAt < 420) {
-        loopRafId = window.requestAnimationFrame(tick);
-      }
-    };
-    loopRafId = window.requestAnimationFrame(tick);
-
-    const panelEl = panelRef.current;
+    const controlsEl = controlsMeasureRef.current;
     const peekEl = peekTabRef.current;
-    const ro = new ResizeObserver(scheduleMeasure);
-    if (panelEl) ro.observe(panelEl);
+    if (!controlsEl && !peekEl) return;
+
+    const read = () => {
+      if (controlsEl) setControlsHeight(Math.ceil(controlsEl.getBoundingClientRect().height));
+      if (peekEl) setPeekHeight(Math.ceil(peekEl.getBoundingClientRect().height));
+    };
+
+    read();
+    const ro = new ResizeObserver(read);
+    if (controlsEl) ro.observe(controlsEl);
     if (peekEl) ro.observe(peekEl);
-    panelEl?.addEventListener("transitionend", scheduleMeasure);
-    peekEl?.addEventListener("transitionend", scheduleMeasure);
-    window.addEventListener("resize", scheduleMeasure, { passive: true });
+    window.addEventListener("resize", read, { passive: true });
 
     return () => {
-      if (rafId !== null) window.cancelAnimationFrame(rafId);
-      if (loopRafId !== null) window.cancelAnimationFrame(loopRafId);
       ro.disconnect();
-      panelEl?.removeEventListener("transitionend", scheduleMeasure);
-      peekEl?.removeEventListener("transitionend", scheduleMeasure);
-      window.removeEventListener("resize", scheduleMeasure);
+      window.removeEventListener("resize", read);
     };
-  }, [panelInFlow, measureChipsOverlayTop, filtersCollapsed]);
+  }, []);
+
+  const isOverlayMode = isMobile && !isNearTop;
+  const barMode: "flow-expanded" | "overlay-expanded" | "overlay-collapsed" = !isOverlayMode
+    ? "flow-expanded"
+    : filtersCollapsed
+      ? "overlay-collapsed"
+      : "overlay-expanded";
+  const controlsVisible = barMode !== "overlay-collapsed";
+  const peekVisible = barMode === "overlay-collapsed";
+  const controlsMaxHeight = controlsHeight > 0 ? `${controlsHeight}px` : "1000px";
+  const peekMaxHeight = peekHeight > 0 ? `${peekHeight}px` : "44px";
+  const hideActiveChips = activeFilterPopover === "price" || activeFilterPopover === "length";
 
   // Track mobile/desktop breakpoint and reset collapse on desktop.
   useEffect(() => {
@@ -435,61 +414,73 @@ export default function Dashboard() {
       <h1 className="sr-only">Binnenvaartschepen te koop</h1>
       {/* Filters — collapsible on mobile scroll */}
       <div className="sticky top-[var(--header-h,0px)] z-20 -mx-4 px-4 sm:-mx-6 sm:px-6 pt-2 pb-2 bg-gradient-to-b from-slate-50 from-80% to-transparent">
-        <div ref={overlayRootRef} className="relative">
-          {/* Keep panel in flow near top; overlay it while scrolling to avoid card reflow. */}
-          <div
-            ref={panelRef}
-            className={`z-30 transition-all duration-300 ease-in-out ${
-              panelInFlow ? "relative" : "absolute left-0 right-0 top-0"
-            } ${
-              filtersCollapsed
-                ? "pointer-events-none -translate-y-[calc(100%+0.75rem)] opacity-0"
-                : "translate-y-0 opacity-100"
-            }`}
-          >
-            <Filters
-              filters={filters}
-              onFilterChange={setFilters}
-              availableTypes={availableTypes}
-              vesselCount={filtered.length}
-              onSaveAsSearch={handleSaveSearch}
-              hideChips
-              onPopoverChange={handlePopoverChange}
-            />
-          </div>
-
-          {/* Peek tab — absolute to prevent layout shift while collapsed */}
-          <button
-            ref={peekTabRef}
-            type="button"
-            onClick={() => setFiltersCollapsed(false)}
-            className={`absolute left-0 right-0 top-full mx-auto flex w-full items-center justify-center gap-1.5 rounded-b-xl bg-white py-1.5 text-xs font-medium text-slate-500 shadow-md ring-1 ring-gray-100 transition-all duration-300 md:hidden ${
-              filtersCollapsed
-                ? "translate-y-0 opacity-100"
-                : "pointer-events-none -translate-y-1 opacity-0"
-            }`}
-            aria-label="Filters tonen"
-          >
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
+        <div className="relative">
+          <div className={isOverlayMode ? "absolute left-0 right-0 top-0 z-30" : "relative z-30"}>
+            {/* Controls layer */}
+            <div
+              className={`transition-[max-height,opacity,transform] duration-300 ease-in-out ${
+                controlsVisible ? "overflow-visible" : "overflow-hidden pointer-events-none"
+              }`}
+              style={{
+                maxHeight: controlsVisible ? controlsMaxHeight : "0px",
+                opacity: controlsVisible ? 1 : 0,
+                transform: controlsVisible ? "translateY(0)" : "translateY(calc(-100% - 0.75rem))",
+              }}
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-            </svg>
-            Filters
-          </button>
+              <div ref={controlsMeasureRef}>
+                <Filters
+                  filters={filters}
+                  onFilterChange={setFilters}
+                  availableTypes={availableTypes}
+                  vesselCount={filtered.length}
+                  onSaveAsSearch={handleSaveSearch}
+                  hideChips
+                  onPopoverChange={handlePopoverChange}
+                />
+              </div>
+            </div>
 
-          {/* Active filter chips — in-flow near top, overlay while scrolling */}
-          <div
-            className={`z-40 transition-all duration-300 ease-in-out ${
-              panelInFlow ? "relative mt-1" : "absolute left-0 right-0"
-            }`}
-            style={!panelInFlow ? { top: chipsOverlayTop } : undefined}
-          >
-            <ActiveChips filters={filters} onClear={handleFilterUpdate} />
+            {/* Collapsed tab layer */}
+            <div
+              className={`transition-[max-height,opacity,transform] duration-300 ease-in-out md:hidden ${
+                peekVisible ? "overflow-visible" : "overflow-hidden pointer-events-none"
+              }`}
+              style={{
+                maxHeight: peekVisible ? peekMaxHeight : "0px",
+                opacity: peekVisible ? 1 : 0,
+                transform: peekVisible ? "translateY(0)" : "translateY(-0.25rem)",
+              }}
+            >
+              <button
+                ref={peekTabRef}
+                type="button"
+                onClick={() => setFiltersCollapsed(false)}
+                className="mx-auto flex w-full items-center justify-center gap-1.5 rounded-b-xl bg-white py-1.5 text-xs font-medium text-slate-500 shadow-md ring-1 ring-gray-100"
+                aria-label="Filters tonen"
+              >
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+                Filters
+              </button>
+            </div>
+
+            {/* Active filter chips layer */}
+            <div
+              className={`relative z-40 transition-[opacity,max-height,margin] duration-200 ease-out ${
+                hideActiveChips
+                  ? "pointer-events-none mt-0 max-h-0 overflow-hidden opacity-0"
+                  : "mt-1 max-h-24 opacity-100"
+              }`}
+            >
+              <ActiveChips filters={filters} onClear={handleFilterUpdate} />
+            </div>
           </div>
         </div>
       </div>
