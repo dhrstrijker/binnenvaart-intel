@@ -10,8 +10,18 @@ function applyRange(
   max: string,
   get: (v: Vessel) => number | null,
 ): Vessel[] {
-  if (min) { const n = Number(min); result = result.filter(v => get(v) !== null && get(v)! >= n); }
-  if (max) { const n = Number(max); result = result.filter(v => get(v) !== null && get(v)! <= n); }
+  if (min) {
+    const n = Number(min);
+    if (Number.isFinite(n)) {
+      result = result.filter((v) => get(v) !== null && get(v)! >= n);
+    }
+  }
+  if (max) {
+    const n = Number(max);
+    if (Number.isFinite(n)) {
+      result = result.filter((v) => get(v) !== null && get(v)! <= n);
+    }
+  }
   return result;
 }
 
