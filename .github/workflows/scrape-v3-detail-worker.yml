@@ -20,9 +20,6 @@ concurrency:
 jobs:
   scrape-v3-detail-worker:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: scraper
     steps:
       - name: Check Central Europe run window
         id: run_window
@@ -48,9 +45,11 @@ jobs:
           python-version: "3.13"
       - run: pip install -r requirements.txt
         if: steps.run_window.outputs.should_run == 'true'
+        working-directory: scraper
       - name: Run scraper v3 detail-worker
         if: steps.run_window.outputs.should_run == 'true'
         run: python -m v3.main_v3 --run-type detail-worker
+        working-directory: scraper
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
