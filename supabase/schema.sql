@@ -71,9 +71,15 @@ CREATE TABLE notification_subscribers (
 CREATE INDEX idx_notification_subscribers_user ON notification_subscribers(user_id);
 
 ALTER TABLE notification_subscribers ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow anonymous read access" ON notification_subscribers FOR SELECT USING (true);
-CREATE POLICY "Authenticated users can subscribe"
+CREATE POLICY "Users can view own notification settings"
+  ON notification_subscribers FOR SELECT TO authenticated
+  USING ((SELECT auth.uid()) = user_id);
+CREATE POLICY "Users can create own notification settings"
   ON notification_subscribers FOR INSERT TO authenticated
+  WITH CHECK ((SELECT auth.uid()) = user_id);
+CREATE POLICY "Users can update own notification settings"
+  ON notification_subscribers FOR UPDATE TO authenticated
+  USING ((SELECT auth.uid()) = user_id)
   WITH CHECK ((SELECT auth.uid()) = user_id);
 
 -- Profiles table (extends auth.users)
