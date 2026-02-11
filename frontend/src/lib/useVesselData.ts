@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Vessel, PriceHistory, VESSEL_LIST_COLUMNS } from "@/lib/supabase";
 import { createClient } from "@/lib/supabase/client";
 import { useSubscription } from "@/lib/useSubscription";
@@ -26,11 +26,16 @@ export function useVesselData(): VesselData {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user, isPremium, isLoading: subLoading } = useSubscription();
+  const hasLoadedOnceRef = useRef(false);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function fetchData() {
       // Only show skeleton on first load; keep stale data visible on refetch
-      if (vessels.length === 0) setLoading(true);
+      if (!hasLoadedOnceRef.current) setLoading(true);
+      setError(null);
+
       try {
         const supabase = createClient();
 
@@ -40,10 +45,12 @@ export function useVesselData(): VesselData {
           .order("scraped_at", { ascending: false });
 
         if (vesselsRes.error) {
-          setError("Er is een fout opgetreden bij het laden van de gegevens.");
+          throw vesselsRes.error;
         } else {
           const all = vesselsRes.data ?? [];
-          setVessels(all.filter((v) => v.canonical_vessel_id === null || v.canonical_vessel_id === undefined));
+          if (!cancelled) {
+            setVessels(all.filter((v) => v.canonical_vessel_id === null || v.canonical_vessel_id === undefined));
+          }
         }
 
         // Build parallel fetches based on user tier
@@ -57,7 +64,7 @@ export function useVesselData(): VesselData {
                 .select("vessel_id, price, recorded_at")
                 .order("recorded_at", { ascending: true })
             ).then((historyRes) => {
-              if (!historyRes.error && historyRes.data) {
+              if (!cancelled && !historyRes.error && historyRes.data) {
                 const grouped: Record<string, PriceHistory[]> = {};
                 for (const entry of historyRes.data) {
                   if (!grouped[entry.vessel_id]) {
@@ -70,7 +77,7 @@ export function useVesselData(): VesselData {
             })
           );
         } else {
-          setPriceHistoryMap({});
+          if (!cancelled) setPriceHistoryMap({});
           parallel.push(
             Promise.resolve(
               supabase
@@ -80,7 +87,7 @@ export function useVesselData(): VesselData {
                 .order("recorded_at", { ascending: false })
                 .limit(500)
             ).then(({ data: activityData }) => {
-              if (activityData) {
+              if (!cancelled && activityData) {
                 const trendMap: Record<string, "up" | "down"> = {};
                 for (const entry of activityData) {
                   if (!trendMap[entry.vessel_id] && entry.old_price != null && entry.new_price != null) {
@@ -103,7 +110,7 @@ export function useVesselData(): VesselData {
                 .select("vessel_id")
                 .eq("user_id", user.id)
             ).then(({ data }) => {
-              setFavoriteIds(new Set((data ?? []).map((f) => f.vessel_id)));
+              if (!cancelled) setFavoriteIds(new Set((data ?? []).map((f) => f.vessel_id)));
             })
           );
           parallel.push(
@@ -113,24 +120,33 @@ export function useVesselData(): VesselData {
                 .select("vessel_id")
                 .eq("user_id", user.id)
             ).then(({ data }) => {
-              setWatchlistIds(new Set((data ?? []).map((w) => w.vessel_id)));
+              if (!cancelled) setWatchlistIds(new Set((data ?? []).map((w) => w.vessel_id)));
             })
           );
         } else {
-          setFavoriteIds(new Set());
-          setWatchlistIds(new Set());
+          if (!cancelled) {
+            setFavoriteIds(new Set());
+            setWatchlistIds(new Set());
+          }
         }
 
         await Promise.all(parallel);
       } catch {
-        setError("Er is een fout opgetreden bij het laden van de gegevens.");
+        if (!cancelled) setError("Er is een fout opgetreden bij het laden van de gegevens.");
       }
-      setLoading(false);
+      if (!cancelled) {
+        hasLoadedOnceRef.current = true;
+        setLoading(false);
+      }
     }
 
     if (!subLoading) {
       fetchData();
     }
+
+    return () => {
+      cancelled = true;
+    };
   }, [user, isPremium, subLoading]);
 
   return { vessels, priceHistoryMap, freeTierTrends, favoriteIds, watchlistIds, loading, error, user, isPremium };
