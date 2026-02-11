@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 from http_utils import fetch_with_retry, get_http_status, is_non_retryable_http_error
 from scrape_gtsschepen import BASE_URL, MAX_PAGES, parse_card, _fetch_detail, _enrich_from_details
 from v2.sources.contracts import new_detail_metrics, new_listing_metrics
+from v2.sources.pagination import resolve_listing_page_cap
 
 logger = logging.getLogger(__name__)
 
@@ -17,9 +18,10 @@ class GTSSchepenAdapter:
     def scrape_listing(self) -> tuple[list[dict], dict]:
         metrics = new_listing_metrics()
         rows: list[dict] = []
+        max_pages = resolve_listing_page_cap(self.source_key, default_cap=MAX_PAGES) or MAX_PAGES
 
         page = 1
-        while page <= MAX_PAGES:
+        while page <= max_pages:
             url = BASE_URL if page == 1 else f"{BASE_URL}page/{page}/"
             metrics["external_requests"] += 1
             try:
