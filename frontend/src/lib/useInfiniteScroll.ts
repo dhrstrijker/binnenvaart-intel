@@ -27,8 +27,8 @@ export function useInfiniteScroll({
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   const loadMore = useCallback(() => {
-    setVisibleCount((prev) => prev + batchSize);
-  }, [batchSize]);
+    setVisibleCount((prev) => Math.min(totalCount, prev + batchSize));
+  }, [batchSize, totalCount]);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
