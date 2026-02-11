@@ -175,6 +175,32 @@ class PipelineV2:
             ).execute()
             metrics.supabase_write_count += 1
 
+            parse_fail_ratio = 0.0
+            if metrics.staged_count > 0:
+                parse_fail_ratio = metrics.parse_fail_count / metrics.staged_count
+
+            health_summary = self._build_health_summary(
+                thresholds=source_config.health_thresholds,
+                parse_fail_ratio=parse_fail_ratio,
+                selector_fail_count=metrics.selector_fail_count,
+                page_coverage_ratio=page_coverage_ratio,
+            )
+
+            run_metadata = {
+                "adapter": adapter.__class__.__name__,
+                "is_healthy": health_summary["is_healthy"],
+                "health_score": health_summary["health_score"],
+                "health_inputs": {
+                    "parse_fail_ratio": parse_fail_ratio,
+                    "selector_fail_count": metrics.selector_fail_count,
+                    "page_coverage_ratio": page_coverage_ratio,
+                },
+                "health_thresholds": source_config.health_thresholds,
+            }
+            # mark_missing_candidates depends on metadata.is_healthy
+            supabase.table("scrape_runs_v2").update({"metadata": run_metadata}).eq("id", run_id).execute()
+            metrics.supabase_write_count += 1
+
             _ = supabase.rpc(
                 "mark_missing_candidates",
                 {"p_run_id": run_id, "p_source": source_config.source_key},
@@ -202,17 +228,6 @@ class PipelineV2:
                 elif event_type == "unchanged":
                     metrics.unchanged_count += 1
 
-            parse_fail_ratio = 0.0
-            if metrics.staged_count > 0:
-                parse_fail_ratio = metrics.parse_fail_count / metrics.staged_count
-
-            health_summary = self._build_health_summary(
-                thresholds=source_config.health_thresholds,
-                parse_fail_ratio=parse_fail_ratio,
-                selector_fail_count=metrics.selector_fail_count,
-                page_coverage_ratio=page_coverage_ratio,
-            )
-
             duration = time.monotonic() - started
             update = metrics.to_db_update()
             update.update(
@@ -222,17 +237,6 @@ class PipelineV2:
                     "finished_at": datetime.now(timezone.utc).isoformat(),
                 }
             )
-            run_metadata = {
-                "adapter": adapter.__class__.__name__,
-                "is_healthy": health_summary["is_healthy"],
-                "health_score": health_summary["health_score"],
-                "health_inputs": {
-                    "parse_fail_ratio": parse_fail_ratio,
-                    "selector_fail_count": metrics.selector_fail_count,
-                    "page_coverage_ratio": page_coverage_ratio,
-                },
-                "health_thresholds": source_config.health_thresholds,
-            }
             if apply_result is not None:
                 run_metadata["apply_result"] = apply_result
             update["metadata"] = run_metadata

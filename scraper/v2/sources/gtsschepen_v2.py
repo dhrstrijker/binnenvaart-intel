@@ -3,7 +3,7 @@ import logging
 import requests
 from bs4 import BeautifulSoup
 
-from http_utils import fetch_with_retry, is_non_retryable_http_error
+from http_utils import fetch_with_retry, get_http_status, is_non_retryable_http_error
 from scrape_gtsschepen import BASE_URL, MAX_PAGES, parse_card, _fetch_detail, _enrich_from_details
 from v2.sources.contracts import new_detail_metrics, new_listing_metrics
 
@@ -25,6 +25,12 @@ class GTSSchepenAdapter:
             try:
                 resp = fetch_with_retry(requests.get, url)
             except requests.RequestException as exc:
+                status = get_http_status(exc)
+                # GTS pagination ends with 404 on non-existing trailing pages.
+                # Treat this as a normal pagination stop once page 1 succeeded.
+                if status == 404 and page > 1:
+                    logger.info("GTS page %d returned 404; stopping pagination.", page)
+                    break
                 if is_non_retryable_http_error(exc):
                     raise
                 logger.warning("Failed to fetch GTS page %d; stopping", page)

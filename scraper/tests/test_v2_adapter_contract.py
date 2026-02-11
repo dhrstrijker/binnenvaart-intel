@@ -155,6 +155,24 @@ def test_gtsschepen_adapter_contract(monkeypatch):
     assert vessel["source_id"] == "t1"
 
 
+def test_gtsschepen_404_on_trailing_page_stops_without_error(monkeypatch):
+    calls = {"n": 0}
+
+    def fake_fetch(*_args, **_kwargs):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            return _Resp(text="<div class='grid-item'></div>")
+        raise _http_error(404)
+
+    monkeypatch.setattr("v2.sources.gtsschepen_v2.MAX_PAGES", 3)
+    monkeypatch.setattr("v2.sources.gtsschepen_v2.fetch_with_retry", fake_fetch)
+    monkeypatch.setattr("v2.sources.gtsschepen_v2.parse_card", lambda _card: _listing("gtsschepen", "t1"))
+
+    rows, metrics = GTSSchepenAdapter().scrape_listing()
+    assert len(rows) == 1
+    assert metrics["external_requests"] == 2
+
+
 def test_gsk_adapter_contract(monkeypatch):
     calls = {"n": 0}
 
