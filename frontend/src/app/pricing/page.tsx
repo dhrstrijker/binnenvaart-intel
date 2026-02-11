@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { PREMIUM_SUBSCRIPTION_STATUSES } from "@/lib/polar/subscriptionSync";
 import Header from "@/components/Header";
@@ -22,17 +22,16 @@ const features = [
 
 export default function PricingPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [user, setUser] = useState<User | null>(null);
   const [isPremium, setIsPremium] = useState(false);
   const [loading, setLoading] = useState(true);
   const checkoutStartedRef = useRef(false);
 
-  const checkoutIntentParam = searchParams.get("checkout");
-  const checkoutIntent =
-    checkoutIntentParam === "monthly" || checkoutIntentParam === "annual"
-      ? checkoutIntentParam
-      : null;
+  const checkoutIntent = (() => {
+    if (typeof window === "undefined") return null;
+    const value = new URLSearchParams(window.location.search).get("checkout");
+    return value === "monthly" || value === "annual" ? value : null;
+  })();
 
   useEffect(() => {
     async function check() {
