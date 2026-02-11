@@ -129,6 +129,7 @@ class PipelineV2:
             metrics.parse_fail_count += adapter_metrics.get("parse_fail_count", 0)
             metrics.selector_fail_count += adapter_metrics.get("selector_fail_count", 0)
             metrics.staged_count = len(listings)
+            page_coverage_ratio = float(adapter_metrics.get("page_coverage_ratio", 1.0))
 
             self._insert_listing_staging(run_id, source_config.source_key, listings)
             metrics.supabase_write_count += 1
@@ -191,6 +192,17 @@ class PipelineV2:
                 elif event_type == "unchanged":
                     metrics.unchanged_count += 1
 
+            parse_fail_ratio = 0.0
+            if metrics.staged_count > 0:
+                parse_fail_ratio = metrics.parse_fail_count / metrics.staged_count
+
+            health_summary = self._build_health_summary(
+                thresholds=source_config.health_thresholds,
+                parse_fail_ratio=parse_fail_ratio,
+                selector_fail_count=metrics.selector_fail_count,
+                page_coverage_ratio=page_coverage_ratio,
+            )
+
             duration = time.monotonic() - started
             update = metrics.to_db_update()
             update.update(
@@ -200,8 +212,20 @@ class PipelineV2:
                     "finished_at": datetime.now(timezone.utc).isoformat(),
                 }
             )
+            run_metadata = {
+                "adapter": adapter.__class__.__name__,
+                "is_healthy": health_summary["is_healthy"],
+                "health_score": health_summary["health_score"],
+                "health_inputs": {
+                    "parse_fail_ratio": parse_fail_ratio,
+                    "selector_fail_count": metrics.selector_fail_count,
+                    "page_coverage_ratio": page_coverage_ratio,
+                },
+                "health_thresholds": source_config.health_thresholds,
+            }
             if apply_result is not None:
-                update["metadata"] = {"apply_result": apply_result}
+                run_metadata["apply_result"] = apply_result
+            update["metadata"] = run_metadata
 
             supabase.table("scrape_runs_v2").update(update).eq("id", run_id).execute()
             metrics.supabase_write_count += 1
@@ -218,6 +242,8 @@ class PipelineV2:
                 "unchanged": metrics.unchanged_count,
                 "detail_fetch_count": metrics.detail_fetch_count,
                 "apply_result": apply_result,
+                "is_healthy": health_summary["is_healthy"],
+                "health_score": health_summary["health_score"],
             }
         except Exception as exc:
             duration = time.monotonic() - started
@@ -231,3 +257,29 @@ class PipelineV2:
                 }
             ).eq("id", run_id).execute()
             raise
+
+    @staticmethod
+    def _build_health_summary(
+        thresholds: dict[str, float],
+        parse_fail_ratio: float,
+        selector_fail_count: int,
+        page_coverage_ratio: float,
+    ) -> dict:
+        max_parse_fail_ratio = float(thresholds.get("max_parse_fail_ratio", 0.10))
+        max_selector_fail_count = int(thresholds.get("max_selector_fail_count", 3))
+        min_page_coverage_ratio = float(thresholds.get("min_page_coverage_ratio", 0.65))
+
+        parse_ok = parse_fail_ratio <= max_parse_fail_ratio
+        selector_ok = selector_fail_count <= max_selector_fail_count
+        coverage_ok = page_coverage_ratio >= min_page_coverage_ratio
+        is_healthy = parse_ok and selector_ok and coverage_ok
+
+        parse_component = 1.0 - min(parse_fail_ratio / max(max_parse_fail_ratio, 0.0001), 1.0)
+        selector_component = 1.0 - min(selector_fail_count / max(max_selector_fail_count, 1), 1.0)
+        coverage_component = min(page_coverage_ratio / max(min_page_coverage_ratio, 0.0001), 1.0)
+        health_score = round((parse_component + selector_component + coverage_component) / 3.0, 4)
+
+        return {
+            "is_healthy": is_healthy,
+            "health_score": health_score,
+        }

@@ -135,3 +135,33 @@ def test_detail_fetch_policy_new_or_changed(monkeypatch):
     pipeline.run_source(adapter, config)
 
     assert adapter.detail_calls == 0
+
+
+def test_health_summary_marks_unhealthy_on_parse_fail_ratio():
+    summary = PipelineV2._build_health_summary(
+        thresholds={
+            "max_parse_fail_ratio": 0.10,
+            "max_selector_fail_count": 3,
+            "min_page_coverage_ratio": 0.65,
+        },
+        parse_fail_ratio=0.25,
+        selector_fail_count=0,
+        page_coverage_ratio=1.0,
+    )
+    assert summary["is_healthy"] is False
+    assert summary["health_score"] < 1.0
+
+
+def test_health_summary_marks_healthy_within_thresholds():
+    summary = PipelineV2._build_health_summary(
+        thresholds={
+            "max_parse_fail_ratio": 0.10,
+            "max_selector_fail_count": 3,
+            "min_page_coverage_ratio": 0.65,
+        },
+        parse_fail_ratio=0.05,
+        selector_fail_count=1,
+        page_coverage_ratio=0.90,
+    )
+    assert summary["is_healthy"] is True
+    assert 0.0 <= summary["health_score"] <= 1.0
