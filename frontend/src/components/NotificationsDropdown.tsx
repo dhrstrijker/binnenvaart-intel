@@ -8,7 +8,7 @@ import { useEscapeKey } from "@/lib/useEscapeKey";
 import { useAuthModal } from "@/lib/AuthModalContext";
 import { useSavedSearches } from "@/lib/useSavedSearches";
 import { useWatchlistCount } from "@/lib/WatchlistContext";
-import { getFilterPills, generateSearchName } from "@/lib/savedSearchTypes";
+import { getFilterPills, generateSearchName, MAX_FREE_SEARCHES } from "@/lib/savedSearchTypes";
 import { formatPrice } from "@/lib/formatting";
 import { sourceLabel } from "@/lib/sources";
 import type { User } from "@supabase/supabase-js";
@@ -215,7 +215,7 @@ export default function NotificationsDropdown({ user, isPremium }: Notifications
               {!canAddSearch && (
                 <div className="mx-4 mb-3 rounded-lg border border-dashed border-slate-200 p-3 text-center">
                   <p className="text-xs text-slate-500">
-                    Max {2} zoekopdrachten bereikt.{" "}
+                    Max {MAX_FREE_SEARCHES} zoekopdrachten bereikt.{" "}
                     <Link href="/pricing" onClick={() => setOpen(false)} className="font-semibold text-cyan-600 hover:text-cyan-700">
                       Upgrade naar Pro
                     </Link>
