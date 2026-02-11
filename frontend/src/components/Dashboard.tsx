@@ -307,13 +307,9 @@ export default function Dashboard() {
     [],
   );
 
-  // Track initial data load so cards only stagger-animate on first load
-  const hasLoadedRef = useRef(false);
-  useEffect(() => {
-    if (!loading && vessels.length > 0) {
-      hasLoadedRef.current = true;
-    }
-  }, [loading, vessels.length]);
+  // Cards should only stagger on first page load.
+  // After initial load, `loading` stays false during normal filter interactions.
+  const hasLoaded = !loading;
 
   const visibleVessels = filtered.slice(0, visibleCount);
 
@@ -457,12 +453,12 @@ export default function Dashboard() {
                   key={vessel.id}
                   layout
                   layoutId={vessel.id}
-                  initial={hasLoadedRef.current ? false : { opacity: 0, y: 24 }}
+                  initial={hasLoaded ? false : { opacity: 0, y: 24 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{
                     duration: 0.4,
-                    delay: hasLoadedRef.current ? 0 : Math.min(index, 11) * 0.05,
+                    delay: hasLoaded ? 0 : Math.min(index, 11) * 0.05,
                     layout: { type: "spring", stiffness: 300, damping: 30 },
                   }}
                 >
