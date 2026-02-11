@@ -49,6 +49,7 @@ export default function NotificationsDropdown({ user, isPremium }: Notifications
   useEffect(() => {
     if (!open || !user) return;
 
+    const userId = user.id;
     let cancelled = false;
 
     async function loadDropdownData() {
@@ -59,7 +60,7 @@ export default function NotificationsDropdown({ user, isPremium }: Notifications
         const { data } = await supabase
           .from("watchlist")
           .select("id, vessel_id, vessels(id, name, source, price)")
-          .eq("user_id", user.id)
+          .eq("user_id", userId)
           .order("added_at", { ascending: false });
         if (cancelled) return;
         const items = (data as unknown as WatchlistVessel[]) ?? [];
