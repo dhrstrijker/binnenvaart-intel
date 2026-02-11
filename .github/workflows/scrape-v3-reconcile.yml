@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: "0 */6 * * *"
   workflow_dispatch:
+    inputs:
+      force_run:
+        description: "Run even outside 06:00-20:00 Europe/Amsterdam"
+        required: false
+        default: "false"
 
 permissions:
   contents: read
@@ -19,12 +24,32 @@ jobs:
       run:
         working-directory: scraper
     steps:
+      - name: Check Central Europe run window
+        id: run_window
+        run: |
+          local_hour="$(TZ=Europe/Amsterdam date +%H)"
+          event_name="${{ github.event_name }}"
+          force_run="${{ github.event.inputs.force_run || 'false' }}"
+          if [ "${event_name}" = "workflow_dispatch" ] && [ "${force_run}" = "true" ]; then
+            echo "should_run=true" >> "${GITHUB_OUTPUT}"
+            echo "Manual override enabled; running scrape."
+          elif [ "${local_hour}" -ge 6 ] && [ "${local_hour}" -lt 20 ]; then
+            echo "should_run=true" >> "${GITHUB_OUTPUT}"
+            echo "Inside allowed window (Europe/Amsterdam hour=${local_hour})."
+          else
+            echo "should_run=false" >> "${GITHUB_OUTPUT}"
+            echo "Outside allowed window (Europe/Amsterdam hour=${local_hour}); skipping scrape."
+          fi
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        if: steps.run_window.outputs.should_run == 'true'
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        if: steps.run_window.outputs.should_run == 'true'
         with:
           python-version: "3.13"
       - run: pip install -r requirements.txt
+        if: steps.run_window.outputs.should_run == 'true'
       - name: Run scraper v3 reconcile
+        if: steps.run_window.outputs.should_run == 'true'
         run: python -m v3.main_v3 --run-type reconcile
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -45,3 +70,6 @@ jobs:
           SCRAPER_HTTP_JITTER_RATIO: "0.2"
           SCRAPER_HTTP_JITTER_MAX_SECONDS: "0.35"
           SCRAPER_HTTP_RESPECT_ROBOTS: "1"
+      - name: Skip scraper run outside allowed window
+        if: steps.run_window.outputs.should_run != 'true'
+        run: echo "Skipped V3 reconcile; allowed scrape window is 06:00-20:00 Europe/Amsterdam."

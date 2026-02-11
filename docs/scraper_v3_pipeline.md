@@ -66,6 +66,8 @@ This document explains the V3 sidecar pipeline designed for lower notification l
 - `.github/workflows/scrape-v3-reconcile.yml` (`0 */6 * * *`)
 
 V3 workflows are currently configured in `authoritative` mode.
+All three workflows enforce a local-time run window of `06:00-20:00 Europe/Amsterdam` (CET/CEST); scheduled runs outside that window exit before scraping.
+Manual `workflow_dispatch` can bypass this gate with `force_run=true`.
 
 ## Runtime Flags
 
@@ -97,6 +99,15 @@ python v3/main_v3.py --run-type detail-worker --mode shadow --sources galle
 # Reconcile run
 python v3/main_v3.py --run-type reconcile --mode shadow --sources galle
 ```
+
+### Local Ops Dashboard
+
+```bash
+cd scraper
+python v3_dashboard.py --port 8787
+```
+
+Open `http://127.0.0.1:8787` for V3 run status, request/write volume, queue pressure, and recent failures.
 
 ## Rollout Guidance
 
