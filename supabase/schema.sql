@@ -259,7 +259,7 @@ CREATE POLICY "Authenticated users can read own events"
 CREATE TABLE activity_log (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   vessel_id UUID REFERENCES vessels(id) ON DELETE CASCADE,
-  event_type TEXT NOT NULL CHECK (event_type IN ('inserted', 'price_changed', 'removed')),
+  event_type TEXT NOT NULL CHECK (event_type IN ('inserted', 'price_changed', 'removed', 'sold')),
   vessel_name TEXT NOT NULL,
   vessel_source TEXT NOT NULL,
   old_price NUMERIC,
