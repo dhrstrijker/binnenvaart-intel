@@ -17,10 +17,10 @@ import SkeletonCard from "./SkeletonCard";
 import AuthNudgeToast from "./AuthNudgeToast";
 import Filters, { FilterState } from "./Filters";
 import ActiveChips from "./filters/ActiveChips";
-import { useScrollDirection } from "@/lib/useScrollDirection";
 import { computeDealScores } from "@/lib/dealScore";
 import { predictPriceRange, PriceRange } from "@/lib/vesselPricing";
 import type { SavedSearchFilters } from "@/lib/savedSearchTypes";
+import { getFilterBarScrollUpdate } from "@/lib/filterBarBehavior.mjs";
 
 const INITIAL_FILTERS: FilterState = {
   search: "",
@@ -37,6 +37,9 @@ const INITIAL_FILTERS: FilterState = {
   sort: "newest",
   showRemoved: false,
 };
+
+const MOBILE_BREAKPOINT_PX = 768;
+const SCROLL_COLLAPSE_THRESHOLD = 18;
 
 /** Read filter state from URL search params (client-side only) */
 function getInitialFilters(): FilterState {
@@ -260,9 +263,20 @@ export default function Dashboard() {
   );
 
   // Collapsible filter bar (mobile only)
-  const scrollDir = useScrollDirection(18);
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined" ? window.innerWidth < MOBILE_BREAKPOINT_PX : false,
+  );
+  const [isNearTop, setIsNearTop] = useState(
+    typeof window !== "undefined" ? window.scrollY < 50 : true,
+  );
   const [filtersCollapsed, setFiltersCollapsed] = useState(false);
   const popoverOpenRef = useRef(false);
+  const lastScrollYRef = useRef(0);
+  const nearTopRef = useRef(true);
+  const overlayRootRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const peekTabRef = useRef<HTMLButtonElement>(null);
+  const [chipsOverlayTop, setChipsOverlayTop] = useState(0);
 
   const handlePopoverChange = useCallback((open: boolean) => {
     popoverOpenRef.current = open;
@@ -271,30 +285,107 @@ export default function Dashboard() {
   }, []);
 
   // Auto-collapse/expand on scroll (mobile only).
-  // Filter bar visibility is transform-based, so cards don't jump when it reappears.
   useEffect(() => {
-    // Only collapse on mobile
-    const isMobile = window.innerWidth < 768;
-    if (!isMobile) {
-      setFiltersCollapsed(false);
-      return;
+    lastScrollYRef.current = window.scrollY;
+    nearTopRef.current = window.scrollY < 50;
+    setIsNearTop(nearTopRef.current);
+    let ticking = false;
+
+    function onScroll() {
+      if (!isMobile || popoverOpenRef.current || ticking) return;
+
+      ticking = true;
+      requestAnimationFrame(() => {
+        const result = getFilterBarScrollUpdate({
+          isMobile,
+          isPopoverOpen: popoverOpenRef.current,
+          scrollY: window.scrollY,
+          lastScrollY: lastScrollYRef.current,
+          threshold: SCROLL_COLLAPSE_THRESHOLD,
+        });
+
+        if (result.collapsed !== null) {
+          setFiltersCollapsed(result.collapsed);
+        }
+
+        const nearTop = window.scrollY < 50;
+        if (nearTop !== nearTopRef.current) {
+          nearTopRef.current = nearTop;
+          setIsNearTop(nearTop);
+        }
+
+        lastScrollYRef.current = result.nextLastScrollY;
+        ticking = false;
+      });
     }
 
-    if (popoverOpenRef.current) return;
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isMobile]);
 
-    if (scrollDir === "down") {
-      setFiltersCollapsed(true);
-    } else if (scrollDir === "up" || scrollDir === null) {
-      setFiltersCollapsed(false);
-    }
-  }, [scrollDir]);
+  const panelInFlow = !filtersCollapsed && isNearTop;
 
-  const panelInFlow = !filtersCollapsed && scrollDir === null;
+  const measureChipsOverlayTop = useCallback(() => {
+    const root = overlayRootRef.current;
+    const anchor = filtersCollapsed ? peekTabRef.current : panelRef.current;
+    if (!root || !anchor) return;
+    const rootTop = root.getBoundingClientRect().top;
+    const anchorBottom = anchor.getBoundingClientRect().bottom;
+    const next = Math.ceil(anchorBottom - rootTop + 4);
+    setChipsOverlayTop((prev) => (prev === next ? prev : next));
+  }, [filtersCollapsed]);
 
-  // Expand on resize to desktop
+  useEffect(() => {
+    if (panelInFlow) return;
+
+    let rafId: number | null = null;
+    let loopRafId: number | null = null;
+    const scheduleMeasure = () => {
+      if (rafId !== null) return;
+      rafId = window.requestAnimationFrame(() => {
+        rafId = null;
+        measureChipsOverlayTop();
+      });
+    };
+
+    scheduleMeasure();
+    // Re-measure through the transition window so overlay chips stay locked
+    // to the moving bar while it animates between collapsed/expanded states.
+    let startedAt: number | null = null;
+    const tick = (ts: number) => {
+      if (startedAt === null) startedAt = ts;
+      scheduleMeasure();
+      if (ts - startedAt < 420) {
+        loopRafId = window.requestAnimationFrame(tick);
+      }
+    };
+    loopRafId = window.requestAnimationFrame(tick);
+
+    const panelEl = panelRef.current;
+    const peekEl = peekTabRef.current;
+    const ro = new ResizeObserver(scheduleMeasure);
+    if (panelEl) ro.observe(panelEl);
+    if (peekEl) ro.observe(peekEl);
+    panelEl?.addEventListener("transitionend", scheduleMeasure);
+    peekEl?.addEventListener("transitionend", scheduleMeasure);
+    window.addEventListener("resize", scheduleMeasure, { passive: true });
+
+    return () => {
+      if (rafId !== null) window.cancelAnimationFrame(rafId);
+      if (loopRafId !== null) window.cancelAnimationFrame(loopRafId);
+      ro.disconnect();
+      panelEl?.removeEventListener("transitionend", scheduleMeasure);
+      peekEl?.removeEventListener("transitionend", scheduleMeasure);
+      window.removeEventListener("resize", scheduleMeasure);
+    };
+  }, [panelInFlow, measureChipsOverlayTop, filtersCollapsed]);
+
+  // Track mobile/desktop breakpoint and reset collapse on desktop.
   useEffect(() => {
     function onResize() {
-      if (window.innerWidth >= 768) setFiltersCollapsed(false);
+      const mobile = window.innerWidth < MOBILE_BREAKPOINT_PX;
+      setIsMobile(mobile);
+      if (!mobile) setFiltersCollapsed(false);
     }
     window.addEventListener("resize", onResize, { passive: true });
     return () => window.removeEventListener("resize", onResize);
@@ -344,10 +435,10 @@ export default function Dashboard() {
       <h1 className="sr-only">Binnenvaartschepen te koop</h1>
       {/* Filters — collapsible on mobile scroll */}
       <div className="sticky top-[var(--header-h,0px)] z-20 -mx-4 px-4 sm:-mx-6 sm:px-6 pt-2 pb-2 bg-gradient-to-b from-slate-50 from-80% to-transparent">
-        <div className="relative">
-          {/* Keep the panel in flow only near top; elsewhere render as overlay
-              so scroll-up auto-expand doesn't push cards down. */}
+        <div ref={overlayRootRef} className="relative">
+          {/* Keep panel in flow near top; overlay it while scrolling to avoid card reflow. */}
           <div
+            ref={panelRef}
             className={`z-30 transition-all duration-300 ease-in-out ${
               panelInFlow ? "relative" : "absolute left-0 right-0 top-0"
             } ${
@@ -367,8 +458,9 @@ export default function Dashboard() {
             />
           </div>
 
-          {/* Peek tab — absolutely positioned so it doesn't affect layout when hidden */}
+          {/* Peek tab — absolute to prevent layout shift while collapsed */}
           <button
+            ref={peekTabRef}
             type="button"
             onClick={() => setFiltersCollapsed(false)}
             className={`absolute left-0 right-0 top-full mx-auto flex w-full items-center justify-center gap-1.5 rounded-b-xl bg-white py-1.5 text-xs font-medium text-slate-500 shadow-md ring-1 ring-gray-100 transition-all duration-300 md:hidden ${
@@ -389,11 +481,16 @@ export default function Dashboard() {
             </svg>
             Filters
           </button>
-        </div>
 
-        {/* Active filter chips — always visible */}
-        <div className="mt-1">
-          <ActiveChips filters={filters} onClear={handleFilterUpdate} />
+          {/* Active filter chips — in-flow near top, overlay while scrolling */}
+          <div
+            className={`z-40 transition-all duration-300 ease-in-out ${
+              panelInFlow ? "relative mt-1" : "absolute left-0 right-0"
+            }`}
+            style={!panelInFlow ? { top: chipsOverlayTop } : undefined}
+          >
+            <ActiveChips filters={filters} onClear={handleFilterUpdate} />
+          </div>
         </div>
       </div>
 

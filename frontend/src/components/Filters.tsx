@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useCallback, useMemo, useEffect } from "react";
+import React, { useState, useRef, useCallback, useMemo, useEffect, useId } from "react";
 import { useOutsideClick } from "@/lib/useOutsideClick";
 import { useEscapeKey } from "@/lib/useEscapeKey";
 import { formatPriceShort } from "@/lib/formatting";
@@ -129,6 +129,10 @@ export default function Filters({
 
   const hasPriceFilter = !!(filters.minPrice || filters.maxPrice);
   const hasLengthFilter = !!(filters.minLength || filters.maxLength);
+  const moreMenuId = useId();
+  const pricePopoverId = useId();
+  const lengthPopoverId = useId();
+  const filtersPopoverId = useId();
 
   return (
     <div className="space-y-2">
@@ -137,6 +141,7 @@ export default function Filters({
         <div
           className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[1px]"
           onClick={closePopover}
+          aria-hidden="true"
         />
       )}
 
@@ -168,6 +173,9 @@ export default function Filters({
                   <button
                     type="button"
                     onClick={() => toggle("meer")}
+                    aria-haspopup="menu"
+                    aria-expanded={activePopover === "meer"}
+                    aria-controls={meerTypes.length > 0 ? moreMenuId : undefined}
                     className={`shrink-0 flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition whitespace-nowrap ${
                       selectedTypeInMeer
                         ? "bg-white text-cyan-700 shadow-sm ring-1 ring-slate-200"
@@ -185,11 +193,18 @@ export default function Filters({
 
             {/* "Meer" dropdown — outside overflow-hidden so it won't be clipped */}
             {activePopover === "meer" && meerTypes.length > 0 && (
-              <div className="absolute right-0 top-full z-30 mt-1.5 w-56 rounded-xl border border-slate-200 bg-white py-1.5 shadow-xl">
+              <div
+                id={moreMenuId}
+                role="menu"
+                aria-label="Meer scheepstypes"
+                className="absolute right-0 top-full z-30 mt-1.5 w-56 rounded-xl border border-slate-200 bg-white py-1.5 shadow-xl"
+              >
                 {meerTypes.map((t) => (
                   <button
                     key={t}
                     type="button"
+                    role="menuitemradio"
+                    aria-checked={filters.type === t}
                     onClick={() => {
                       update({ type: filters.type === t ? "" : t });
                       setActivePopover(null);
@@ -214,6 +229,9 @@ export default function Filters({
           <button
             type="button"
             onClick={() => toggle("price")}
+            aria-haspopup="dialog"
+            aria-expanded={activePopover === "price"}
+            aria-controls={pricePopoverId}
             className={`flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium transition ${
               activePopover === "price"
                 ? "border-cyan-400 bg-white text-cyan-700 shadow-md ring-2 ring-cyan-100"
@@ -235,6 +253,9 @@ export default function Filters({
           <button
             type="button"
             onClick={() => toggle("length")}
+            aria-haspopup="dialog"
+            aria-expanded={activePopover === "length"}
+            aria-controls={lengthPopoverId}
             className={`flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium transition ${
               activePopover === "length"
                 ? "border-cyan-400 bg-white text-cyan-700 shadow-md ring-2 ring-cyan-100"
@@ -257,6 +278,9 @@ export default function Filters({
             <button
               type="button"
               onClick={() => toggle("filters")}
+              aria-haspopup="dialog"
+              aria-expanded={activePopover === "filters"}
+              aria-controls={filtersPopoverId}
               className={`flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium transition ${
                 activePopover === "filters" || extraFilterCount > 0
                   ? "border-cyan-300 bg-cyan-50 text-cyan-700"
@@ -300,6 +324,7 @@ export default function Filters({
         {/* ═══ Price popover ═══ */}
         {activePopover === "price" && (
           <RangePopover
+            id={pricePopoverId}
             title="Wat is je budget?"
             cfg={PRICE_CFG}
             presets={PRICE_PRESETS}
@@ -315,6 +340,7 @@ export default function Filters({
         {/* ═══ Length popover ═══ */}
         {activePopover === "length" && (
           <RangePopover
+            id={lengthPopoverId}
             title="Welke scheepslengte?"
             cfg={LENGTH_CFG}
             presets={LENGTH_PRESETS}
@@ -330,6 +356,7 @@ export default function Filters({
         {/* ═══ Filters popover ═══ */}
         {activePopover === "filters" && (
           <FiltersDropdown
+            id={filtersPopoverId}
             filters={filters}
             update={update}
             onSaveAsSearch={onSaveAsSearch}

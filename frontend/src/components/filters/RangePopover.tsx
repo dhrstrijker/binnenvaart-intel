@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback, useId } from "react";
 import DualRangeSlider from "./DualRangeSlider";
 
 interface RangePopoverProps {
+  id?: string;
   title: string;
   cfg: { min: number; max: number; step: number };
   presets: { label: string; min: number; max: number }[];
@@ -14,6 +15,7 @@ interface RangePopoverProps {
 }
 
 export default function RangePopover({
+  id,
   title,
   cfg,
   presets,
@@ -28,6 +30,7 @@ export default function RangePopover({
     currentMin ? Number(currentMin) : cfg.min,
     currentMax ? Number(currentMax) : cfg.max,
   ]);
+  const titleId = useId();
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const valuesRef = useRef<[number, number]>(values);
 
@@ -88,9 +91,15 @@ export default function RangePopover({
   const isDefault = values[0] === cfg.min && values[1] === cfg.max;
 
   return (
-    <div className="absolute left-1/2 top-full z-50 mt-3 w-[440px] max-w-[calc(100vw-2rem)] -translate-x-1/2 rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
+    <div
+      id={id}
+      role="dialog"
+      aria-modal="false"
+      aria-labelledby={titleId}
+      className="absolute left-1/2 top-full z-50 mt-3 w-[440px] max-w-[calc(100vw-2rem)] -translate-x-1/2 rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl"
+    >
       {/* Title */}
-      <h3 className="mb-5 text-center text-base font-semibold text-slate-800">
+      <h3 id={titleId} className="mb-5 text-center text-base font-semibold text-slate-800">
         {title}
       </h3>
 

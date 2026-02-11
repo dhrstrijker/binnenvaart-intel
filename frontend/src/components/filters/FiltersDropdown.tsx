@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useId } from "react";
 import type { FilterState } from "@/components/Filters";
 import { SOURCES } from "@/lib/filterConfig";
 
 interface FiltersDropdownProps {
+  id?: string;
   filters: FilterState;
   update: (partial: Partial<FilterState>) => void;
   onSaveAsSearch?: (filters: FilterState) => void;
@@ -11,17 +12,31 @@ interface FiltersDropdownProps {
 }
 
 export default function FiltersDropdown({
+  id,
   filters,
   update,
   onSaveAsSearch,
   extraFilterCount,
   onClose,
 }: FiltersDropdownProps) {
+  const searchInputId = useId();
+  const minTonnageId = useId();
+  const maxTonnageId = useId();
+  const minBuildYearId = useId();
+  const maxBuildYearId = useId();
+  const sortSelectId = useId();
+
   return (
-    <div className="absolute left-0 right-0 top-full z-50 mt-3 rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl">
+    <div
+      id={id}
+      role="dialog"
+      aria-modal="false"
+      aria-label="Extra filters"
+      className="absolute left-0 right-0 top-full z-50 mt-3 rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl"
+    >
       {/* Search */}
       <div className="mb-4">
-        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-400">
+        <label htmlFor={searchInputId} className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-400">
           Zoeken
         </label>
         <div className="relative">
@@ -32,6 +47,7 @@ export default function FiltersDropdown({
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
+            id={searchInputId}
             type="text"
             placeholder="Scheepsnaam..."
             value={filters.search}
@@ -71,18 +87,22 @@ export default function FiltersDropdown({
         </label>
         <div className="flex items-center gap-2">
           <input
+            id={minTonnageId}
             type="number"
             value={filters.minTonnage}
             onChange={(e) => update({ minTonnage: e.target.value })}
             placeholder="Min"
+            aria-label="Minimum tonnage"
             className="w-full min-w-0 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-300 outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-100"
           />
           <span className="text-sm text-slate-300">–</span>
           <input
+            id={maxTonnageId}
             type="number"
             value={filters.maxTonnage}
             onChange={(e) => update({ maxTonnage: e.target.value })}
             placeholder="Max"
+            aria-label="Maximum tonnage"
             className="w-full min-w-0 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-300 outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-100"
           />
         </div>
@@ -95,18 +115,22 @@ export default function FiltersDropdown({
         </label>
         <div className="flex items-center gap-2">
           <input
+            id={minBuildYearId}
             type="number"
             value={filters.minBuildYear}
             onChange={(e) => update({ minBuildYear: e.target.value })}
             placeholder="Van"
+            aria-label="Bouwjaar vanaf"
             className="w-full min-w-0 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-300 outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-100"
           />
           <span className="text-sm text-slate-300">–</span>
           <input
+            id={maxBuildYearId}
             type="number"
             value={filters.maxBuildYear}
             onChange={(e) => update({ maxBuildYear: e.target.value })}
             placeholder="Tot"
+            aria-label="Bouwjaar tot"
             className="w-full min-w-0 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-300 outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-100"
           />
         </div>
@@ -114,10 +138,11 @@ export default function FiltersDropdown({
 
       {/* Sort */}
       <div className="mb-4">
-        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-400">
+        <label htmlFor={sortSelectId} className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-400">
           Sorteren
         </label>
         <select
+          id={sortSelectId}
           value={filters.sort}
           onChange={(e) => update({ sort: e.target.value })}
           className="w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition hover:border-slate-300 focus:border-cyan-400"
