@@ -1,0 +1,37 @@
+name: Scrape vessels v2 (shadow)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scrape-v2-shadow
+  cancel-in-progress: false
+
+jobs:
+  scrape-v2-shadow:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: scraper
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements.txt
+      - name: Run scraper v2 in shadow mode
+        run: python main.py
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PIPELINE_V2_ENABLED: "true"
+          PIPELINE_V2_ONLY: "true"
+          PIPELINE_V2_MODE: "shadow"
+          PIPELINE_V2_NOTIFICATIONS: "off"
+          PIPELINE_V2_SOURCES: "galle,rensendriessen"

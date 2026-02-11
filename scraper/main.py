@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 from datetime import datetime, timezone
 
 import scrape_rensendriessen
@@ -10,6 +11,7 @@ import scrape_gsk
 import alerting
 from db import clear_changes, get_changes, mark_removed, run_dedup, supabase
 from notifications import send_personalized_notifications, send_digest
+from v2.main_v2 import run_pipeline_v2
 
 logging.basicConfig(
     level=logging.INFO,
@@ -41,6 +43,20 @@ def main():
         logger.info("Running in digest-only mode: %s", args.digest_only)
         send_digest(args.digest_only)
         return
+
+    # V2 migration mode (shadow/authoritative), controlled by env flags.
+    v2_enabled = os.environ.get("PIPELINE_V2_ENABLED", "false").strip().lower() in ("1", "true", "yes")
+    v2_only = os.environ.get("PIPELINE_V2_ONLY", "false").strip().lower() in ("1", "true", "yes")
+    if v2_enabled:
+        try:
+            run_pipeline_v2()
+        except Exception:
+            logger.exception("Pipeline v2 run failed")
+            if v2_only:
+                raise
+        if v2_only:
+            logger.info("PIPELINE_V2_ONLY enabled; skipping legacy pipeline.")
+            return
 
     logger.info("Starting scrape...")
     clear_changes()
@@ -145,11 +161,14 @@ def main():
     }
     changes = get_changes()
     logger.info("Changes detected: %d", len(changes))
-    send_personalized_notifications(combined_stats, changes)
-
-    # Send daily digest after scraping
-    logger.info("Sending daily digest...")
-    send_digest("daily")
+    notifications_mode = os.environ.get("PIPELINE_V2_NOTIFICATIONS", "on").strip().lower()
+    if notifications_mode == "off":
+        logger.info("Notifications disabled by PIPELINE_V2_NOTIFICATIONS=off")
+    else:
+        send_personalized_notifications(combined_stats, changes)
+        # Send daily digest after scraping
+        logger.info("Sending daily digest...")
+        send_digest("daily")
 
 
 if __name__ == "__main__":
