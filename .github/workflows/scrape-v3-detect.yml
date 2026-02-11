@@ -25,7 +25,7 @@ jobs:
           python-version: "3.13"
       - run: pip install -r requirements.txt
       - name: Run scraper v3 detect
-        run: python v3/main_v3.py --run-type detect
+        run: python -m v3.main_v3 --run-type detect
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
