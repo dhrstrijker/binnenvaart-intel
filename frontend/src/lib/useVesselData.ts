@@ -147,9 +147,7 @@ export function useVesselData(): VesselData {
       }
     }
 
-    if (!subLoading) {
-      fetchData();
-    }
+    fetchData();
 
     return () => {
       cancelled = true;

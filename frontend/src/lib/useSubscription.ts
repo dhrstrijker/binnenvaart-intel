@@ -21,32 +21,61 @@ export function useSubscription() {
   useEffect(() => {
     const supabase = createClient();
 
-    async function load() {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
+    async function getUserWithTimeout(timeoutMs: number): Promise<User | null> {
+      return await new Promise<User | null>((resolve, reject) => {
+        const timeoutHandle = setTimeout(() => {
+          reject(new Error("auth.getUser timeout"));
+        }, timeoutMs);
 
-      if (user) {
-        const { data } = await supabase
-          .from("subscriptions")
-          .select("id, status, current_period_end, recurring_interval, cancel_at_period_end")
-          .eq("user_id", user.id)
-          .eq("status", "active")
-          .gt("current_period_end", new Date().toISOString())
-          .limit(1)
-          .maybeSingle();
+        supabase.auth
+          .getUser()
+          .then(({ data }) => {
+            clearTimeout(timeoutHandle);
+            resolve(data.user ?? null);
+          })
+          .catch((err) => {
+            clearTimeout(timeoutHandle);
+            reject(err);
+          });
+      });
+    }
 
-        if (data) {
-          setIsPremium(true);
-          setSubscription(data);
+    async function load(providedUser?: User | null) {
+      try {
+        const currentUser = providedUser === undefined ? await getUserWithTimeout(8000) : providedUser;
+        setUser(currentUser ?? null);
+        setIsPremium(false);
+        setSubscription(null);
+
+        if (currentUser) {
+          const { data } = await supabase
+            .from("subscriptions")
+            .select("id, status, current_period_end, recurring_interval, cancel_at_period_end")
+            .eq("user_id", currentUser.id)
+            .eq("status", "active")
+            .gt("current_period_end", new Date().toISOString())
+            .limit(1)
+            .maybeSingle();
+
+          if (data) {
+            setIsPremium(true);
+            setSubscription(data);
+          }
         }
+      } catch (err) {
+        console.error("Failed to load subscription state", err);
+        setUser(null);
+        setIsPremium(false);
+        setSubscription(null);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     }
 
     load();
 
-    const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange(() => {
-      load();
+    const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange((_event, session) => {
+      load(session?.user ?? null);
     });
 
     return () => authSub.unsubscribe();
