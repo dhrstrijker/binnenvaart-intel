@@ -42,6 +42,11 @@ python main.py
 - `PIPELINE_V2_NOTIFICATIONS=off|on`
 - `PIPELINE_V2_SOURCES` is a comma-separated source allowlist
 
+V2 operational docs:
+
+- `docs/scraper_v2_pipeline.md`
+- `docs/scraper_v2_cleanup_plan.md`
+
 ### Frontend
 
 ```bash
