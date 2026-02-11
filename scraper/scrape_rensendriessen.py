@@ -11,6 +11,27 @@ API_URL = "https://api.rensendriessen.com/api/public/ships/brokers/list/filter/"
 MAX_PAGES = 50
 
 
+def parse_bool(value) -> bool:
+    """Parse explicit boolean-like values from source payloads.
+
+    Avoid Python truthiness pitfalls where non-empty strings like \"false\"
+    would otherwise evaluate to True.
+    """
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return False
+    if isinstance(value, (int, float)):
+        return value != 0
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in {"true", "1", "yes", "y", "ja"}:
+            return True
+        if normalized in {"false", "0", "no", "n", "nee", ""}:
+            return False
+    return False
+
+
 def parse_dimension(value):
     """Parse a dimension like '110,00m' or 110.0 to float."""
     if value is None:
@@ -85,7 +106,7 @@ def parse_vessel(ship: dict) -> dict:
         "image_url": image_url,
         "raw_details": raw_details,
         "image_urls": image_urls or None,
-        "is_sold": bool(ship.get("is_sold")),
+        "is_sold": parse_bool(ship.get("is_sold")),
     }
 
 

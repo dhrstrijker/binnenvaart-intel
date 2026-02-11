@@ -9,6 +9,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: scrape-v1
+  cancel-in-progress: false
+
 jobs:
   scrape:
     runs-on: ubuntu-latest

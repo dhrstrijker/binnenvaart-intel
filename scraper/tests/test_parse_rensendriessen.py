@@ -1,4 +1,4 @@
-from scrape_rensendriessen import parse_dimension, parse_vessel
+from scrape_rensendriessen import parse_dimension, parse_vessel, parse_bool
 
 
 class TestParseDimension:
@@ -116,6 +116,18 @@ class TestParseVessel:
         result = parse_vessel(self._make_ship(is_sold="true"))
         assert result["is_sold"] is True
 
+    def test_is_sold_false_string(self):
+        result = parse_vessel(self._make_ship(is_sold="false"))
+        assert result["is_sold"] is False
+
+    def test_is_sold_zero_string(self):
+        result = parse_vessel(self._make_ship(is_sold="0"))
+        assert result["is_sold"] is False
+
+    def test_is_sold_numeric_one(self):
+        result = parse_vessel(self._make_ship(is_sold=1))
+        assert result["is_sold"] is True
+
     def test_is_sold_absent(self):
         result = parse_vessel(self._make_ship())
         assert result["is_sold"] is False
@@ -137,3 +149,20 @@ class TestParseVessel:
     def test_tonnage_none_when_no_data(self):
         result = parse_vessel(self._make_ship())
         assert result["tonnage"] is None
+
+
+class TestParseBool:
+    def test_true_values(self):
+        assert parse_bool(True) is True
+        assert parse_bool("true") is True
+        assert parse_bool("YES") is True
+        assert parse_bool("1") is True
+        assert parse_bool(1) is True
+
+    def test_false_values(self):
+        assert parse_bool(False) is False
+        assert parse_bool("false") is False
+        assert parse_bool("0") is False
+        assert parse_bool("nee") is False
+        assert parse_bool(0) is False
+        assert parse_bool(None) is False
