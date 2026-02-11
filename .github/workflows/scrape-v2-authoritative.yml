@@ -33,8 +33,6 @@ jobs:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          PIPELINE_V2_ENABLED: "true"
-          PIPELINE_V2_ONLY: "true"
           PIPELINE_V2_MODE: "authoritative"
           PIPELINE_V2_NOTIFICATIONS: "on"
           PIPELINE_V2_SOURCES: "galle,rensendriessen,pcshipbrokers,gtsschepen,gsk"

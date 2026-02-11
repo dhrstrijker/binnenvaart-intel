@@ -78,3 +78,12 @@ DEFAULT_SOURCE_CONFIGS: dict[str, SourceConfig] = {
         },
     ),
 }
+
+# Explicit ownership mapping for on-call and parser contract accountability.
+SOURCE_ADAPTER_OWNERS: dict[str, str] = {
+    "galle": "scraper-pipeline",
+    "rensendriessen": "scraper-pipeline",
+    "pcshipbrokers": "scraper-pipeline",
+    "gtsschepen": "scraper-pipeline",
+    "gsk": "scraper-pipeline",
+}

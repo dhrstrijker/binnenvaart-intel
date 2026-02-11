@@ -6,7 +6,7 @@ This document explains how the V2 ingestion pipeline works in production.
 
 - Reduce scrape and write waste through staging + diff-based apply.
 - Make run behavior deterministic (`inserted`, `price_changed`, `sold`, `removed`, `unchanged`).
-- Keep rollback possible via legacy V1 workflow.
+- Keep ingestion, enrichment, and notifications on one V2-first path.
 
 ## Execution Model
 
@@ -14,21 +14,17 @@ This document explains how the V2 ingestion pipeline works in production.
 - Runtime: `scraper/main.py`.
 - V2 entrypoint: `scraper/v2/main_v2.py`.
 - Core engine: `scraper/v2/pipeline.py`.
+- Post-ingestion tasks: `scraper/post_ingestion.py`.
+- Alert routing: `scraper/v2/alerting_v2.py`.
 
 Authoritative production workflow:
 
 - File: `.github/workflows/scrape-v2-authoritative.yml`
 - Schedule: `0 7,19 * * *` (07:00 and 19:00 UTC)
 - Mode env:
-  - `PIPELINE_V2_ENABLED=true`
-  - `PIPELINE_V2_ONLY=true`
   - `PIPELINE_V2_MODE=authoritative`
   - `PIPELINE_V2_NOTIFICATIONS=on`
   - `PIPELINE_V2_SOURCES=galle,rensendriessen,pcshipbrokers,gtsschepen,gsk`
-
-Rollback path:
-
-- Legacy workflow remains manual-only at `.github/workflows/scrape.yml`.
 
 ## Data Flow
 
@@ -71,6 +67,11 @@ Rollback path:
   - event counts
   - health metadata (`is_healthy`, `health_score`, inputs, thresholds)
 
+9. **Post-ingestion + notifications**
+- `main.py` runs dedup + extraction + prediction via `post_ingestion.py`.
+- Changes are read from DB using `get_changes_since(run_start_iso)` (no in-memory change cache).
+- Personalized notifications and digest dispatch run from this DB-backed change set.
+
 ## Core Tables
 
 - `scrape_runs_v2`: run-level metrics and metadata.
@@ -93,6 +94,14 @@ If any threshold fails, run is unhealthy.
 
 - Notifications run from `main.py` unless `PIPELINE_V2_NOTIFICATIONS=off`.
 - In production authoritative workflow, this is now `on`.
+
+## Alert Routing
+
+`v2/alerting_v2.py` evaluates authoritative runs and routes alerts for:
+
+- source count drop >35% vs trailing median
+- parse fail ratio >10%
+- removal bursts >3x trailing median
 
 ## Observability and Parity Queries
 

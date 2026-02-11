@@ -62,20 +62,6 @@ def normalize_type(raw_type: str | None) -> str | None:
         return None
     return TYPE_MAP.get(raw_type.strip().lower(), raw_type)
 
-# Module-level list that collects all changes for notification emails.
-# Reset via clear_changes() before a scrape run; read via get_changes() after.
-_changes: list[dict] = []
-
-
-def clear_changes() -> None:
-    """Reset the collected changes list."""
-    _changes.clear()
-
-
-def get_changes() -> list[dict]:
-    """Return a copy of all collected changes."""
-    return list(_changes)
-
 
 def _log_activity(
     vessel_id: str,
@@ -116,7 +102,6 @@ def mark_removed(source: str, run_start: str) -> int:
     if count > 0:
         logger.info("Marked %d %s vessels as removed", count, source)
         for row in resp.data:
-            _changes.append({"kind": "removed", "vessel": row, "old_price": row.get("price"), "new_price": None})
             _log_activity(
                 vessel_id=row["id"],
                 event_type="removed",
@@ -157,7 +142,6 @@ def _insert_new_vessel(vessel: dict, now: str, is_sold: bool) -> str:
         ).execute()
 
     event = "sold" if is_sold else "inserted"
-    _changes.append({"kind": event, "vessel": vessel, "old_price": None, "new_price": vessel.get("price")})
     _log_activity(
         vessel_id=vessel_id, event_type=event,
         vessel_name=vessel.get("name", ""), vessel_source=vessel["source"],
@@ -169,8 +153,7 @@ def _insert_new_vessel(vessel: dict, now: str, is_sold: bool) -> str:
 def _handle_sold_transition(
     vessel: dict, vessel_id: str, old_price: float | None, new_price: float | None,
 ) -> None:
-    """Record a sold transition in changes and activity log."""
-    _changes.append({"kind": "sold", "vessel": vessel, "old_price": old_price, "new_price": new_price})
+    """Record a sold transition in activity log."""
     _log_activity(
         vessel_id=vessel_id, event_type="sold",
         vessel_name=vessel.get("name", ""), vessel_source=vessel["source"],
@@ -207,10 +190,6 @@ def _update_existing_vessel(
                 {"vessel_id": vessel_id, "price": new_price, "recorded_at": now}
             ).execute()
 
-        _changes.append({
-            "kind": "price_changed", "vessel": vessel,
-            "old_price": old_price, "new_price": new_price,
-        })
         _log_activity(
             vessel_id=vessel_id, event_type="price_changed",
             vessel_name=vessel.get("name", ""), vessel_source=vessel["source"],
@@ -236,7 +215,7 @@ def upsert_vessel(vessel: dict) -> str:
     """Upsert a vessel record and track price changes.
 
     Returns one of: "inserted", "price_changed", "unchanged", "error".
-    Change details are automatically collected in the module-level list.
+    Change details are logged to activity_log/price_history.
     """
     source = vessel["source"]
     source_id = vessel["source_id"]

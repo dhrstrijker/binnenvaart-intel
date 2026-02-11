@@ -25,13 +25,11 @@ cp .env.example .env   # fill in Supabase credentials
 python main.py
 ```
 
-#### Scraper v2 (shadow/authoritative migration mode)
+#### Scraper v2 (authoritative/shadow)
 
-`main.py` supports a staged v2 pipeline behind env flags:
+`main.py` runs the V2 pipeline. Configure mode and source scope with env flags:
 
 ```bash
-PIPELINE_V2_ENABLED=true \
-PIPELINE_V2_ONLY=true \
 PIPELINE_V2_MODE=shadow \
 PIPELINE_V2_NOTIFICATIONS=off \
 PIPELINE_V2_SOURCES=galle \

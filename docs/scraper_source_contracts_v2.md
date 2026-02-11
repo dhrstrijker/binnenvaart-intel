@@ -1,6 +1,19 @@
 # Scraper Source Contracts (V2)
 
+Common listing adapter metric keys:
+
+- `external_requests`
+- `selector_fail_count`
+- `parse_fail_count`
+- `page_coverage_ratio`
+
+Common detail adapter metric keys:
+
+- `external_requests`
+- `parse_fail_count`
+
 ## Galle (`galle`)
+- Owner: `scraper-pipeline`
 - Listing URL: `https://gallemakelaars.nl/scheepsaanbod`
 - Listing selector: `.cat-product-small`
 - Required listing fields: `source_id`, `name`, `url`
@@ -8,6 +21,7 @@
 - Minimum healthy listing count: 12
 
 ## RensenDriessen (`rensendriessen`)
+- Owner: `scraper-pipeline`
 - Listing endpoint: `https://api.rensendriessen.com/api/public/ships/brokers/list/filter/`
 - Request shape: `POST` JSON `{"page": n}`
 - Expected response shape: list or object with `results`/`data`
@@ -15,6 +29,7 @@
 - Minimum healthy listing count: 20
 
 ## PC Shipbrokers (`pcshipbrokers`)
+- Owner: `scraper-pipeline`
 - Listing URL: `https://pcshipbrokers.com/scheepsaanbod`
 - Required script payload key: `compareShipData`
 - Required listing fields: `source_id`, `name`, `url`
@@ -22,6 +37,7 @@
 - Minimum healthy listing count: 40
 
 ## GTS Schepen (`gtsschepen`)
+- Owner: `scraper-pipeline`
 - Listing URL: `https://www.gtsschepen.nl/schepen/`
 - Listing selector: `.grid-item`
 - Required listing fields: `source_id`, `name`, `url`
@@ -29,6 +45,7 @@
 - Minimum healthy listing count: 40
 
 ## GSK (`gsk`)
+- Owner: `scraper-pipeline`
 - GraphQL endpoint: `https://www.gskbrokers.eu/graphql`
 - Listing operation: `GetVessels(skip, limit)`
 - Required listing fields: `slug|id`, `vesselName`, `general.status`

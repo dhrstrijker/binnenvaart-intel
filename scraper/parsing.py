@@ -65,3 +65,33 @@ def parse_tonnage(text: str | None) -> float | None:
         return float(cleaned)
     except ValueError:
         return None
+
+
+def parse_dimension_value(value) -> float | None:
+    """Parse a single dimension like '110,00m' or 110.0 to float."""
+    if value is None:
+        return None
+    s = str(value).strip().lower().replace("m", "").replace(",", ".").strip()
+    if not s:
+        return None
+    try:
+        return float(s)
+    except (ValueError, TypeError):
+        return None
+
+
+def parse_bool(value) -> bool:
+    """Parse explicit boolean-like values from source payloads."""
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return False
+    if isinstance(value, (int, float)):
+        return value != 0
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in {"true", "1", "yes", "y", "ja"}:
+            return True
+        if normalized in {"false", "0", "no", "n", "nee", ""}:
+            return False
+    return False

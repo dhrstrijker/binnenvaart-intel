@@ -6,6 +6,12 @@ from db import supabase
 from v2.config import SourceConfig
 from v2.fingerprint import make_fingerprint
 from v2.metrics import RunMetrics
+from v2.sources.contracts import (
+    validate_detail_metrics,
+    validate_detail_row,
+    validate_listing_metrics,
+    validate_listing_rows,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -124,12 +130,14 @@ class PipelineV2:
         run_id = self.start_run(source_config.source_key, metadata={"adapter": adapter.__class__.__name__})
 
         try:
-            listings, adapter_metrics = adapter.scrape_listing()
-            metrics.external_request_count += adapter_metrics.get("external_requests", 0)
-            metrics.parse_fail_count += adapter_metrics.get("parse_fail_count", 0)
-            metrics.selector_fail_count += adapter_metrics.get("selector_fail_count", 0)
+            raw_listings, raw_adapter_metrics = adapter.scrape_listing()
+            listings = validate_listing_rows(source_config.source_key, raw_listings)
+            adapter_metrics = validate_listing_metrics(source_config.source_key, raw_adapter_metrics)
+            metrics.external_request_count += adapter_metrics["external_requests"]
+            metrics.parse_fail_count += adapter_metrics["parse_fail_count"]
+            metrics.selector_fail_count += adapter_metrics["selector_fail_count"]
             metrics.staged_count = len(listings)
-            page_coverage_ratio = float(adapter_metrics.get("page_coverage_ratio", 1.0))
+            page_coverage_ratio = adapter_metrics["page_coverage_ratio"]
 
             self._insert_listing_staging(run_id, source_config.source_key, listings)
             metrics.supabase_write_count += 1
@@ -147,9 +155,11 @@ class PipelineV2:
                 )
 
                 if should_fetch_detail:
-                    vessel, detail_metrics = adapter.enrich_detail(listing)
-                    metrics.external_request_count += detail_metrics.get("external_requests", 0)
-                    metrics.parse_fail_count += detail_metrics.get("parse_fail_count", 0)
+                    raw_vessel, raw_detail_metrics = adapter.enrich_detail(listing)
+                    vessel = validate_detail_row(source_config.source_key, raw_vessel)
+                    detail_metrics = validate_detail_metrics(source_config.source_key, raw_detail_metrics)
+                    metrics.external_request_count += detail_metrics["external_requests"]
+                    metrics.parse_fail_count += detail_metrics["parse_fail_count"]
                     metrics.detail_fetch_count += 1
                 else:
                     vessel = dict(listing)
@@ -235,6 +245,8 @@ class PipelineV2:
                 "source": source_config.source_key,
                 "mode": self.mode,
                 "listings": len(listings),
+                "staged_count": metrics.staged_count,
+                "parse_fail_count": metrics.parse_fail_count,
                 "inserted": metrics.inserted_count,
                 "price_changed": metrics.price_changed_count,
                 "sold": metrics.sold_count,

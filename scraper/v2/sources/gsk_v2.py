@@ -2,15 +2,17 @@ import logging
 import time
 
 from scrape_gsk import PAGE_SIZE, GRAPHQL_URL, QUERY, _fetch_with_retry, parse_vessel, _fetch_detail
+from v2.sources.contracts import new_detail_metrics, new_listing_metrics
 
 logger = logging.getLogger(__name__)
 
 
 class GSKAdapter:
     source_key = "gsk"
+    owner = "scraper-pipeline"
 
     def scrape_listing(self) -> tuple[list[dict], dict]:
-        metrics = {"external_requests": 0, "selector_fail_count": 0, "parse_fail_count": 0}
+        metrics = new_listing_metrics()
         rows: list[dict] = []
 
         skip = 0
@@ -50,11 +52,12 @@ class GSKAdapter:
 
         if not rows:
             metrics["selector_fail_count"] += 1
+            metrics["page_coverage_ratio"] = 0.0
 
         return rows, metrics
 
     def enrich_detail(self, listing_row: dict) -> tuple[dict, dict]:
-        metrics = {"external_requests": 0, "parse_fail_count": 0}
+        metrics = new_detail_metrics()
         vessel = dict(listing_row)
         slug = vessel.get("source_id")
 

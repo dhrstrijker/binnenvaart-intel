@@ -4,15 +4,17 @@ import requests
 
 from http_utils import fetch_with_retry
 from scrape_rensendriessen import API_URL, MAX_PAGES, parse_vessel
+from v2.sources.contracts import new_detail_metrics, new_listing_metrics
 
 logger = logging.getLogger(__name__)
 
 
 class RensenDriessenAdapter:
     source_key = "rensendriessen"
+    owner = "scraper-pipeline"
 
     def scrape_listing(self) -> tuple[list[dict], dict]:
-        metrics = {"external_requests": 0, "selector_fail_count": 0, "parse_fail_count": 0}
+        metrics = new_listing_metrics()
         rows: list[dict] = []
 
         page = 1
@@ -34,9 +36,10 @@ class RensenDriessenAdapter:
 
         if not rows:
             metrics["selector_fail_count"] += 1
+            metrics["page_coverage_ratio"] = 0.0
 
         return rows, metrics
 
     def enrich_detail(self, listing_row: dict) -> tuple[dict, dict]:
         # Listing already includes the full payload.
-        return dict(listing_row), {"external_requests": 0, "parse_fail_count": 0}
+        return dict(listing_row), new_detail_metrics()
