@@ -48,89 +48,96 @@ export function useVesselData(): VesselData {
           throw vesselsRes.error;
         } else {
           const all = vesselsRes.data ?? [];
+          const canonicalVessels = all.filter((v) => v.canonical_vessel_id === null || v.canonical_vessel_id === undefined);
+          const vesselIds = canonicalVessels.map((v) => v.id);
           if (!cancelled) {
-            setVessels(all.filter((v) => v.canonical_vessel_id === null || v.canonical_vessel_id === undefined));
+            setVessels(canonicalVessels);
           }
-        }
 
-        // Build parallel fetches based on user tier
-        const parallel: Promise<void>[] = [];
+          // Build parallel fetches based on user tier
+          const parallel: Promise<void>[] = [];
 
-        if (user && isPremium) {
-          parallel.push(
-            Promise.resolve(
-              supabase
-                .from("price_history")
-                .select("vessel_id, price, recorded_at")
-                .order("recorded_at", { ascending: true })
-            ).then((historyRes) => {
-              if (!cancelled && !historyRes.error && historyRes.data) {
-                const grouped: Record<string, PriceHistory[]> = {};
-                for (const entry of historyRes.data) {
-                  if (!grouped[entry.vessel_id]) {
-                    grouped[entry.vessel_id] = [];
+          if (user && isPremium) {
+            if (vesselIds.length === 0) {
+              if (!cancelled) setPriceHistoryMap({});
+            } else {
+              parallel.push(
+                Promise.resolve(
+                  supabase
+                    .from("price_history")
+                    .select("vessel_id, price, recorded_at")
+                    .in("vessel_id", vesselIds)
+                    .order("recorded_at", { ascending: true })
+                ).then((historyRes) => {
+                  if (!cancelled && !historyRes.error && historyRes.data) {
+                    const grouped: Record<string, PriceHistory[]> = {};
+                    for (const entry of historyRes.data) {
+                      if (!grouped[entry.vessel_id]) {
+                        grouped[entry.vessel_id] = [];
+                      }
+                      grouped[entry.vessel_id].push(entry as PriceHistory);
+                    }
+                    setPriceHistoryMap(grouped);
                   }
-                  grouped[entry.vessel_id].push(entry as PriceHistory);
-                }
-                setPriceHistoryMap(grouped);
-              }
-            })
-          );
-        } else {
-          if (!cancelled) setPriceHistoryMap({});
-          parallel.push(
-            Promise.resolve(
-              supabase
-                .from("activity_log")
-                .select("vessel_id, old_price, new_price")
-                .eq("event_type", "price_changed")
-                .order("recorded_at", { ascending: false })
-                .limit(500)
-            ).then(({ data: activityData }) => {
-              if (!cancelled && activityData) {
-                const trendMap: Record<string, "up" | "down"> = {};
-                for (const entry of activityData) {
-                  if (!trendMap[entry.vessel_id] && entry.old_price != null && entry.new_price != null) {
-                    if (entry.new_price > entry.old_price) trendMap[entry.vessel_id] = "up";
-                    else if (entry.new_price < entry.old_price) trendMap[entry.vessel_id] = "down";
+                })
+              );
+            }
+          } else {
+            if (!cancelled) setPriceHistoryMap({});
+            parallel.push(
+              Promise.resolve(
+                supabase
+                  .from("activity_log")
+                  .select("vessel_id, old_price, new_price")
+                  .eq("event_type", "price_changed")
+                  .order("recorded_at", { ascending: false })
+                  .limit(500)
+              ).then(({ data: activityData }) => {
+                if (!cancelled && activityData) {
+                  const trendMap: Record<string, "up" | "down"> = {};
+                  for (const entry of activityData) {
+                    if (!trendMap[entry.vessel_id] && entry.old_price != null && entry.new_price != null) {
+                      if (entry.new_price > entry.old_price) trendMap[entry.vessel_id] = "up";
+                      else if (entry.new_price < entry.old_price) trendMap[entry.vessel_id] = "down";
+                    }
                   }
+                  setFreeTierTrends(trendMap);
                 }
-                setFreeTierTrends(trendMap);
-              }
-            })
-          );
-        }
-
-        // Batch-fetch user's favorites + watchlist (eliminates per-card N+1 queries)
-        if (user) {
-          parallel.push(
-            Promise.resolve(
-              supabase
-                .from("favorites")
-                .select("vessel_id")
-                .eq("user_id", user.id)
-            ).then(({ data }) => {
-              if (!cancelled) setFavoriteIds(new Set((data ?? []).map((f) => f.vessel_id)));
-            })
-          );
-          parallel.push(
-            Promise.resolve(
-              supabase
-                .from("watchlist")
-                .select("vessel_id")
-                .eq("user_id", user.id)
-            ).then(({ data }) => {
-              if (!cancelled) setWatchlistIds(new Set((data ?? []).map((w) => w.vessel_id)));
-            })
-          );
-        } else {
-          if (!cancelled) {
-            setFavoriteIds(new Set());
-            setWatchlistIds(new Set());
+              })
+            );
           }
-        }
 
-        await Promise.all(parallel);
+          // Batch-fetch user's favorites + watchlist (eliminates per-card N+1 queries)
+          if (user) {
+            parallel.push(
+              Promise.resolve(
+                supabase
+                  .from("favorites")
+                  .select("vessel_id")
+                  .eq("user_id", user.id)
+              ).then(({ data }) => {
+                if (!cancelled) setFavoriteIds(new Set((data ?? []).map((f) => f.vessel_id)));
+              })
+            );
+            parallel.push(
+              Promise.resolve(
+                supabase
+                  .from("watchlist")
+                  .select("vessel_id")
+                  .eq("user_id", user.id)
+              ).then(({ data }) => {
+                if (!cancelled) setWatchlistIds(new Set((data ?? []).map((w) => w.vessel_id)));
+              })
+            );
+          } else {
+            if (!cancelled) {
+              setFavoriteIds(new Set());
+              setWatchlistIds(new Set());
+            }
+          }
+
+          await Promise.all(parallel);
+        }
       } catch {
         if (!cancelled) setError("Er is een fout opgetreden bij het laden van de gegevens.");
       }
