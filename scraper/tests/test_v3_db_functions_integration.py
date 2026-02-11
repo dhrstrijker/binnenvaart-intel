@@ -249,6 +249,57 @@ def test_apply_scrape_diff_v3_handles_sold_and_price_change(integration_source_v
     assert updated["status"] == "active"
 
 
+def test_apply_scrape_diff_v3_merges_detail_fields_for_unchanged(integration_source_v3):
+    vessel = (
+        supabase.table("vessels")
+        .insert(
+            {
+                "source": integration_source_v3,
+                "source_id": "same-price",
+                "name": "Integration Vessel",
+                "type": "Motorvrachtschip",
+                "price": 100.0,
+                "url": "https://example.com/integration",
+                "image_url": "https://example.com/integration.jpg",
+                "status": "active",
+            }
+        )
+        .execute()
+        .data[0]
+    )
+    vessel_id = vessel["id"]
+
+    run_id = _insert_run(integration_source_v3, "detail-worker", is_healthy=True)
+    payload = _vessel_payload(integration_source_v3, "same-price", 100.0, is_sold=False)
+    payload["raw_details"] = {"engine": "integration-test"}
+    payload["image_urls"] = ["https://example.com/integration-2.jpg"]
+    _insert_vessel_staging(run_id, integration_source_v3, "same-price", payload, is_sold=False)
+
+    supabase.rpc(
+        "compute_scrape_diff_v3",
+        {"p_run_id": run_id, "p_source": integration_source_v3, "p_run_type": "detail-worker"},
+    ).execute()
+    event = (
+        supabase.table("scrape_diff_events_v3")
+        .select("event_type")
+        .eq("run_id", run_id)
+        .eq("source", integration_source_v3)
+        .eq("source_id", "same-price")
+        .execute()
+        .data[0]
+    )
+    assert event["event_type"] == "unchanged"
+
+    supabase.rpc(
+        "apply_scrape_diff_v3",
+        {"p_run_id": run_id, "p_source": integration_source_v3, "p_run_type": "detail-worker"},
+    ).execute()
+
+    updated = supabase.table("vessels").select("raw_details,image_urls").eq("id", vessel_id).execute().data[0]
+    assert updated["raw_details"] == {"engine": "integration-test"}
+    assert updated["image_urls"] == ["https://example.com/integration-2.jpg"]
+
+
 def test_apply_scrape_diff_v3_is_idempotent_for_same_run(integration_source_v3):
     run_id = _insert_run(integration_source_v3, "detect", is_healthy=True)
     payload = _vessel_payload(integration_source_v3, "same-run", 100.0)

@@ -66,7 +66,7 @@ This document explains the V3 sidecar pipeline designed for lower notification l
 - `.github/workflows/scrape-v3-reconcile.yml` (`0 */6 * * *`)
 
 V3 workflows are currently configured in `authoritative` mode.
-All three workflows enforce a local-time run window of `06:00-20:00 Europe/Amsterdam` (CET/CEST); scheduled runs outside that window exit before scraping.
+All three workflows enforce a local-time run window of `06:00-22:00 Europe/Amsterdam` (CET/CEST); scheduled runs outside that window exit before scraping.
 Manual `workflow_dispatch` can bypass this gate with `force_run=true`.
 
 ## Runtime Flags

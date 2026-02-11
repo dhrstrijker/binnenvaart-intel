@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       force_run:
-        description: "Run even outside 06:00-20:00 Europe/Amsterdam"
+        description: "Run even outside 06:00-22:00 Europe/Amsterdam"
         required: false
         default: "false"
 
@@ -33,7 +33,7 @@ jobs:
           if [ "${event_name}" = "workflow_dispatch" ] && [ "${force_run}" = "true" ]; then
             echo "should_run=true" >> "${GITHUB_OUTPUT}"
             echo "Manual override enabled; running scrape."
-          elif [ "${local_hour}" -ge 6 ] && [ "${local_hour}" -lt 20 ]; then
+          elif [ "${local_hour}" -ge 6 ] && [ "${local_hour}" -lt 22 ]; then
             echo "should_run=true" >> "${GITHUB_OUTPUT}"
             echo "Inside allowed window (Europe/Amsterdam hour=${local_hour})."
           else
@@ -70,4 +70,4 @@ jobs:
           SCRAPER_HTTP_RESPECT_ROBOTS: "1"
       - name: Skip scraper run outside allowed window
         if: steps.run_window.outputs.should_run != 'true'
-        run: echo "Skipped V3 detect; allowed scrape window is 06:00-20:00 Europe/Amsterdam."
+        run: echo "Skipped V3 detect; allowed scrape window is 06:00-22:00 Europe/Amsterdam."
