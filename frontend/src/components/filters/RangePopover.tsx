@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import DualRangeSlider from "./DualRangeSlider";
 
 interface RangePopoverProps {
@@ -29,35 +29,58 @@ export default function RangePopover({
     currentMax ? Number(currentMax) : cfg.max,
   ]);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const valuesRef = useRef<[number, number]>(values);
 
-  useEffect(() => {
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, []);
-
-  function applyValues(v: [number, number]) {
-    setValues(v);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
+  const commitValues = useCallback(
+    (v: [number, number]) => {
       onApply(
         v[0] === cfg.min ? "" : String(v[0]),
         v[1] === cfg.max ? "" : String(v[1]),
       );
+    },
+    [cfg.min, cfg.max, onApply],
+  );
+
+  const flushPending = useCallback(() => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+      debounceRef.current = null;
+      commitValues(valuesRef.current);
+    }
+  }, [commitValues]);
+
+  useEffect(() => {
+    valuesRef.current = values;
+  }, [values]);
+
+  useEffect(() => {
+    return () => {
+      flushPending();
+    };
+  }, [flushPending]);
+
+  function applyValues(v: [number, number]) {
+    setValues(v);
+    valuesRef.current = v;
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      commitValues(v);
+      debounceRef.current = null;
     }, 200);
   }
 
   function handlePreset(preset: { min: number; max: number }) {
+    flushPending();
     const v: [number, number] = [preset.min, preset.max];
     setValues(v);
-    onApply(
-      v[0] === cfg.min ? "" : String(v[0]),
-      v[1] === cfg.max ? "" : String(v[1]),
-    );
+    valuesRef.current = v;
+    commitValues(v);
   }
 
   function handleClear() {
+    flushPending();
     setValues([cfg.min, cfg.max]);
+    valuesRef.current = [cfg.min, cfg.max];
     onApply("", "");
     onClose();
   }
@@ -127,7 +150,10 @@ export default function RangePopover({
         </button>
         <button
           type="button"
-          onClick={onClose}
+          onClick={() => {
+            flushPending();
+            onClose();
+          }}
           className="rounded-lg bg-slate-800 px-5 py-2 text-sm font-semibold text-white transition hover:bg-slate-700"
         >
           Toon resultaten

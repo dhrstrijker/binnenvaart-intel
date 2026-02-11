@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React from "react";
 import type { FilterState } from "@/components/Filters";
 import { SOURCES } from "@/lib/filterConfig";
 
@@ -17,19 +17,6 @@ export default function FiltersDropdown({
   extraFilterCount,
   onClose,
 }: FiltersDropdownProps) {
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, []);
-
-  function updateDebounced(partial: Partial<FilterState>) {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => update(partial), 200);
-  }
-
   return (
     <div className="absolute left-0 right-0 top-full z-50 mt-3 rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl">
       {/* Search */}
@@ -86,7 +73,7 @@ export default function FiltersDropdown({
           <input
             type="number"
             value={filters.minTonnage}
-            onChange={(e) => updateDebounced({ minTonnage: e.target.value })}
+            onChange={(e) => update({ minTonnage: e.target.value })}
             placeholder="Min"
             className="w-full min-w-0 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-300 outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-100"
           />
@@ -94,7 +81,7 @@ export default function FiltersDropdown({
           <input
             type="number"
             value={filters.maxTonnage}
-            onChange={(e) => updateDebounced({ maxTonnage: e.target.value })}
+            onChange={(e) => update({ maxTonnage: e.target.value })}
             placeholder="Max"
             className="w-full min-w-0 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-300 outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-100"
           />
@@ -110,7 +97,7 @@ export default function FiltersDropdown({
           <input
             type="number"
             value={filters.minBuildYear}
-            onChange={(e) => updateDebounced({ minBuildYear: e.target.value })}
+            onChange={(e) => update({ minBuildYear: e.target.value })}
             placeholder="Van"
             className="w-full min-w-0 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-300 outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-100"
           />
@@ -118,7 +105,7 @@ export default function FiltersDropdown({
           <input
             type="number"
             value={filters.maxBuildYear}
-            onChange={(e) => updateDebounced({ maxBuildYear: e.target.value })}
+            onChange={(e) => update({ maxBuildYear: e.target.value })}
             placeholder="Tot"
             className="w-full min-w-0 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-300 outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-100"
           />
