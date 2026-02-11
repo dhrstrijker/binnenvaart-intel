@@ -259,9 +259,40 @@ class TestSendPersonalizedNotifications:
         mock_filter_watchlist.return_value = []
         mock_saved_matches.return_value = [_make_change(kind="inserted", vessel_id="v1")]
 
-        send_personalized_notifications({"total": 1}, [_make_change(kind="inserted", vessel_id="v1")])
+        report = send_personalized_notifications({"total": 1}, [_make_change(kind="inserted", vessel_id="v1")])
 
         mock_resend.Emails.send.assert_called_once()
         mock_save_history.assert_called_once()
         args = mock_save_history.call_args[0]
         assert args[2] == "watchlist_and_saved_searches"
+        assert report["successful_sends"] == 1
+        assert report["failed_sends"] == 0
+
+    @patch("notifications.save_notification_history")
+    @patch("notifications._get_saved_search_matches_deduped")
+    @patch("notifications.filter_changes_for_user")
+    @patch("notifications.get_verified_subscribers")
+    @patch("notifications.resend")
+    def test_send_failures_are_reported(
+        self,
+        mock_resend,
+        mock_get_subscribers,
+        mock_filter_watchlist,
+        mock_saved_matches,
+        mock_save_history,
+    ):
+        mock_resend.api_key = "test_key"
+        mock_resend.Emails.send.side_effect = RuntimeError("send failed")
+        mock_get_subscribers.return_value = [
+            _make_subscriber(user_id="user-1", email="test@example.com")
+        ]
+        mock_filter_watchlist.return_value = []
+        mock_saved_matches.return_value = [_make_change(kind="inserted", vessel_id="v1")]
+
+        report = send_personalized_notifications({"total": 1}, [_make_change(kind="inserted", vessel_id="v1")])
+
+        assert report["matched_recipients"] == 1
+        assert report["send_attempts"] == 1
+        assert report["successful_sends"] == 0
+        assert report["failed_sends"] == 1
+        mock_save_history.assert_not_called()

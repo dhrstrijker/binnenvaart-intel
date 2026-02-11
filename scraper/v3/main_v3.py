@@ -4,6 +4,7 @@ import argparse
 import logging
 import os
 
+from db import supabase
 from post_ingestion import run_post_ingestion_tasks
 from v3.alerting import evaluate_v3_run_alerts
 from v3.config import DEFAULT_SOURCE_CONFIGS_V3, SOURCE_ADAPTER_OWNERS_V3
@@ -98,6 +99,58 @@ def run_pipeline_v3(run_type: str, mode: str, sources: list[str]) -> list[dict]:
     return results
 
 
+def _collect_reconcile_post_ingestion_candidates(results: list[dict]) -> list[str] | None:
+    """Collect vessel IDs that need post-ingestion work from reconcile diff events."""
+    run_ids = [
+        str(r.get("run_id"))
+        for r in results
+        if r.get("status") == "success" and r.get("run_type") == "reconcile" and r.get("run_id")
+    ]
+    if not run_ids:
+        return []
+
+    try:
+        rows = (
+            supabase.table("scrape_diff_events_v3")
+            .select("vessel_id,event_type,payload")
+            .in_("run_id", run_ids)
+            .not_.is_("vessel_id", "null")
+            .execute()
+            .data
+            or []
+        )
+    except Exception:
+        logger.exception("Failed to load reconcile diff events; falling back to full post-ingestion scope")
+        return None
+
+    candidates: list[str] = []
+    seen: set[str] = set()
+
+    for row in rows:
+        vessel_id = row.get("vessel_id")
+        if not vessel_id:
+            continue
+
+        event_type = str(row.get("event_type") or "")
+        payload = row.get("payload") if isinstance(row.get("payload"), dict) else {}
+        has_detail_payload = bool(
+            payload and (payload.get("raw_details") is not None or payload.get("image_urls") is not None)
+        )
+        should_include = event_type in {"inserted", "price_changed", "sold"} or has_detail_payload
+
+        vessel_id_str = str(vessel_id)
+        if should_include and vessel_id_str not in seen:
+            seen.add(vessel_id_str)
+            candidates.append(vessel_id_str)
+
+    logger.info(
+        "Post-ingestion candidate selection: %d vessel(s) from %d reconcile run(s)",
+        len(candidates),
+        len(run_ids),
+    )
+    return candidates
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--run-type", choices=["detect", "detail-worker", "reconcile"], required=True)
@@ -128,7 +181,11 @@ def main() -> None:
     if mode == "authoritative" and args.run_type == "reconcile":
         run_post_ingestion = os.environ.get("PIPELINE_V3_RUN_POST_INGESTION", "on").strip().lower()
         if run_post_ingestion == "on":
-            run_post_ingestion_tasks()
+            post_ingestion_scope = os.environ.get("PIPELINE_V3_POST_INGESTION_SCOPE", "full").strip().lower()
+            candidate_ids: list[str] | None = None
+            if post_ingestion_scope == "incremental":
+                candidate_ids = _collect_reconcile_post_ingestion_candidates(results)
+            run_post_ingestion_tasks(changed_vessel_ids=candidate_ids, scope=post_ingestion_scope)
 
     successes = [r for r in results if r.get("status") == "success"]
     if results and not successes:

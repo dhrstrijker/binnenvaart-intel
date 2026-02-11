@@ -222,3 +222,92 @@ class TestRangeMargins:
         assert price_model.RANGE_MARGINS["high"] == 0.15
         assert price_model.RANGE_MARGINS["medium"] == 0.25
         assert price_model.RANGE_MARGINS["low"] == 0.35
+
+
+class _FakeUpdateQuery:
+    def __init__(self, writes, payload):
+        self._writes = writes
+        self._payload = payload
+
+    def eq(self, column, value):
+        assert column == "id"
+        self._writes.append({"id": value, "payload": self._payload})
+        return self
+
+    def execute(self):
+        return None
+
+
+class _FakeTable:
+    def __init__(self, writes):
+        self._writes = writes
+
+    def update(self, payload):
+        return _FakeUpdateQuery(self._writes, payload)
+
+
+class _FakeSupabase:
+    def __init__(self, writes):
+        self._writes = writes
+
+    def table(self, name):
+        assert name == "vessels"
+        return _FakeTable(self._writes)
+
+
+class TestPredictAll:
+    def test_target_ids_only_write_predictions_for_targets(self, monkeypatch):
+        writes = []
+        predicted_for = []
+
+        monkeypatch.setattr(price_model, "supabase", _FakeSupabase(writes))
+
+        def _fake_knn_predict(vessel, _features, _fleet):
+            predicted_for.append(vessel["id"])
+            return {
+                "predicted_price": 500000,
+                "prediction_confidence": "medium",
+                "prediction_range_low": 375000,
+                "prediction_range_high": 625000,
+            }
+
+        monkeypatch.setattr(price_model, "_knn_predict", _fake_knn_predict)
+
+        vessels = [
+            _vessel(id="v-1"),
+            _vessel(id="v-2"),
+            _vessel(id="v-3"),
+        ]
+        result = price_model.predict_all(vessels, target_ids=["v-2"])
+
+        assert predicted_for == ["v-2"]
+        assert [w["id"] for w in writes] == ["v-2"]
+        assert result == {"predicted": 1, "suppressed": 0, "errors": 0}
+
+    def test_empty_target_ids_runs_no_predictions(self, monkeypatch):
+        writes = []
+        predicted_for = []
+
+        monkeypatch.setattr(price_model, "supabase", _FakeSupabase(writes))
+
+        def _fake_knn_predict(vessel, _features, _fleet):
+            predicted_for.append(vessel["id"])
+            return {
+                "predicted_price": 500000,
+                "prediction_confidence": "medium",
+                "prediction_range_low": 375000,
+                "prediction_range_high": 625000,
+            }
+
+        monkeypatch.setattr(price_model, "_knn_predict", _fake_knn_predict)
+
+        vessels = [
+            _vessel(id="v-1"),
+            _vessel(id="v-2"),
+            _vessel(id="v-3"),
+        ]
+        result = price_model.predict_all(vessels, target_ids=[])
+
+        assert predicted_for == []
+        assert writes == []
+        assert result == {"predicted": 0, "suppressed": 0, "errors": 0}

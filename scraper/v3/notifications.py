@@ -69,11 +69,34 @@ def dispatch_outbox_notifications_v3(limit: int = 200) -> dict:
     }
 
     try:
-        send_personalized_notifications(stats, changes)
+        dispatch_report = send_personalized_notifications(stats, changes)
     except Exception as exc:
         logger.exception("V3 outbox notification dispatch failed")
         mark_outbox_failed(ids, str(exc))
         return {"pending": len(pending), "sent": 0, "failed": len(ids)}
 
+    failed_sends = int((dispatch_report or {}).get("failed_sends", 0))
+    blocked_reason = (dispatch_report or {}).get("blocked_reason")
+    history_write_failures = int((dispatch_report or {}).get("history_write_failures", 0))
+    successful_sends = int((dispatch_report or {}).get("successful_sends", 0))
+
+    if blocked_reason == "missing_api_key":
+        error = "notification dispatch blocked: missing_api_key"
+        logger.error(error)
+        mark_outbox_failed(ids, error)
+        return {"pending": len(pending), "sent": 0, "failed": len(ids)}
+
+    if failed_sends > 0:
+        error = f"notification dispatch had {failed_sends} failed send(s)"
+        logger.error(error)
+        mark_outbox_failed(ids, error)
+        return {"pending": len(pending), "sent": 0, "failed": len(ids)}
+
     mark_outbox_sent(ids)
+    if history_write_failures > 0:
+        logger.warning(
+            "V3 outbox marked sent after %s successful send(s), but %s notification_history write(s) failed",
+            successful_sends,
+            history_write_failures,
+        )
     return {"pending": len(pending), "sent": len(ids), "failed": 0}
