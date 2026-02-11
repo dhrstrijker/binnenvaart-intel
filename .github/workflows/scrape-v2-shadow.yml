@@ -1,9 +1,6 @@
 name: Scrape vessels v2 (shadow)
 
 on:
-  schedule:
-    # Run 5 minutes after v1 to compare parity on fresh data.
-    - cron: "5 7,19 * * *"
   workflow_dispatch:
 
 permissions:

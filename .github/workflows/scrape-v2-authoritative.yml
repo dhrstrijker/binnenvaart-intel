@@ -1,6 +1,9 @@
 name: Scrape vessels v2 (authoritative)
 
 on:
+  schedule:
+    # Production authoritative run cadence.
+    - cron: "0 7,19 * * *"
   workflow_dispatch:
 
 permissions:
@@ -34,4 +37,4 @@ jobs:
           PIPELINE_V2_ONLY: "true"
           PIPELINE_V2_MODE: "authoritative"
           PIPELINE_V2_NOTIFICATIONS: "off"
-          PIPELINE_V2_SOURCES: "galle,rensendriessen"
+          PIPELINE_V2_SOURCES: "galle,rensendriessen,pcshipbrokers,gtsschepen,gsk"
