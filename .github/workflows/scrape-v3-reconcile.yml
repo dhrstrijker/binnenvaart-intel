@@ -2,13 +2,9 @@ name: Scrape vessels v3 (reconcile)
 
 on:
   schedule:
+    # Keep broad UTC scheduling; the run window step enforces local hours year-round.
     - cron: "0 */6 * * *"
   workflow_dispatch:
-    inputs:
-      force_run:
-        description: "Run even outside 06:00-22:00 Europe/Amsterdam"
-        required: false
-        default: "false"
 
 permissions:
   contents: read
@@ -25,12 +21,7 @@ jobs:
         id: run_window
         run: |
           local_hour="$(TZ=Europe/Amsterdam date +%H)"
-          event_name="${{ github.event_name }}"
-          force_run="${{ github.event.inputs.force_run || 'false' }}"
-          if [ "${event_name}" = "workflow_dispatch" ] && [ "${force_run}" = "true" ]; then
-            echo "should_run=true" >> "${GITHUB_OUTPUT}"
-            echo "Manual override enabled; running scrape."
-          elif [ "${local_hour}" -ge 6 ] && [ "${local_hour}" -lt 22 ]; then
+          if [ "${local_hour}" -ge 6 ] && [ "${local_hour}" -lt 22 ]; then
             echo "should_run=true" >> "${GITHUB_OUTPUT}"
             echo "Inside allowed window (Europe/Amsterdam hour=${local_hour})."
           else

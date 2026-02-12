@@ -10,6 +10,13 @@ permissions:
   contents: read
 
 jobs:
+  workflow-guards:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+      - name: Check v3 workflow run-window guardrails
+        run: bash .github/scripts/check_v3_workflow_window_guards.sh
+
   python-tests:
     runs-on: ubuntu-latest
     defaults:
