@@ -1,0 +1,92 @@
+name: Robots.txt Evidence Capture
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+    inputs:
+      sources:
+        description: "Comma-separated source allowlist (defaults to PIPELINE_V3_SOURCES set in workflow env)."
+        required: false
+        type: string
+      strict_network_errors:
+        description: "Fail run when any robots.txt request has a network/transport error."
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  capture-robots-evidence:
+    runs-on: ubuntu-latest
+    env:
+      PIPELINE_V3_SOURCES: "galle,rensendriessen,pcshipbrokers,gtsschepen,gsk"
+      ROBOTS_EVIDENCE_USER_AGENT: "Navisio-Robots-Evidence/1.0 (+https://navisio.nl)"
+      ROBOTS_EVIDENCE_TSA_URL: ${{ secrets.ROBOTS_EVIDENCE_TSA_URL }}
+      ROBOTS_EVIDENCE_SIGNING_KEY_B64: ${{ secrets.ROBOTS_EVIDENCE_SIGNING_KEY_B64 }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.13"
+      - name: Install Python dependencies
+        run: pip install -r scraper/requirements.txt
+      - name: Prepare signing key
+        run: |
+          if [ -z "${ROBOTS_EVIDENCE_SIGNING_KEY_B64:-}" ]; then
+            echo "No signing key configured; continuing without detached signature."
+            exit 0
+          fi
+          key_path="${RUNNER_TEMP}/robots_evidence_signing_key.pem"
+          echo "${ROBOTS_EVIDENCE_SIGNING_KEY_B64}" | base64 --decode > "${key_path}"
+          chmod 600 "${key_path}"
+          echo "ROBOTS_EVIDENCE_SIGNING_KEY_PATH=${key_path}" >> "${GITHUB_ENV}"
+      - name: Capture robots evidence bundle
+        env:
+          INPUT_SOURCES: ${{ inputs.sources }}
+          INPUT_STRICT_ERRORS: ${{ inputs.strict_network_errors }}
+        run: |
+          args=(
+            --output-root analysis/compliance/robots_evidence
+            --timeout-seconds 30
+          )
+
+          if [ "${INPUT_STRICT_ERRORS:-true}" = "true" ]; then
+            args+=(--strict-network-errors)
+          fi
+
+          if [ -n "${INPUT_SOURCES:-}" ]; then
+            args+=(--sources "${INPUT_SOURCES}")
+          fi
+
+          python scraper/robots_evidence.py "${args[@]}"
+      - name: Upload evidence bundle artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: robots-evidence-${{ github.run_id }}
+          path: analysis/compliance/robots_evidence
+          retention-days: 90
+      - name: Commit evidence ledger
+        if: always()
+        run: |
+          if [ -n "${ROBOTS_EVIDENCE_SIGNING_KEY_PATH:-}" ]; then
+            rm -f "${ROBOTS_EVIDENCE_SIGNING_KEY_PATH}"
+          fi
+
+          if [ -z "$(git status --porcelain -- analysis/compliance/robots_evidence)" ]; then
+            echo "No evidence changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add analysis/compliance/robots_evidence
+          git commit -m "chore(compliance): robots evidence capture run ${{ github.run_id }}"
+
+          if ! git push; then
+            echo "::warning::git push failed. Artifact still contains this run's evidence bundle."
+          fi

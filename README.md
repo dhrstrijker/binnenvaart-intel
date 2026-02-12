@@ -7,6 +7,7 @@ Market intelligence dashboard for Dutch inland shipping (binnenvaart) vessels. S
 - **scraper/** - Python scraper that pulls vessel listings from Dutch brokers (RensenDriessen, Galle) and stores them in Supabase
 - **frontend/** - Next.js dashboard showing vessels, price history, and market trends
 - **supabase/** - Database schema (vessels, price_history tables with RLS)
+- **analysis/compliance/robots_evidence/** - automated `robots.txt` evidence bundles (manifest + hash chain)
 
 ## Setup
 
@@ -86,6 +87,7 @@ python v3/main_v3.py --run-type reconcile
 V3 operational docs:
 
 - `docs/scraper_v3_pipeline.md`
+- `docs/robots_evidence_pipeline.md`
 
 ### Frontend
 
