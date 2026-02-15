@@ -1,0 +1,89 @@
+{
+  "completed_at_utc": "2026-02-15T05:03:04Z",
+  "error": null,
+  "fetched_at_utc": "2026-02-15T05:03:03Z",
+  "final_url": "https://d1rgf40dxvl4q4.cloudfront.net/6dee339e-a465-485d-9642-18b2e75cd870/robots.txt",
+  "host": "pcshipbrokers.com",
+  "reason": "OK",
+  "relevant_paths": [
+    "/scheepsaanbod",
+    "/ships/"
+  ],
+  "requested_url": "https://pcshipbrokers.com/robots.txt",
+  "response_headers": [
+    {
+      "name": "Accept-Ranges",
+      "value": "bytes"
+    },
+    {
+      "name": "Age",
+      "value": "1011895"
+    },
+    {
+      "name": "Cache-Control",
+      "value": "public, max-age=31536000"
+    },
+    {
+      "name": "Connection",
+      "value": "keep-alive"
+    },
+    {
+      "name": "Content-Length",
+      "value": "24"
+    },
+    {
+      "name": "Content-Type",
+      "value": "text/plain"
+    },
+    {
+      "name": "Date",
+      "value": "Tue, 03 Feb 2026 11:58:10 GMT"
+    },
+    {
+      "name": "ETag",
+      "value": "\"b6216d61c03e6ce0c9aea6ca7808f7ca\""
+    },
+    {
+      "name": "Expires",
+      "value": "Thu, 27 Nov 2025 16:57:56 GMT"
+    },
+    {
+      "name": "Last-Modified",
+      "value": "Tue, 03 Feb 2026 11:25:02 GMT"
+    },
+    {
+      "name": "Server",
+      "value": "AmazonS3"
+    },
+    {
+      "name": "Vary",
+      "value": "Origin"
+    },
+    {
+      "name": "Via",
+      "value": "1.1 7eec4b899788ee4df5c41267e91dcf8a.cloudfront.net (CloudFront)"
+    },
+    {
+      "name": "X-Amz-Cf-Id",
+      "value": "AE_1OLWhgBKXvlgJW2nKCaoAYRx6YLHkK8VUZy5-qZJyJAs3v5hA5w=="
+    },
+    {
+      "name": "X-Amz-Cf-Pop",
+      "value": "IAD61-P2"
+    },
+    {
+      "name": "X-Cache",
+      "value": "Hit from cloudfront"
+    },
+    {
+      "name": "x-amz-server-side-encryption",
+      "value": "AES256"
+    }
+  ],
+  "robots_permissions": {
+    "/scheepsaanbod": true,
+    "/ships/": true
+  },
+  "source_key": "pcshipbrokers",
+  "status_code": 200
+}
