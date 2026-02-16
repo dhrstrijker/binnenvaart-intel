@@ -1,0 +1,67 @@
+{
+  "completed_at_utc": "2026-02-16T05:10:46Z",
+  "error": null,
+  "fetched_at_utc": "2026-02-16T05:10:41Z",
+  "final_url": "https://www.rensendriessen.com/robots.txt",
+  "host": "www.rensendriessen.com",
+  "reason": "OK",
+  "relevant_paths": [
+    "/brokerage/vessels-for-sale/details"
+  ],
+  "requested_url": "https://www.rensendriessen.com/robots.txt",
+  "response_headers": [
+    {
+      "name": "Access-Control-Allow-Origin",
+      "value": "https://api.rensendriessen.com"
+    },
+    {
+      "name": "Connection",
+      "value": "keep-alive"
+    },
+    {
+      "name": "Content-Encoding",
+      "value": "gzip"
+    },
+    {
+      "name": "Content-Type",
+      "value": "text/plain; charset=utf-8"
+    },
+    {
+      "name": "Date",
+      "value": "Mon, 16 Feb 2026 05:10:46 GMT"
+    },
+    {
+      "name": "Link",
+      "value": "<https://www.rensendriessen.com/wp-json/>; rel=\"https://api.w.org/\""
+    },
+    {
+      "name": "Permissions-Policy",
+      "value": "private-state-token-redemption=(self \"https://www.google.com\" \"https://www.gstatic.com\" \"https://recaptcha.net\" \"https://challenges.cloudflare.com\" \"https://hcaptcha.com\"), private-state-token-issuance=(self \"https://www.google.com\" \"https://www.gstatic.com\" \"https://recaptcha.net\" \"https://challenges.cloudflare.com\" \"https://hcaptcha.com\")"
+    },
+    {
+      "name": "Server",
+      "value": "nginx"
+    },
+    {
+      "name": "Transfer-Encoding",
+      "value": "chunked"
+    },
+    {
+      "name": "Vary",
+      "value": "Accept-Encoding"
+    },
+    {
+      "name": "X-Powered-By",
+      "value": "PleskLin"
+    },
+    {
+      "name": "X-Robots-Tag",
+      "value": "noindex, follow"
+    }
+  ],
+  "robots_permissions": {
+    "/brokerage/vessels-for-sale/details": true
+  },
+  "source_key": "rensendriessen",
+  "status_code": 200
+}
