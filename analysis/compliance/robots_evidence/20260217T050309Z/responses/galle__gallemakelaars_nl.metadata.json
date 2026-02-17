@@ -1,0 +1,83 @@
+{
+  "completed_at_utc": "2026-02-17T05:03:10Z",
+  "error": null,
+  "fetched_at_utc": "2026-02-17T05:03:09Z",
+  "final_url": "https://gallemakelaars.nl/robots.txt",
+  "host": "gallemakelaars.nl",
+  "reason": "OK",
+  "relevant_paths": [
+    "/scheepsaanbod"
+  ],
+  "requested_url": "https://gallemakelaars.nl/robots.txt",
+  "response_headers": [
+    {
+      "name": "Accept-Ranges",
+      "value": "bytes"
+    },
+    {
+      "name": "Cache-Control",
+      "value": "max-age=2700"
+    },
+    {
+      "name": "Connection",
+      "value": "keep-alive"
+    },
+    {
+      "name": "Content-Encoding",
+      "value": "gzip"
+    },
+    {
+      "name": "Content-Length",
+      "value": "89"
+    },
+    {
+      "name": "Content-Security-Policy",
+      "value": "upgrade-insecure-requests"
+    },
+    {
+      "name": "Content-Type",
+      "value": "text/plain"
+    },
+    {
+      "name": "Date",
+      "value": "Tue, 17 Feb 2026 05:01:31 GMT"
+    },
+    {
+      "name": "ETag",
+      "value": "\"4c-5280af7b26180-gzip\""
+    },
+    {
+      "name": "Expires",
+      "value": "Thu, 19 Mar 2026 05:01:31 GMT"
+    },
+    {
+      "name": "Last-Modified",
+      "value": "Tue, 29 Dec 2015 15:20:54 GMT"
+    },
+    {
+      "name": "Server",
+      "value": "nginx"
+    },
+    {
+      "name": "Strict-Transport-Security",
+      "value": "max-age=31536000"
+    },
+    {
+      "name": "Vary",
+      "value": "Accept-Encoding"
+    },
+    {
+      "name": "X-Accel-Version",
+      "value": "0.01"
+    },
+    {
+      "name": "X-Powered-By",
+      "value": "PleskLin"
+    }
+  ],
+  "robots_permissions": {
+    "/scheepsaanbod": true
+  },
+  "source_key": "galle",
+  "status_code": 200
+}
