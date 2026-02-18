@@ -1,0 +1,93 @@
+{
+  "completed_at_utc": "2026-02-18T05:03:59Z",
+  "error": null,
+  "fetched_at_utc": "2026-02-18T05:03:59Z",
+  "final_url": "https://www.gskbrokers.eu/robots.txt",
+  "host": "www.gskbrokers.eu",
+  "reason": "OK",
+  "relevant_paths": [
+    "/graphql",
+    "/nl/schip/"
+  ],
+  "requested_url": "https://www.gskbrokers.eu/robots.txt",
+  "response_headers": [
+    {
+      "name": "Content-Length",
+      "value": "70"
+    },
+    {
+      "name": "content-type",
+      "value": "text/plain; charset=utf-8"
+    },
+    {
+      "name": "cross-origin-opener-policy",
+      "value": "same-origin"
+    },
+    {
+      "name": "cross-origin-resource-policy",
+      "value": "cross-origin"
+    },
+    {
+      "name": "date",
+      "value": "Wed, 18 Feb 2026 05:03:59 GMT"
+    },
+    {
+      "name": "etag",
+      "value": "W/\"46-00wS2CN0lsPFwTbUKLjhZursUpU\""
+    },
+    {
+      "name": "origin-agent-cluster",
+      "value": "?1"
+    },
+    {
+      "name": "referrer-policy",
+      "value": "no-referrer"
+    },
+    {
+      "name": "server",
+      "value": "Google Frontend"
+    },
+    {
+      "name": "strict-transport-security",
+      "value": "max-age=31536000; includeSubDomains"
+    },
+    {
+      "name": "vary",
+      "value": "Accept-Encoding"
+    },
+    {
+      "name": "x-cloud-trace-context",
+      "value": "3ab048dc9638fa2f2eb0412eedb80d43;o=1"
+    },
+    {
+      "name": "x-content-type-options",
+      "value": "nosniff"
+    },
+    {
+      "name": "x-dns-prefetch-control",
+      "value": "off"
+    },
+    {
+      "name": "x-download-options",
+      "value": "noopen"
+    },
+    {
+      "name": "x-frame-options",
+      "value": "SAMEORIGIN"
+    },
+    {
+      "name": "x-permitted-cross-domain-policies",
+      "value": "none"
+    },
+    {
+      "name": "x-xss-protection",
+      "value": "0"
+    }
+  ],
+  "robots_permissions": {
+    "/graphql": true,
+    "/nl/schip/": true
+  },
+  "source_key": "gsk",
+  "status_code": 200
+}
