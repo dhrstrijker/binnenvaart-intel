@@ -161,12 +161,29 @@ def is_non_retryable_http_error(exc: Exception) -> bool:
     return status_code in NON_RETRYABLE_STATUS_CODES
 
 
+_DEFAULT_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/131.0.0.0 Safari/537.36"
+    ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    "Accept-Language": "nl-NL,nl;q=0.9,en-US;q=0.8,en;q=0.7",
+    "Accept-Encoding": "gzip, deflate, br",
+    "DNT": "1",
+    "Connection": "keep-alive",
+    "Upgrade-Insecure-Requests": "1",
+}
+
+
 def fetch_with_retry(method, url, retries=3, **kwargs):
     """Fetch a URL with exponential-backoff retries on network errors.
 
     Uses longer backoff for 429 (rate-limit) responses, respecting
     the Retry-After header when present.
     """
+    if "headers" not in kwargs:
+        kwargs["headers"] = dict(_DEFAULT_HEADERS)
     for attempt in range(1, retries + 1):
         try:
             _sleep_for_politeness(url)
