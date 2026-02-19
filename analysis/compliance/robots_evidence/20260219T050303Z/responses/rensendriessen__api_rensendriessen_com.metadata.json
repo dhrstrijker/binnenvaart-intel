@@ -1,0 +1,71 @@
+{
+  "completed_at_utc": "2026-02-19T05:03:07Z",
+  "error": null,
+  "fetched_at_utc": "2026-02-19T05:03:07Z",
+  "final_url": "https://api.rensendriessen.com/robots.txt",
+  "host": "api.rensendriessen.com",
+  "reason": "Not Found",
+  "relevant_paths": [
+    "/api/public/ships/brokers/list/filter/"
+  ],
+  "requested_url": "https://api.rensendriessen.com/robots.txt",
+  "response_headers": [
+    {
+      "name": "content-language",
+      "value": "nl"
+    },
+    {
+      "name": "content-length",
+      "value": "179"
+    },
+    {
+      "name": "content-type",
+      "value": "text/html; charset=utf-8"
+    },
+    {
+      "name": "cross-origin-opener-policy",
+      "value": "same-origin"
+    },
+    {
+      "name": "date",
+      "value": "Thu, 19 Feb 2026 05:03:07 GMT"
+    },
+    {
+      "name": "permissions-policy",
+      "value": "autoplay=*, camera=*, fullscreen=*, geolocation=*, microphone=*, payment=*, picture-in-picture=(), web-share=()"
+    },
+    {
+      "name": "referrer-policy",
+      "value": "no-referrer-when-downgrade"
+    },
+    {
+      "name": "server",
+      "value": "nginx"
+    },
+    {
+      "name": "strict-transport-security",
+      "value": "max-age=16000000; includeSubDomains; preload;"
+    },
+    {
+      "name": "vary",
+      "value": "Accept-Language, Origin"
+    },
+    {
+      "name": "x-content-type-options",
+      "value": "nosniff"
+    },
+    {
+      "name": "x-frame-options",
+      "value": "DENY"
+    },
+    {
+      "name": "x-xss-protection",
+      "value": "1; mode=block"
+    }
+  ],
+  "robots_permissions": {
+    "/api/public/ships/brokers/list/filter/": null
+  },
+  "source_key": "rensendriessen",
+  "status_code": 404
+}

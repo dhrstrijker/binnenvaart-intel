@@ -1,0 +1,24 @@
+{
+  "canonical_manifest_file": "manifest.canonical.json",
+  "manifest_file": "manifest.json",
+  "manifest_sha256": "43042d382abc0b76a22d86ff145d77ab783c200eb1d1ac22671d80cf049a9eec",
+  "manifest_sha256_file": "manifest.sha256",
+  "rfc3161_timestamp": {
+    "enabled": true,
+    "query_file": "manifest.canonical.json.tsq",
+    "query_sha256": "1716705db237f00ff15bcb6495452f2fc6eee2f8574a63373bbb27eccd827506",
+    "reply_file": "manifest.canonical.json.tsr",
+    "reply_sha256": "54f40871c449cabe05a5cc1fc807f12937f7ad57bcdf989aad5d36d78e201dad",
+    "reply_text_file": "manifest.canonical.json.tsr.txt",
+    "reply_text_sha256": "bdf280a3c46e56e2dc3658ff6a29dfe3897865bc82faa6ad563ee62b1edee9c8",
+    "tsa_url": "http://timestamp.digicert.com"
+  },
+  "signature": {
+    "enabled": true,
+    "public_key_file": "signing.public.pem",
+    "public_key_sha256": "6d9895554a1e94a07ec105bfe41cf1a9971f5edd8a35f46107ca54f0815d72b1",
+    "signature_file": "manifest.canonical.json.sig",
+    "signature_sha256": "b9f8f0733b60d30d18e6a551f62bb778e75517b2ccc93c702df38d775512b5a8",
+    "signing_key_path": "/home/runner/work/_temp/robots_evidence_signing_key.pem"
+  }
+}
