@@ -1,0 +1,179 @@
+{
+  "bundle_path": "/home/runner/work/binnenvaart-intel/binnenvaart-intel/analysis/compliance/robots_evidence/20260221T044634Z",
+  "capture_policy": {
+    "timeout_seconds": 30,
+    "user_agent": "Navisio-Robots-Evidence/1.0 (+https://navisio.nl)"
+  },
+  "captured_at_utc": "2026-02-21T04:46:42Z",
+  "environment": {
+    "hostname": "runnervmwffz4",
+    "platform": "Linux-6.11.0-1018-azure-x86_64-with-glibc2.39",
+    "python_version": "3.13.11 (main, Dec  8 2025, 02:51:34) [GCC 13.3.0]"
+  },
+  "format_version": "1.0",
+  "git": {
+    "branch": "main",
+    "commit": "d268df6089597d26471bab6d93fb0c204fa78521",
+    "is_dirty": true
+  },
+  "output_root": "/home/runner/work/binnenvaart-intel/binnenvaart-intel/analysis/compliance/robots_evidence",
+  "previous_manifest_sha256": "67ae335e1fbb485a775e531c0bd022a2ecf446268d7bd0b184a8581ec387efa9",
+  "requested_sources": [
+    "galle",
+    "rensendriessen",
+    "pcshipbrokers",
+    "gtsschepen",
+    "gsk"
+  ],
+  "run_id": "20260221T044634Z",
+  "summary": {
+    "network_error_count": 0,
+    "non_ok_status_count": 1,
+    "success_count": 6,
+    "target_count": 6
+  },
+  "targets": [
+    {
+      "completed_at_utc": "2026-02-21T04:46:35Z",
+      "error": null,
+      "fetched_at_utc": "2026-02-21T04:46:34Z",
+      "files": {
+        "body": "responses/galle__gallemakelaars_nl.robots.txt",
+        "body_sha256": "df9e2be0acc3530ed7224566a27b318ea4ec0a2f93c22ec0e460e41cf9d6c7c2",
+        "metadata": "responses/galle__gallemakelaars_nl.metadata.json",
+        "metadata_sha256": "20b783ad8242542835f757a19a3fee49463c09efed004f4904449c0331395f59"
+      },
+      "final_url": "https://gallemakelaars.nl/robots.txt",
+      "host": "gallemakelaars.nl",
+      "reason": "OK",
+      "relevant_paths": [
+        "/scheepsaanbod"
+      ],
+      "requested_url": "https://gallemakelaars.nl/robots.txt",
+      "robots_permissions": {
+        "/scheepsaanbod": true
+      },
+      "source_key": "galle",
+      "status_code": 200
+    },
+    {
+      "completed_at_utc": "2026-02-21T04:46:38Z",
+      "error": null,
+      "fetched_at_utc": "2026-02-21T04:46:35Z",
+      "files": {
+        "body": "responses/rensendriessen__www_rensendriessen_com.robots.txt",
+        "body_sha256": "1ba76366c4c9d1725399cf7c079aa9222ec745eb204013c4e26030320205c317",
+        "metadata": "responses/rensendriessen__www_rensendriessen_com.metadata.json",
+        "metadata_sha256": "bd01e94d08878a3d2c3cce1904414cc9fe99b51bc7437129705a2d3cad5b98f2"
+      },
+      "final_url": "https://www.rensendriessen.com/robots.txt",
+      "host": "www.rensendriessen.com",
+      "reason": "OK",
+      "relevant_paths": [
+        "/brokerage/vessels-for-sale/details"
+      ],
+      "requested_url": "https://www.rensendriessen.com/robots.txt",
+      "robots_permissions": {
+        "/brokerage/vessels-for-sale/details": true
+      },
+      "source_key": "rensendriessen",
+      "status_code": 200
+    },
+    {
+      "completed_at_utc": "2026-02-21T04:46:39Z",
+      "error": null,
+      "fetched_at_utc": "2026-02-21T04:46:38Z",
+      "files": {
+        "body": "responses/rensendriessen__api_rensendriessen_com.robots.txt",
+        "body_sha256": "5547992afdadb59737c5c0feb1a35dff294cd27145bf290c031737ecf8a2577d",
+        "metadata": "responses/rensendriessen__api_rensendriessen_com.metadata.json",
+        "metadata_sha256": "dbcf88b2e06c7ff0cf0c49968e4906a165729867ad426b187c815aea49ce590b"
+      },
+      "final_url": "https://api.rensendriessen.com/robots.txt",
+      "host": "api.rensendriessen.com",
+      "reason": "Not Found",
+      "relevant_paths": [
+        "/api/public/ships/brokers/list/filter/"
+      ],
+      "requested_url": "https://api.rensendriessen.com/robots.txt",
+      "robots_permissions": {
+        "/api/public/ships/brokers/list/filter/": null
+      },
+      "source_key": "rensendriessen",
+      "status_code": 404
+    },
+    {
+      "completed_at_utc": "2026-02-21T04:46:39Z",
+      "error": null,
+      "fetched_at_utc": "2026-02-21T04:46:39Z",
+      "files": {
+        "body": "responses/pcshipbrokers__pcshipbrokers_com.robots.txt",
+        "body_sha256": "e5c4b84484ee4216e9373be99380320c25dd94805f99f0a805846f087636553f",
+        "metadata": "responses/pcshipbrokers__pcshipbrokers_com.metadata.json",
+        "metadata_sha256": "865361df9724506eab9d82832a0272d6d79aa1d95e86febe5aa78f1a3de2c4d3"
+      },
+      "final_url": "https://d1rgf40dxvl4q4.cloudfront.net/7fbd5348-7e74-4ab3-a961-9f7baf69d912/robots.txt",
+      "host": "pcshipbrokers.com",
+      "reason": "OK",
+      "relevant_paths": [
+        "/scheepsaanbod",
+        "/ships/"
+      ],
+      "requested_url": "https://pcshipbrokers.com/robots.txt",
+      "robots_permissions": {
+        "/scheepsaanbod": true,
+        "/ships/": true
+      },
+      "source_key": "pcshipbrokers",
+      "status_code": 200
+    },
+    {
+      "completed_at_utc": "2026-02-21T04:46:41Z",
+      "error": null,
+      "fetched_at_utc": "2026-02-21T04:46:39Z",
+      "files": {
+        "body": "responses/gtsschepen__www_gtsschepen_nl.robots.txt",
+        "body_sha256": "836889faf465ae56370f571295ec01d670f1e4ac7d8eef161db1e0cd2b3fdbcf",
+        "metadata": "responses/gtsschepen__www_gtsschepen_nl.metadata.json",
+        "metadata_sha256": "7d606a1fd143ae2695848868b07454fbe429a5e8a731a97ad8b65671f979a859"
+      },
+      "final_url": "https://www.gtsschepen.nl/robots.txt",
+      "host": "www.gtsschepen.nl",
+      "reason": "OK",
+      "relevant_paths": [
+        "/schepen/"
+      ],
+      "requested_url": "https://www.gtsschepen.nl/robots.txt",
+      "robots_permissions": {
+        "/schepen/": true
+      },
+      "source_key": "gtsschepen",
+      "status_code": 200
+    },
+    {
+      "completed_at_utc": "2026-02-21T04:46:42Z",
+      "error": null,
+      "fetched_at_utc": "2026-02-21T04:46:41Z",
+      "files": {
+        "body": "responses/gsk__www_gskbrokers_eu.robots.txt",
+        "body_sha256": "14eaaa85b0fcbae5aa6fb76e4eb642cb620bd86b4d21b0fb573f307296f0bdb2",
+        "metadata": "responses/gsk__www_gskbrokers_eu.metadata.json",
+        "metadata_sha256": "e9ea57fa198c578b52861302fd50219ab744e12fc93e7fd70bda5bcbc95ad21b"
+      },
+      "final_url": "https://www.gskbrokers.eu/robots.txt",
+      "host": "www.gskbrokers.eu",
+      "reason": "OK",
+      "relevant_paths": [
+        "/graphql",
+        "/nl/schip/"
+      ],
+      "requested_url": "https://www.gskbrokers.eu/robots.txt",
+      "robots_permissions": {
+        "/graphql": true,
+        "/nl/schip/": true
+      },
+      "source_key": "gsk",
+      "status_code": 200
+    }
+  ]
+}
