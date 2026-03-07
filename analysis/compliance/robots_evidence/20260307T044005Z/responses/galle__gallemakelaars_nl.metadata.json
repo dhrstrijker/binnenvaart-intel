@@ -1,0 +1,18 @@
+{
+  "completed_at_utc": "2026-03-07T04:40:36Z",
+  "error": "ReadTimeout: HTTPSConnectionPool(host='gallemakelaars.nl', port=443): Read timed out. (read timeout=30)",
+  "fetched_at_utc": "2026-03-07T04:40:05Z",
+  "final_url": null,
+  "host": "gallemakelaars.nl",
+  "reason": null,
+  "relevant_paths": [
+    "/scheepsaanbod"
+  ],
+  "requested_url": "https://gallemakelaars.nl/robots.txt",
+  "response_headers": [],
+  "robots_permissions": {
+    "/scheepsaanbod": null
+  },
+  "source_key": "galle",
+  "status_code": null
+}
