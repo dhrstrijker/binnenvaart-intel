@@ -19,7 +19,7 @@
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "resend": "^6.9.1",
+    "resend": "^6.9.2",
     "svix": "^1.84.1"
   },
   "devDependencies": {
